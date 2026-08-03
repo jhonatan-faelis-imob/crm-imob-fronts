@@ -405,6 +405,7 @@ background: var(--page-bg)  →  #F7F5F3 (warm gray em todas as páginas)
 DATABASE_URL=              # Neon PostgreSQL
 REDIS_URL=                 # Upstash Redis
 JWT_SECRET=
+FRONTEND_URL=              # Origem do frontend em produção, liberada no CORS
 GEMINI_API_KEY=
 RESEND_API_KEY=
 ONESIGNAL_APP_ID=
