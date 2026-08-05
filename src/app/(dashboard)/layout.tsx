@@ -1,5 +1,6 @@
 import { Sidebar } from '@/components/layout/sidebar'
 import { BottomNav } from '@/components/layout/bottom-nav'
+import { InstallPWA } from '@/components/InstallPWA'
 
 export default function DashboardLayout({
   children,
@@ -13,6 +14,7 @@ export default function DashboardLayout({
         <main className="flex-1 overflow-y-auto bg-page p-6 pb-24 lg:pb-6">{children}</main>
         <BottomNav />
       </div>
+      <InstallPWA />
     </div>
   )
 }
