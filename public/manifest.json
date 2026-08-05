@@ -2,7 +2,7 @@
   "name": "CRM Imob",
   "short_name": "CRM Imob",
   "description": "CRM para corretores de imóveis — gestão de leads, metas e follow-up",
-  "start_url": "/dashboard",
+  "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",

@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from 'next/font/google'
 import { Toaster } from '@/components/ui/toast'
 import { Providers } from '@/components/providers'
 import { RegisterServiceWorker } from '@/components/RegisterServiceWorker'
+import { SwCacheReset } from '@/components/SwCacheReset'
 import './globals.css'
 
 const jakarta = Plus_Jakarta_Sans({
@@ -52,6 +53,7 @@ export default function RootLayout({
       </head>
       <body className={jakarta.variable} suppressHydrationWarning>
         <RegisterServiceWorker />
+        <SwCacheReset />
         <Providers>
           <Toaster>{children}</Toaster>
         </Providers>

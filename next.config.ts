@@ -7,6 +7,7 @@ const withPWAConfig = withPWA({
   register: true,
   skipWaiting: true,
   runtimeCaching: [
+    // Fontes — cache longo
     {
       urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
       handler: 'CacheFirst',
@@ -23,15 +24,7 @@ const withPWAConfig = withPWA({
         expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
       },
     },
-    {
-      urlPattern: /\/api\/.*/i,
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'api-cache',
-        expiration: { maxEntries: 32, maxAgeSeconds: 60 * 5 },
-        networkTimeoutSeconds: 10,
-      },
-    },
+    // Imagens — cache médio
     {
       urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/i,
       handler: 'CacheFirst',
@@ -40,19 +33,29 @@ const withPWAConfig = withPWA({
         expiration: { maxEntries: 64, maxAgeSeconds: 60 * 60 * 24 * 30 },
       },
     },
+    // JS e CSS estáticos
     {
       urlPattern: /\.(?:js|css)$/i,
       handler: 'StaleWhileRevalidate',
-      options: {
-        cacheName: 'static-resources',
-      },
+      options: { cacheName: 'static-resources' },
     },
+    // API — NUNCA cachear, sempre rede
     {
-      urlPattern: /\/.*/i,
+      urlPattern: /\/api\/.*/i,
+      handler: 'NetworkOnly',
+    },
+    // Rotas protegidas — NUNCA cachear páginas HTML autenticadas
+    {
+      urlPattern: /^\/(dashboard|leads|tarefas|metas|equipe|empreendimentos|relatorios)(\/.*)?$/i,
+      handler: 'NetworkOnly',
+    },
+    // Rota raiz e login — NetworkFirst com fallback
+    {
+      urlPattern: /^\/(login|cadastro|$)/i,
       handler: 'NetworkFirst',
       options: {
-        cacheName: 'pages-cache',
-        expiration: { maxEntries: 32, maxAgeSeconds: 60 * 60 * 24 },
+        cacheName: 'auth-pages',
+        expiration: { maxEntries: 4, maxAgeSeconds: 60 * 60 * 24 },
         networkTimeoutSeconds: 10,
       },
     },
