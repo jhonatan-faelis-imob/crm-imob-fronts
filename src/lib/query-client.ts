@@ -5,6 +5,7 @@ export const queryClient = new QueryClient({
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutos
       retry: 1,
+      refetchOnWindowFocus: false, // evitar loading desnecessário ao trocar aba
     },
   },
 })

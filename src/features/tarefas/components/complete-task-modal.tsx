@@ -78,7 +78,7 @@ function CompleteTaskForm({
 
   return (
     <>
-      <div className="space-y-4 p-4 sm:p-6">
+      <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
         <div>
           <label htmlFor="complete-task-notes" className={labelClassName}>
             O que foi feito?
@@ -178,7 +178,7 @@ function CompleteTaskForm({
         </div>
       </div>
 
-      <DialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
+      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
         <button
           type="button"
           onClick={onCancel}
@@ -221,8 +221,8 @@ export function CompleteTaskModal({
         if (!nextOpen) onClose()
       }}
     >
-      <DialogContent className="w-[calc(100%-2rem)] max-w-md gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
-        <DialogHeader className="flex-row items-center gap-3 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
+      <DialogContent className="flex max-h-[90vh] w-[calc(100%-2rem)] max-w-md flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
+        <DialogHeader className="shrink-0 flex-row items-center gap-3 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#E8F5E9] text-success">
             <CheckCircle2 className="h-6 w-6" />
           </span>
