@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { List, Plus, SquareKanban } from 'lucide-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/toast'
 import { FiltersBar, defaultLeadFilters, type LeadFilters } from '@/features/leads/filters-bar'
@@ -60,7 +61,15 @@ export default function LeadsPage() {
       queryClient.invalidateQueries({ queryKey: ['leads'] })
       toast.add({ title: 'Lead criado com sucesso!', type: 'success' })
     },
-    onError: () => {
+    onError: (error: unknown) => {
+      if (isAxiosError(error) && error.response?.status === 409) {
+        toast.add({
+          title: 'Cliente já cadastrado',
+          description: error.response.data?.message ?? 'Telefone já cadastrado.',
+          type: 'error',
+        })
+        return
+      }
       toast.add({ title: 'Não foi possível criar o lead', type: 'error' })
     },
   })

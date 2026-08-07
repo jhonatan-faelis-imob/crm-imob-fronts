@@ -13,6 +13,7 @@ export function TaskCard({
   onComplete,
   onEdit,
   onDelete,
+  onOpenDetail,
 }: {
   task: Task
   parentTask?: Task
@@ -20,6 +21,7 @@ export function TaskCard({
   onComplete: (task: Task) => void
   onEdit: (task: Task) => void
   onDelete: (taskId: string) => void
+  onOpenDetail: (task: Task) => void
 }) {
   const typeMeta = TASK_TYPE_META[task.type]
   const TypeIcon = typeMeta.icon
@@ -31,7 +33,13 @@ export function TaskCard({
 
   return (
     <div
-      className={`group relative flex items-start gap-3 rounded-[16px] border-[0.5px] border-l-[3px] border-neutral-200 border-l-transparent bg-white p-4 transition-colors hover:border-l-brand hover:bg-[#FAFAFA] ${
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpenDetail(task)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') onOpenDetail(task)
+      }}
+      className={`group relative flex cursor-pointer items-start gap-3 rounded-[16px] border-[0.5px] border-l-[3px] border-neutral-200 border-l-transparent bg-white p-4 transition-colors hover:border-l-brand hover:bg-[#FAFAFA] ${
         isCancelled ? 'opacity-60' : ''
       }`}
     >
@@ -40,7 +48,10 @@ export function TaskCard({
         role="checkbox"
         aria-checked={isDone}
         aria-label={isDone ? 'Tarefa concluída' : 'Marcar como concluída'}
-        onClick={() => task.status === 'pendente' && onComplete(task)}
+        onClick={(event) => {
+          event.stopPropagation()
+          if (task.status === 'pendente') onComplete(task)
+        }}
         disabled={task.status !== 'pendente'}
         className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-[1.5px] transition-colors ${
           isDone
@@ -95,6 +106,7 @@ export function TaskCard({
         {task.leadName && task.leadId && (
           <Link
             href={`/leads/${task.leadId}`}
+            onClick={(event) => event.stopPropagation()}
             className="mt-1 flex items-center gap-1 text-xs text-neutral-400 hover:text-brand"
           >
             <User className="h-3 w-3" />
@@ -113,7 +125,10 @@ export function TaskCard({
             <button
               type="button"
               aria-label="Editar tarefa"
-              onClick={() => onEdit(task)}
+              onClick={(event) => {
+                event.stopPropagation()
+                onEdit(task)
+              }}
               className="rounded-[6px] p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
             >
               <Pencil className="h-3.5 w-3.5" />
@@ -122,7 +137,10 @@ export function TaskCard({
               type="button"
               aria-label="Cancelar tarefa"
               title="Cancelar tarefa"
-              onClick={() => onDelete(task.id)}
+              onClick={(event) => {
+                event.stopPropagation()
+                onDelete(task.id)
+              }}
               className="rounded-[6px] p-1 text-neutral-400 hover:bg-[#FFEBEE] hover:text-danger"
             >
               <Trash2 className="h-3.5 w-3.5" />

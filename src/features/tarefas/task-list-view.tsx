@@ -37,12 +37,14 @@ export function TaskListView({
   onComplete,
   onEdit,
   onDelete,
+  onOpenDetail,
 }: {
   tasks: Task[]
   newTaskId?: string | null
   onComplete: (task: Task) => void
   onEdit: (task: Task) => void
   onDelete: (taskId: string) => void
+  onOpenDetail: (task: Task) => void
 }) {
   const groups = new Map<BucketKey, Task[]>()
   for (const task of tasks) {
@@ -96,6 +98,7 @@ export function TaskListView({
                   onComplete={onComplete}
                   onEdit={onEdit}
                   onDelete={onDelete}
+                  onOpenDetail={onOpenDetail}
                 />
               ))}
             </div>

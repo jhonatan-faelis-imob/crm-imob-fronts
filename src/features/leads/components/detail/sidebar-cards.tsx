@@ -206,10 +206,12 @@ export function NextTaskCard({
   tasks,
   onComplete,
   onScheduleNew,
+  onOpenDetail,
 }: {
   tasks: Task[]
   onComplete: (task: Task) => void
   onScheduleNew: () => void
+  onOpenDetail: (task: Task) => void
 }) {
   const nextTask = [...tasks]
     .filter((task) => task.status === 'pendente')
@@ -219,13 +221,24 @@ export function NextTaskCard({
     <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5">
       <h3 className="text-sm font-semibold text-neutral-900">Próxima tarefa</h3>
       {nextTask ? (
-        <div className="mt-3">
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => onOpenDetail(nextTask)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') onOpenDetail(nextTask)
+          }}
+          className="mt-3 cursor-pointer rounded-[12px]"
+        >
           <p className="text-xs font-medium text-brand">{TASK_TYPE_LABEL[nextTask.type]}</p>
           <p className="mt-1 text-sm font-medium text-neutral-900">{nextTask.title}</p>
           <p className="mt-1 text-xs text-neutral-400">{formatDateTimeBR(nextTask.dueDate)}</p>
           <button
             type="button"
-            onClick={() => onComplete(nextTask)}
+            onClick={(event) => {
+              event.stopPropagation()
+              onComplete(nextTask)
+            }}
             className="mt-3 w-full rounded-[8px] bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
           >
             Concluir

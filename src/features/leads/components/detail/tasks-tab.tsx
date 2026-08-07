@@ -47,12 +47,14 @@ export function TasksTab({
   onOpenNewTask,
   onCompleteRequest,
   onDelete,
+  onOpenDetail,
 }: {
   tasks: Task[]
   newTaskId?: string | null
   onOpenNewTask: () => void
   onCompleteRequest: (task: Task) => void
   onDelete: (taskId: string) => void
+  onOpenDetail: (task: Task) => void
 }) {
   const [filter, setFilter] = useState<'pendente' | 'concluida' | 'todas'>('pendente')
 
@@ -99,7 +101,13 @@ export function TasksTab({
           return (
             <div
               key={task.id}
-              className={`flex items-start gap-3 rounded-[16px] border-[0.5px] bg-white p-4 ${
+              role="button"
+              tabIndex={0}
+              onClick={() => onOpenDetail(task)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') onOpenDetail(task)
+              }}
+              className={`flex cursor-pointer items-start gap-3 rounded-[16px] border-[0.5px] bg-white p-4 transition-colors hover:bg-[#FAFAFA] ${
                 overdue ? 'border-danger' : 'border-neutral-200'
               } ${isCancelled ? 'opacity-60' : ''}`}
             >
@@ -136,7 +144,10 @@ export function TasksTab({
                   <button
                     type="button"
                     aria-label="Concluir tarefa"
-                    onClick={() => onCompleteRequest(task)}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onCompleteRequest(task)
+                    }}
                     className="rounded-[8px] p-1.5 text-neutral-400 hover:bg-[#E8F5E9] hover:text-success"
                   >
                     <Check className="h-4 w-4" />
@@ -146,7 +157,10 @@ export function TasksTab({
                   <button
                     type="button"
                     aria-label="Cancelar tarefa"
-                    onClick={() => onDelete(task.id)}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onDelete(task.id)
+                    }}
                     className="rounded-[8px] p-1.5 text-neutral-400 hover:bg-[#FFEBEE] hover:text-danger"
                   >
                     <Trash2 className="h-4 w-4" />

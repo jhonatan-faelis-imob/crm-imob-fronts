@@ -29,12 +29,14 @@ export function TaskCalendarView({
   onComplete,
   onEdit,
   onDelete,
+  onOpenDetail,
 }: {
   tasks: Task[]
   newTaskId?: string | null
   onComplete: (task: Task) => void
   onEdit: (task: Task) => void
   onDelete: (taskId: string) => void
+  onOpenDetail: (task: Task) => void
 }) {
   const today = new Date()
   const [currentMonth, setCurrentMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1))
@@ -184,6 +186,7 @@ export function TaskCalendarView({
                 onComplete={onComplete}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                onOpenDetail={onOpenDetail}
               />
             ))}
             {selectedDayTasks.length === 0 && (

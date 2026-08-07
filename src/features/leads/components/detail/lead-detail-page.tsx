@@ -9,6 +9,7 @@ import { toast } from '@/components/ui/toast'
 import { mapApiPropertyToProperty, type ApiProperty } from '@/features/empreendimentos/api'
 import { mapApiTaskToTask, mapCompleteDataToDto, type ApiTask } from '@/features/tarefas/api'
 import { CompleteTaskModal, type CompleteTaskData } from '@/features/tarefas/components/complete-task-modal'
+import { TaskDetailSheet } from '@/features/tarefas/components/task-detail-sheet'
 import { interactionsService } from '@/services/interactions.service'
 import { leadsService } from '@/services/leads.service'
 import { propertiesService } from '@/services/properties.service'
@@ -54,7 +55,9 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
   const [isAiDialogOpen, setIsAiDialogOpen] = useState(false)
   const [isLostModalOpen, setIsLostModalOpen] = useState(false)
   const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState(false)
+  const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [completingTask, setCompletingTask] = useState<Task | null>(null)
+  const [openingTask, setOpeningTask] = useState<Task | null>(null)
   const [newTaskId, setNewTaskId] = useState<string | null>(null)
 
   const { data: brokers } = useQuery<BrokerOption[]>({
@@ -183,6 +186,17 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
     },
   })
 
+  const updateTask = useMutation({
+    mutationFn: ({ id, dto }: { id: string; dto: Record<string, unknown> }) => tasksService.update(id, dto),
+    onSuccess: () => {
+      invalidateTasks()
+      toast.add({ title: 'Tarefa atualizada com sucesso!', type: 'success' })
+    },
+    onError: () => {
+      toast.add({ title: 'Não foi possível salvar as alterações', type: 'error' })
+    },
+  })
+
   const completeTask = useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: Record<string, unknown> }) => tasksService.complete(id, dto),
     onSuccess: () => {
@@ -252,16 +266,29 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
     setIsEditDialogOpen(true)
   }
 
-  function handleCreateTask(data: NewTaskFormValues) {
-    createTask.mutate({
-      leadId: lead.id,
-      assignedTo: lead.ownerId,
+  function openNewTaskDialog() {
+    setEditingTask(null)
+    setIsNewTaskDialogOpen(true)
+  }
+
+  function openEditTaskDialog(task: Task) {
+    setEditingTask(task)
+    setIsNewTaskDialogOpen(true)
+  }
+
+  function handleSaveTask(data: NewTaskFormValues, taskId?: string) {
+    const dto = {
       title: data.title,
+      description: data.description || undefined,
       type: data.type,
       priority: data.priority,
       dueDate: new Date(data.dueDate).toISOString(),
-      hasNextTask: false,
-    })
+    }
+    if (taskId) {
+      updateTask.mutate({ id: taskId, dto })
+    } else {
+      createTask.mutate({ ...dto, leadId: lead.id, assignedTo: lead.ownerId, hasNextTask: false })
+    }
   }
 
   function handleConfirmComplete(data: CompleteTaskData) {
@@ -326,9 +353,10 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
                 <TasksTab
                   tasks={tasks}
                   newTaskId={newTaskId}
-                  onOpenNewTask={() => setIsNewTaskDialogOpen(true)}
+                  onOpenNewTask={openNewTaskDialog}
                   onCompleteRequest={setCompletingTask}
                   onDelete={(id) => cancelTask.mutate(id)}
+                  onOpenDetail={setOpeningTask}
                 />
               )}
             </TabsContent>
@@ -350,7 +378,8 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
           <NextTaskCard
             tasks={tasks}
             onComplete={setCompletingTask}
-            onScheduleNew={() => setIsNewTaskDialogOpen(true)}
+            onScheduleNew={openNewTaskDialog}
+            onOpenDetail={setOpeningTask}
           />
         </div>
       </div>
@@ -370,12 +399,28 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
         onConfirm={handleConfirmLostReason}
         isSubmitting={markAsLost.isPending}
       />
-      <NewTaskDialog open={isNewTaskDialogOpen} onOpenChange={setIsNewTaskDialogOpen} onCreate={handleCreateTask} />
+      <NewTaskDialog
+        open={isNewTaskDialogOpen}
+        onOpenChange={(next) => {
+          setIsNewTaskDialogOpen(next)
+          if (!next) setEditingTask(null)
+        }}
+        task={editingTask}
+        onSave={handleSaveTask}
+      />
       <CompleteTaskModal
         task={completingTask}
         open={completingTask !== null}
         onClose={() => setCompletingTask(null)}
         onConfirm={handleConfirmComplete}
+      />
+      <TaskDetailSheet
+        task={openingTask}
+        open={openingTask !== null}
+        onOpenChange={(next) => !next && setOpeningTask(null)}
+        onComplete={setCompletingTask}
+        onEdit={openEditTaskDialog}
+        onCancel={(id) => cancelTask.mutate(id)}
       />
     </div>
   )

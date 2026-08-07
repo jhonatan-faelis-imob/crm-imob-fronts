@@ -4,6 +4,7 @@ import { Calendar, CheckSquare, List, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { CompleteTaskModal, type CompleteTaskData } from '@/features/tarefas/components/complete-task-modal'
+import { TaskDetailSheet } from '@/features/tarefas/components/task-detail-sheet'
 import { FiltersBar } from '@/features/tarefas/filters-bar'
 import { isWithinRange } from '@/features/tarefas/date-utils'
 import { NewTaskDialog, type NewTaskFormValues, type TaskLeadOption } from '@/features/tarefas/new-task-dialog'
@@ -38,6 +39,7 @@ export default function TarefasPage() {
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [completingTask, setCompletingTask] = useState<Task | null>(null)
+  const [openingTask, setOpeningTask] = useState<Task | null>(null)
   const queryClient = useQueryClient()
 
   const apiParams = buildTaskParams(filters)
@@ -232,6 +234,7 @@ export default function TarefasPage() {
           onComplete={handleOpenComplete}
           onEdit={openEditTaskDialog}
           onDelete={handleCancelTask}
+          onOpenDetail={setOpeningTask}
         />
       ) : (
         <TaskCalendarView
@@ -239,6 +242,7 @@ export default function TarefasPage() {
           onComplete={handleOpenComplete}
           onEdit={openEditTaskDialog}
           onDelete={handleCancelTask}
+          onOpenDetail={setOpeningTask}
         />
       )}
 
@@ -256,6 +260,15 @@ export default function TarefasPage() {
         open={completingTask !== null}
         onClose={() => setCompletingTask(null)}
         onConfirm={handleConfirmComplete}
+      />
+
+      <TaskDetailSheet
+        task={openingTask}
+        open={openingTask !== null}
+        onOpenChange={(next) => !next && setOpeningTask(null)}
+        onComplete={handleOpenComplete}
+        onEdit={openEditTaskDialog}
+        onCancel={handleCancelTask}
       />
     </div>
   )
