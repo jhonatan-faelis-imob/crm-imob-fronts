@@ -173,12 +173,14 @@ export function TaskDetailSheet({
             </div>
           )}
 
-          {task.description && (
-            <div>
-              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-neutral-400">Descrição</p>
-              <p className="text-sm text-neutral-600">{task.description}</p>
-            </div>
-          )}
+          <div>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-neutral-400">Descrição</p>
+            {task.description ? (
+              <p className="text-sm leading-relaxed text-neutral-600">{task.description}</p>
+            ) : (
+              <p className="text-sm italic text-neutral-400">Nenhuma descrição adicionada</p>
+            )}
+          </div>
 
           {task.status === 'pendente' && (
             <div className="space-y-2 pt-2">
