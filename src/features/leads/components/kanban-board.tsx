@@ -49,14 +49,21 @@ function DroppableColumn({ stage, leads }: { stage: ApiFunnelStage; leads: Lead[
   return (
     <div className="flex w-[280px] shrink-0 flex-col">
       <div className="h-1 rounded-full" style={{ backgroundColor: stage.color }} />
-      <div className="mt-3 flex items-center gap-2">
-        <h3 className="text-sm font-semibold text-neutral-900">{stage.name}</h3>
-        <span
-          className="rounded-full px-2 py-0.5 text-xs font-medium"
-          style={{ backgroundColor: `${stage.color}26`, color: stage.color }}
-        >
-          {leads.length}
-        </span>
+      <div className="mt-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-neutral-900">{stage.name}</h3>
+          <span
+            className="rounded-full px-2 py-0.5 text-xs font-medium"
+            style={{ backgroundColor: `${stage.color}26`, color: stage.color }}
+          >
+            {leads.length}
+          </span>
+        </div>
+        {columnVgv > 0 && (
+          <span className="rounded-full bg-brand-bg px-2 py-0.5 text-xs font-semibold text-brand">
+            {formatVgv(columnVgv)}
+          </span>
+        )}
       </div>
       <div
         ref={setNodeRef}
@@ -73,14 +80,6 @@ function DroppableColumn({ stage, leads }: { stage: ApiFunnelStage; leads: Lead[
             Nenhum lead nesta etapa
           </p>
         )}
-      </div>
-      <div className="mt-2 border-t-[0.5px] border-neutral-200 px-1 pt-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-neutral-400">VGV potencial</span>
-          <span className="text-xs font-semibold text-neutral-600">
-            {columnVgv > 0 ? formatVgv(columnVgv) : '—'}
-          </span>
-        </div>
       </div>
     </div>
   )
