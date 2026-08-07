@@ -1,4 +1,4 @@
-import { Clock, Mail, Phone } from 'lucide-react'
+import { Clock, DollarSign, Mail, Phone } from 'lucide-react'
 import { useFormContext } from 'react-hook-form'
 import type { LeadInterest, LeadSource, MaritalStatus } from '@/types'
 import { PROPERTY_TYPE_META, PROPERTY_TYPES } from '@/features/empreendimentos/constants'
@@ -118,16 +118,6 @@ export function TabBasicInfo({ brokers }: { brokers: BrokerOption[] }) {
           </IconInputWrapper>
         </FormField>
 
-        <FormField label="Renda familiar" htmlFor="income">
-          <MaskedInput
-            id="income"
-            control={control}
-            name="basic.income"
-            mask={currencyMask}
-            placeholder="R$ 0,00"
-          />
-        </FormField>
-
         <FormField label="E-mail" htmlFor="email" error={basicErrors?.email?.message}>
           <IconInputWrapper icon={<Mail className="h-4 w-4" />}>
             <input
@@ -198,6 +188,59 @@ export function TabBasicInfo({ brokers }: { brokers: BrokerOption[] }) {
           <TagsInput control={control} name="basic.tags" id="tags" suggestions={TAG_SUGGESTIONS} />
         </FormField>
       </FieldGrid>
+
+      <div className="border-t-[0.5px] border-neutral-200 pt-4">
+        <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-neutral-900">
+          <DollarSign className="h-4 w-4 text-brand" />
+          Informações financeiras
+        </p>
+        <FieldGrid>
+          <FormField label="Renda familiar" htmlFor="income">
+            <MaskedInput
+              id="income"
+              control={control}
+              name="basic.income"
+              mask={currencyMask}
+              placeholder="R$ 0,00"
+            />
+          </FormField>
+
+          <FormField label="Valor de interesse" htmlFor="interestValue">
+            <MaskedInput
+              id="interestValue"
+              control={control}
+              name="basic.interestValue"
+              mask={currencyMask}
+              placeholder="R$ 0,00"
+            />
+          </FormField>
+
+          <FormField label="FGTS disponível" htmlFor="fgtsValue">
+            <MaskedInput
+              id="fgtsValue"
+              control={control}
+              name="basic.fgtsValue"
+              mask={currencyMask}
+              placeholder="R$ 0,00"
+            />
+          </FormField>
+
+          <FormField label="Recursos próprios" htmlFor="ownResources">
+            <MaskedInput
+              id="ownResources"
+              control={control}
+              name="basic.ownResources"
+              mask={currencyMask}
+              placeholder="R$ 0,00"
+            />
+          </FormField>
+        </FieldGrid>
+
+        <label className="mt-4 flex items-center gap-2 text-[13px] font-medium text-neutral-900">
+          <input type="checkbox" className="h-4 w-4 accent-brand" {...register('basic.hasClt3Years')} />
+          Possui mais de 3 anos de registro CLT
+        </label>
+      </div>
 
       <div className="flex flex-wrap items-center gap-6 border-t-[0.5px] border-neutral-200 pt-4">
         <label className="flex items-center gap-2 text-[13px] font-medium text-neutral-900">

@@ -7,7 +7,7 @@ import { isAxiosError } from 'axios'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/toast'
 import { FiltersBar, defaultLeadFilters, type LeadFilters } from '@/features/leads/filters-bar'
-import { KanbanBoard } from '@/features/leads/components/kanban-board'
+import { formatVgv, KanbanBoard } from '@/features/leads/components/kanban-board'
 import { LeadsListView } from '@/features/leads/list-view'
 import { NewLeadDialog } from '@/features/leads/new-lead-dialog'
 import {
@@ -79,15 +79,26 @@ export default function LeadsPage() {
   }
 
   const leads = (leadsData?.data ?? []).map(mapApiLeadToLead)
+  const totalVgv = leads.reduce((sum, lead) => sum + (lead.interestValue ?? 0), 0)
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-[28px] font-semibold text-neutral-900">Leads</h1>
-          <p className="mt-1 text-sm text-neutral-400">
-            {isLoading ? 'Carregando...' : `${leads.length} leads`}
-          </p>
+          {isLoading ? (
+            <p className="mt-1 text-sm text-neutral-400">Carregando...</p>
+          ) : (
+            <div className="mt-1 flex items-center gap-2 text-sm text-neutral-400">
+              <span>{leads.length} leads</span>
+              {totalVgv > 0 && (
+                <>
+                  <span>·</span>
+                  <span className="font-semibold text-neutral-600">{formatVgv(totalVgv)} em potencial</span>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-2">

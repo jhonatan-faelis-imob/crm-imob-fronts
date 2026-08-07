@@ -32,8 +32,19 @@ function DraggableLeadCard({ lead }: { lead: Lead }) {
   )
 }
 
+export function formatVgv(value: number): string {
+  if (value >= 1_000_000) return `R$ ${(value / 1_000_000).toFixed(1)}M`
+  if (value >= 1_000) return `R$ ${(value / 1_000).toFixed(0)}K`
+  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+}
+
+function sumInterestValue(leads: Lead[]): number {
+  return leads.reduce((sum, lead) => sum + (lead.interestValue ?? 0), 0)
+}
+
 function DroppableColumn({ stage, leads }: { stage: ApiFunnelStage; leads: Lead[] }) {
   const { setNodeRef, isOver } = useDroppable({ id: stage.id })
+  const columnVgv = sumInterestValue(leads)
 
   return (
     <div className="flex w-[280px] shrink-0 flex-col">
@@ -62,6 +73,14 @@ function DroppableColumn({ stage, leads }: { stage: ApiFunnelStage; leads: Lead[
             Nenhum lead nesta etapa
           </p>
         )}
+      </div>
+      <div className="mt-2 border-t-[0.5px] border-neutral-200 px-1 pt-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-neutral-400">VGV potencial</span>
+          <span className="text-xs font-semibold text-neutral-600">
+            {columnVgv > 0 ? formatVgv(columnVgv) : '—'}
+          </span>
+        </div>
       </div>
     </div>
   )
