@@ -2,7 +2,9 @@
 
 import Link from 'next/link'
 import { ArrowLeft, MoreVertical, Pencil } from 'lucide-react'
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +32,8 @@ export function DetailHeader({
   onArchive: () => void
   onSelectStage: (stage: ApiFunnelStage) => void
 }) {
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false)
+
   const { data: stages } = useQuery<ApiFunnelStage[]>({
     queryKey: ['funnel-stages'],
     queryFn: funnelStagesService.findAll,
@@ -86,13 +90,30 @@ export function DetailHeader({
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={onTransfer}>Transferir corretor</DropdownMenuItem>
               <DropdownMenuItem onClick={onMarkAsLost}>Marcar como perdido</DropdownMenuItem>
-              <DropdownMenuItem onClick={onArchive} variant="destructive">
+              <DropdownMenuItem onClick={() => setShowArchiveConfirm(true)} variant="destructive">
                 Arquivar
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={showArchiveConfirm}
+        onOpenChange={setShowArchiveConfirm}
+        title="Arquivar lead?"
+        description={
+          <>
+            <strong>{lead.name}</strong> será arquivado e não aparecerá mais no funil, na lista de leads nem
+            nos relatórios.
+          </>
+        }
+        confirmLabel="Sim, arquivar"
+        onConfirm={() => {
+          setShowArchiveConfirm(false)
+          onArchive()
+        }}
+      />
     </div>
   )
 }

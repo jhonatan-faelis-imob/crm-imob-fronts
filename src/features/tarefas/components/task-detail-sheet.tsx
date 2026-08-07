@@ -1,8 +1,10 @@
 'use client'
 
-import { CheckCircle, Mail, MessageCircle, Pencil, X } from 'lucide-react'
+import { CheckCircle, Mail, MessageCircle, Pencil, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import {
   mapApiLeadToLead,
@@ -60,6 +62,8 @@ export function TaskDetailSheet({
   onEdit: (task: Task) => void
   onCancel: (taskId: string) => void
 }) {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
   const { data: apiLead } = useQuery<ApiLead>({
     queryKey: ['lead', task?.leadId],
     queryFn: () => leadsService.findById(task!.leadId!),
@@ -86,8 +90,20 @@ export function TaskDetailSheet({
     action()
   }
 
+  function handleOpenChange(next: boolean) {
+    if (!next) setShowDeleteConfirm(false)
+    onOpenChange(next)
+  }
+
+  const taskId = task.id
+
+  function handleConfirmDelete() {
+    setShowDeleteConfirm(false)
+    closeAnd(() => onCancel(taskId))
+  }
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent side="right" className="w-full gap-0 overflow-y-auto p-0 sm:max-w-md">
         <SheetHeader className="border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
           <div className="flex items-center gap-2.5">
@@ -184,16 +200,30 @@ export function TaskDetailSheet({
               </button>
               <button
                 type="button"
-                onClick={() => closeAnd(() => onCancel(task.id))}
+                onClick={() => setShowDeleteConfirm(true)}
                 className="flex w-full items-center justify-center gap-2 rounded-[8px] px-4 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-[#FFEBEE]"
               >
-                <X className="h-4 w-4" />
-                Cancelar tarefa
+                <Trash2 className="h-4 w-4" />
+                Excluir tarefa
               </button>
             </div>
           )}
         </div>
       </SheetContent>
+
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        title="Excluir tarefa?"
+        description={
+          <>
+            A tarefa <strong>&quot;{task.title}&quot;</strong> será excluída e removida da sua lista de
+            pendentes. Essa ação não pode ser desfeita.
+          </>
+        }
+        confirmLabel="Sim, excluir"
+        onConfirm={handleConfirmDelete}
+      />
     </Sheet>
   )
 }

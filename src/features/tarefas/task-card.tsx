@@ -1,6 +1,8 @@
 import { Check, Link2, Pencil, Trash2, User, X } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { getInitials } from '@/lib/utils'
 import type { Task } from '@/types'
 import { PRIORITY_META, TASK_TYPE_META } from './constants'
@@ -23,6 +25,8 @@ export function TaskCard({
   onDelete: (taskId: string) => void
   onOpenDetail: (task: Task) => void
 }) {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
   const typeMeta = TASK_TYPE_META[task.type]
   const TypeIcon = typeMeta.icon
   const priorityMeta = PRIORITY_META[task.priority]
@@ -32,6 +36,7 @@ export function TaskCard({
   const isCancelled = task.status === 'cancelada'
 
   return (
+    <>
     <div
       role="button"
       tabIndex={0}
@@ -135,11 +140,11 @@ export function TaskCard({
             </button>
             <button
               type="button"
-              aria-label="Cancelar tarefa"
-              title="Cancelar tarefa"
+              aria-label="Excluir tarefa"
+              title="Excluir tarefa"
               onClick={(event) => {
                 event.stopPropagation()
-                onDelete(task.id)
+                setShowDeleteConfirm(true)
               }}
               className="rounded-[6px] p-1 text-neutral-400 hover:bg-[#FFEBEE] hover:text-danger"
             >
@@ -161,5 +166,23 @@ export function TaskCard({
         </Avatar>
       </div>
     </div>
+
+    <ConfirmDialog
+      open={showDeleteConfirm}
+      onOpenChange={setShowDeleteConfirm}
+      title="Excluir tarefa?"
+      description={
+        <>
+          A tarefa <strong>&quot;{task.title}&quot;</strong> será excluída e removida da sua lista de
+          pendentes. Essa ação não pode ser desfeita.
+        </>
+      }
+      confirmLabel="Sim, excluir"
+      onConfirm={() => {
+        setShowDeleteConfirm(false)
+        onDelete(task.id)
+      }}
+    />
+    </>
   )
 }

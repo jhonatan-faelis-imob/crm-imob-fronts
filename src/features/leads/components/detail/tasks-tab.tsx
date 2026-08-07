@@ -13,6 +13,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { useState } from 'react'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { Task, TaskPriority, TaskType } from '@/types'
 import { formatDateTimeBR } from './format'
 
@@ -57,6 +58,7 @@ export function TasksTab({
   onOpenDetail: (task: Task) => void
 }) {
   const [filter, setFilter] = useState<'pendente' | 'concluida' | 'todas'>('pendente')
+  const [deletingTask, setDeletingTask] = useState<Task | null>(null)
 
   const filtered = tasks.filter((task) => filter === 'todas' || task.status === filter)
 
@@ -156,10 +158,10 @@ export function TasksTab({
                 {task.status === 'pendente' && (
                   <button
                     type="button"
-                    aria-label="Cancelar tarefa"
+                    aria-label="Excluir tarefa"
                     onClick={(event) => {
                       event.stopPropagation()
-                      onDelete(task.id)
+                      setDeletingTask(task)
                     }}
                     className="rounded-[8px] p-1.5 text-neutral-400 hover:bg-[#FFEBEE] hover:text-danger"
                   >
@@ -177,6 +179,26 @@ export function TasksTab({
           </p>
         )}
       </div>
+
+      <ConfirmDialog
+        open={deletingTask !== null}
+        onOpenChange={(next) => !next && setDeletingTask(null)}
+        title="Excluir tarefa?"
+        description={
+          deletingTask && (
+            <>
+              A tarefa <strong>&quot;{deletingTask.title}&quot;</strong> será excluída e removida da lista de
+              pendentes. Essa ação não pode ser desfeita.
+            </>
+          )
+        }
+        confirmLabel="Sim, excluir"
+        onConfirm={() => {
+          if (!deletingTask) return
+          onDelete(deletingTask.id)
+          setDeletingTask(null)
+        }}
+      />
     </div>
   )
 }
