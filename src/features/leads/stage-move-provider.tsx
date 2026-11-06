@@ -42,14 +42,14 @@ interface StageModalsContextValue {
 
 const StageModalsContext = createContext<StageModalsContextValue | null>(null)
 
-// PATCH /sales/:id/status exige coordenador ou acima
-const CAN_CANCEL_SALE_ROLES = new Set(['coordenador', 'gerente', 'diretor'])
+// Espelha SalesService.updateStatus: o corretor só cancela a venda que é dele
+const MANAGE_SALE_ROLES = new Set(['coordenador', 'gerente', 'diretor'])
 
 // Montado em leads/layout.tsx: uma única instância de cada modal atende a página de Leads
 // (Kanban, card, lista) e o detalhe do lead, em vez de um modal por card.
 export function StageMoveProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient()
-  const role = useAuthStore((state) => state.user?.role)
+  const user = useAuthStore((state) => state.user)
   const [queue, setQueue] = useState<SaleTarget[]>([])
   const [queueSize, setQueueSize] = useState(0)
   const [lostTarget, setLostTarget] = useState<{ leadId: string; cancelSaleId?: string } | null>(null)
@@ -64,7 +64,9 @@ export function StageMoveProvider({ children }: { children: ReactNode }) {
   })
 
   const current = queue.at(0)
-  const canCancelSale = role !== undefined && CAN_CANCEL_SALE_ROLES.has(role)
+  const canCancelSale =
+    !!user &&
+    (MANAGE_SALE_ROLES.has(user.role) || (user.role === 'corretor' && leaveWon?.sale.brokerId === user.id))
 
   function advance() {
     setQueue((items) => items.slice(1))

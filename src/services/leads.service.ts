@@ -5,6 +5,7 @@ export interface ActiveSale {
   saleValue: number
   status: string
   soldAt: string
+  brokerId: string | null
 }
 
 export const leadsService = {
