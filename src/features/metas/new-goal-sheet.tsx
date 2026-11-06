@@ -4,7 +4,7 @@ import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { isAxiosError } from 'axios'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Sheet,
   SheetContent,
@@ -18,10 +18,11 @@ import { toast } from '@/components/ui/toast'
 import { formatCurrency } from '@/lib/utils'
 import { useAuthStore } from '@/store/auth.store'
 import { goalsService } from '@/services/goals.service'
+import { teamsService } from '@/services/teams.service'
 import type { GoalScope, GoalType } from '@/types'
 import { computeFunnelFromVgv } from './calculations'
 import { FUNNEL_STAGES, GOAL_SCOPE_META, GOAL_TYPE_META } from './constants'
-import { goalToFormValues, mapFormToCreateGoalDto, type ApiGoal } from './api'
+import { allowedGoalScopes, goalToFormValues, mapFormToCreateGoalDto, type ApiGoal } from './api'
 
 const SCOPE_VALUES = Object.keys(GOAL_SCOPE_META) as [GoalScope, ...GoalScope[]]
 const TYPE_VALUES = Object.keys(GOAL_TYPE_META) as [GoalType, ...GoalType[]]
@@ -29,6 +30,7 @@ const TYPE_VALUES = Object.keys(GOAL_TYPE_META) as [GoalType, ...GoalType[]]
 const newGoalSchema = z
   .object({
     scope: z.enum(SCOPE_VALUES, { message: 'Selecione o escopo' }),
+    teamId: z.string().optional(),
     type: z.enum(TYPE_VALUES, { message: 'Selecione o tipo' }),
     startDate: z.string().min(1, 'Informe a data de início'),
     endDate: z.string().min(1, 'Informe a data de fim'),
@@ -83,6 +85,7 @@ export function NewGoalSheet({
     handleSubmit,
     control,
     reset,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<NewGoalFormData>({
     resolver: zodResolver(newGoalSchema),
@@ -90,6 +93,16 @@ export function NewGoalSheet({
   })
 
   const scope = useWatch({ control, name: 'scope' })
+  // Gerente e diretor não pertencem a uma equipe; o coordenador usa sempre a própria
+  const canPickTeam = user?.role === 'diretor' || user?.role === 'gerente'
+  const showTeamField = scope === 'equipe' && canPickTeam
+
+  const { data: teams } = useQuery<{ id: string; name: string }[]>({
+    queryKey: ['teams'],
+    queryFn: teamsService.findAll,
+    enabled: open && canPickTeam,
+  })
+
   const individualVgv = useWatch({ control, name: 'individualVgv' })
   const individualTicket = useWatch({ control, name: 'individualTicket' })
   const individualCommissionPct = useWatch({ control, name: 'individualCommissionPct' })
@@ -108,13 +121,19 @@ export function NewGoalSheet({
       isEditing ? goalsService.update(goal.id, dto) : goalsService.create(dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['goals'] })
+      queryClient.invalidateQueries({ queryKey: ['goal'] })
+      queryClient.invalidateQueries({ queryKey: ['goal-summary'] })
       toast.add({ title: isEditing ? 'Meta atualizada com sucesso!' : 'Meta criada com sucesso!', type: 'success' })
       reset()
       onOpenChange(false)
     },
     onError: (error) => {
       if (isAxiosError(error) && error.response?.status === 403) {
-        toast.add({ title: 'Você não tem permissão para editar esta meta', type: 'error' })
+        toast.add({
+          title: 'Você não tem permissão para esta meta',
+          description: error.response.data?.message,
+          type: 'error',
+        })
         return
       }
       toast.add({
@@ -125,8 +144,11 @@ export function NewGoalSheet({
   })
 
   function onSubmit(data: NewGoalFormData) {
-    if (!user) return
-    saveGoal.mutate(mapFormToCreateGoalDto(data, { id: user.id, teamId: user.teamId ?? null }))
+    if (showTeamField && !data.teamId) {
+      setError('teamId', { message: 'Selecione a equipe' })
+      return
+    }
+    saveGoal.mutate(mapFormToCreateGoalDto(data))
   }
 
   return (
@@ -154,7 +176,7 @@ export function NewGoalSheet({
               <option value="" disabled>
                 Selecione o escopo
               </option>
-              {SCOPE_VALUES.map((value) => (
+              {allowedGoalScopes(user?.role).map((value) => (
                 <option key={value} value={value}>
                   {GOAL_SCOPE_META[value]}
                 </option>
@@ -162,6 +184,25 @@ export function NewGoalSheet({
             </select>
             {errors.scope && <p className={errorClassName}>{errors.scope.message}</p>}
           </div>
+
+          {showTeamField && (
+            <div>
+              <label htmlFor="teamId" className={labelClassName}>
+                Equipe
+              </label>
+              <select id="teamId" defaultValue="" className={inputClassName} {...register('teamId')}>
+                <option value="" disabled>
+                  Selecione a equipe
+                </option>
+                {(teams ?? []).map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
+              </select>
+              {errors.teamId && <p className={errorClassName}>{errors.teamId.message}</p>}
+            </div>
+          )}
 
           <div>
             <label htmlFor="type" className={labelClassName}>

@@ -52,7 +52,15 @@ export function StageMoveProvider({ children }: { children: ReactNode }) {
   }
 
   function invalidateSaleQueries(leadId: string) {
-    for (const queryKey of [['leads'], ['lead', leadId], ['goals'], ['dashboard'], ['pending-leads'], ['properties']]) {
+    for (const queryKey of [
+      ['leads'],
+      ['lead', leadId],
+      ['goals'],
+      ['goal-summary'],
+      ['dashboard'],
+      ['pending-leads'],
+      ['properties'],
+    ]) {
       queryClient.invalidateQueries({ queryKey })
     }
     queryClient.invalidateQueries({ predicate: (query) => isSaleReportKey(query.queryKey[0]) })

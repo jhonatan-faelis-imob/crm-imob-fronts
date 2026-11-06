@@ -5,6 +5,7 @@ import { Plus, Target } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/ui/empty-state'
+import { toLocalISODate } from '@/lib/date'
 import { useAuthStore } from '@/store/auth.store'
 import { goalsService } from '@/services/goals.service'
 import { reportsService } from '@/services/reports.service'
@@ -18,10 +19,12 @@ import { RankingSection } from '@/features/metas/ranking-section'
 import {
   canEditGoal,
   goalScope,
+  isCurrentGoal,
   matchesPeriodTab,
-  sumEntriesByStage,
+  periodTabForGoal,
+  pickDefaultGoal,
   type ApiGoal,
-  type ApiGoalDailyEntry,
+  type ApiGoalSummary,
 } from '@/features/metas/api'
 import type { GoalSummary, RankingEntry } from '@/features/metas/types'
 
@@ -33,33 +36,29 @@ interface BrokerRankingEntry {
   units: number
 }
 
-function iso(date: Date) {
-  return date.toISOString().slice(0, 10)
-}
-
 function periodRange(period: Period): { startDate: string; endDate: string } {
   const now = new Date()
   if (period === 'mes') {
     return {
-      startDate: iso(new Date(now.getFullYear(), now.getMonth(), 1)),
-      endDate: iso(new Date(now.getFullYear(), now.getMonth() + 1, 0)),
+      startDate: toLocalISODate(new Date(now.getFullYear(), now.getMonth(), 1)),
+      endDate: toLocalISODate(new Date(now.getFullYear(), now.getMonth() + 1, 0)),
     }
   }
   if (period === 'trimestre') {
     const quarter = Math.floor(now.getMonth() / 3)
     return {
-      startDate: iso(new Date(now.getFullYear(), quarter * 3, 1)),
-      endDate: iso(new Date(now.getFullYear(), quarter * 3 + 3, 0)),
+      startDate: toLocalISODate(new Date(now.getFullYear(), quarter * 3, 1)),
+      endDate: toLocalISODate(new Date(now.getFullYear(), quarter * 3 + 3, 0)),
     }
   }
   return {
-    startDate: iso(new Date(now.getFullYear(), 0, 1)),
-    endDate: iso(new Date(now.getFullYear(), 11, 31)),
+    startDate: toLocalISODate(new Date(now.getFullYear(), 0, 1)),
+    endDate: toLocalISODate(new Date(now.getFullYear(), 11, 31)),
   }
 }
 
 export default function MetasPage() {
-  const [period, setPeriod] = useState<Period>('mes')
+  const [chosenPeriod, setPeriod] = useState<Period | undefined>(undefined)
   const [selectedGoalId, setSelectedGoalId] = useState<string | undefined>(undefined)
   const [isDailyEntryOpen, setIsDailyEntryOpen] = useState(false)
   const [isGoalSheetOpen, setIsGoalSheetOpen] = useState(false)
@@ -71,18 +70,23 @@ export default function MetasPage() {
     queryFn: goalsService.findAll,
   })
 
+  const today = toLocalISODate()
   const hasNoGoalsAtAll = !isGoalsLoading && (goals?.length ?? 0) === 0
+
+  // Sem escolha do usuário, abre na aba da meta vigente: uma meta trimestral não pode
+  // ficar escondida atrás da aba Mês
+  const defaultGoal = pickDefaultGoal(goals ?? [], user?.id, today)
+  const period = chosenPeriod ?? (defaultGoal && periodTabForGoal(defaultGoal)) ?? 'mes'
   const periodGoals = (goals ?? []).filter((goal) => matchesPeriodTab(goal, period) && goal.active)
 
-  const ownIndividualGoal = periodGoals.find(
-    (goal) => goalScope(goal) === 'individual' && goal.userId === user?.id,
-  )
   const selectedGoal =
-    periodGoals.find((goal) => goal.id === selectedGoalId) ?? ownIndividualGoal ?? periodGoals[0]
+    periodGoals.find((goal) => goal.id === selectedGoalId) ??
+    pickDefaultGoal(periodGoals, user?.id, today) ??
+    periodGoals[0]
 
-  const { data: entries, isLoading: isEntriesLoading } = useQuery<ApiGoalDailyEntry[]>({
-    queryKey: ['goal-entries', selectedGoal?.id],
-    queryFn: () => goalsService.getEntries(selectedGoal!.id),
+  const { data: summary } = useQuery<ApiGoalSummary>({
+    queryKey: ['goal-summary', selectedGoal?.id],
+    queryFn: () => goalsService.getSummary(selectedGoal!.id),
     enabled: !!selectedGoal,
   })
 
@@ -117,8 +121,6 @@ export default function MetasPage() {
     }
   })
 
-  const realized = sumEntriesByStage(entries ?? [])
-
   function openNewGoal() {
     setEditingGoal(null)
     setIsGoalSheetOpen(true)
@@ -130,7 +132,8 @@ export default function MetasPage() {
   }
 
   const selectedGoalCanEdit = selectedGoal ? canEditGoal(selectedGoal, user) : false
-  const selectedGoalIsOwn = selectedGoal?.userId === user?.id
+  const selectedGoalIsOwn = !!selectedGoal && selectedGoal.userId === user?.id
+  const canRegisterToday = selectedGoalIsOwn && isCurrentGoal(selectedGoal, today)
 
   return (
     <div className="space-y-6">
@@ -207,11 +210,10 @@ export default function MetasPage() {
 
           <IndividualGoalSection
             goal={selectedGoal}
-            realized={realized}
-            isLoading={isEntriesLoading && !!selectedGoal}
+            summary={summary}
             canEdit={selectedGoalCanEdit}
             title={selectedGoalIsOwn ? 'Minha meta do período' : selectedGoal ? `Funil — ${selectedGoal.title}` : undefined}
-            onRegisterToday={selectedGoalIsOwn ? () => setIsDailyEntryOpen(true) : undefined}
+            onRegisterToday={canRegisterToday ? () => setIsDailyEntryOpen(true) : undefined}
             onCreateGoal={openNewGoal}
             onEdit={() => selectedGoal && openEditGoal(selectedGoal)}
           />
@@ -224,7 +226,12 @@ export default function MetasPage() {
         </>
       )}
 
-      <DailyEntrySheet open={isDailyEntryOpen} onOpenChange={setIsDailyEntryOpen} goal={ownIndividualGoal} />
+      <DailyEntrySheet
+        open={isDailyEntryOpen}
+        onOpenChange={setIsDailyEntryOpen}
+        goal={selectedGoal}
+        summary={summary}
+      />
       <NewGoalSheet
         key={editingGoal?.id ?? 'new'}
         open={isGoalSheetOpen}

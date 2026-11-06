@@ -2,7 +2,8 @@ import { goalScope, type ApiGoal } from './api'
 import { GOAL_SCOPE_BADGE, GOAL_SCOPE_META } from './constants'
 
 function formatPeriodRange(goal: ApiGoal) {
-  const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short' }
+  // As datas vêm à meia-noite UTC: no fuso local seriam exibidas como o dia anterior
+  const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short', timeZone: 'UTC' }
   const start = new Date(goal.periodStart).toLocaleDateString('pt-BR', options)
   const end = new Date(goal.periodEnd).toLocaleDateString('pt-BR', options)
   return `${start} – ${end}`

@@ -2,10 +2,11 @@ import { CalendarCheck, ArrowRight, Pencil, Target } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
-import { FUNNEL_STAGES, type FunnelStageKey } from './constants'
+import { formatPercent } from './calculations'
+import { FUNNEL_STAGES } from './constants'
 import { FunnelStageCard } from './funnel-stage-card'
-import type { ApiGoal } from './api'
-import { goalFunnelTargets } from './api'
+import { ProgressBar } from './progress-bar'
+import type { ApiGoal, ApiGoalSummary } from './api'
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
@@ -18,8 +19,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 export function IndividualGoalSection({
   goal,
-  realized,
-  isLoading,
+  summary,
   canEdit,
   title = 'Minha meta do período',
   onRegisterToday,
@@ -27,18 +27,13 @@ export function IndividualGoalSection({
   onEdit,
 }: {
   goal: ApiGoal | undefined
-  realized: Record<FunnelStageKey, number>
-  isLoading: boolean
+  summary: ApiGoalSummary | undefined
   canEdit?: boolean
   title?: string
   onRegisterToday?: () => void
   onCreateGoal: () => void
   onEdit?: () => void
 }) {
-  if (isLoading) {
-    return <Skeleton className="h-64 rounded-[16px]" />
-  }
-
   if (!goal) {
     return (
       <EmptyState
@@ -50,12 +45,13 @@ export function IndividualGoalSection({
     )
   }
 
-  const targetVgv = Number(goal.targetVgv ?? 0)
+  if (!summary) {
+    return <Skeleton className="h-64 rounded-[16px]" />
+  }
+
+  const { vgv, units, period, funnel } = summary
   const avgTicket = Number(goal.avgTicket ?? 0)
-  const commissionPct = Number(goal.commissionPct ?? 0)
-  const units = goal.goalUnits ?? (avgTicket > 0 ? targetVgv / avgTicket : 0)
-  const commission = targetVgv * (commissionPct / 100)
-  const targets = goalFunnelTargets(goal)
+  const commission = vgv.target * (Number(goal.commissionPct ?? 0) / 100)
 
   return (
     <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5 lg:p-6">
@@ -73,27 +69,49 @@ export function IndividualGoalSection({
         )}
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <Stat label="VGV desejado" value={formatCurrency(targetVgv)} />
-        <Stat label="Ticket médio" value={formatCurrency(avgTicket)} />
-        <Stat label="Comissão estimada" value={formatCurrency(commission)} />
-        <Stat label="Unidades necessárias" value={String(Math.ceil(units))} />
+      {funnel ? (
+        <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <Stat label="VGV desejado" value={formatCurrency(vgv.target)} />
+          <Stat label="Ticket médio" value={formatCurrency(avgTicket)} />
+          <Stat label="Comissão estimada" value={formatCurrency(commission)} />
+          <Stat label="Unidades necessárias" value={String(units.target)} />
+        </div>
+      ) : (
+        <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <Stat label="Meta de VGV" value={formatCurrency(vgv.target)} />
+          <Stat label="VGV realizado" value={formatCurrency(vgv.current)} />
+          <Stat label="Unidades vendidas" value={String(units.current)} />
+          <Stat label="Dias restantes" value={String(period.daysLeft)} />
+        </div>
+      )}
+
+      <div className="mt-4">
+        <div className="flex items-center justify-between text-xs font-medium text-neutral-600">
+          <span>{formatCurrency(vgv.current)} em vendas</span>
+          <span>{formatPercent(vgv.percent)}</span>
+        </div>
+        <div className="mt-1.5">
+          <ProgressBar value={vgv.percent} />
+        </div>
       </div>
 
-      <div className="mt-6 flex items-center overflow-x-auto pb-2">
-        {FUNNEL_STAGES.map((stage, index) => (
-          <div key={stage.key} className="flex shrink-0 items-center gap-2">
-            <FunnelStageCard
-              label={stage.label}
-              meta={targets[stage.key]}
-              realizado={realized[stage.key]}
-            />
-            {index < FUNNEL_STAGES.length - 1 && (
-              <ArrowRight className="h-4 w-4 shrink-0 text-neutral-300" />
-            )}
-          </div>
-        ))}
-      </div>
+      {funnel && (
+        <div className="mt-6 flex items-center overflow-x-auto pb-2">
+          {FUNNEL_STAGES.map((stage, index) => (
+            <div key={stage.key} className="flex shrink-0 items-center gap-2">
+              <FunnelStageCard
+                label={stage.label}
+                meta={funnel.target[stage.apiKey]}
+                realizado={funnel.realized[stage.apiKey]}
+                metaDoDia={funnel.dailyTarget[stage.apiKey]}
+              />
+              {index < FUNNEL_STAGES.length - 1 && (
+                <ArrowRight className="h-4 w-4 shrink-0 text-neutral-300" />
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {onRegisterToday && (
         <button

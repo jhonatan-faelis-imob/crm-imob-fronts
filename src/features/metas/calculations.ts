@@ -13,7 +13,8 @@ export function computeFunnelFromVgv(
 ): ComputedFunnel | null {
   if (!vgv || !avgTicket || vgv <= 0 || avgTicket <= 0) return null
 
-  const fechamentos = vgv / avgTicket
+  // Mesmo arredondamento do backend: não existe meia unidade vendida
+  const fechamentos = Math.ceil(vgv / avgTicket)
   const agendamentos = fechamentos * 3
   const simulacoes = agendamentos * 2
   const qualificacoes = simulacoes * 2

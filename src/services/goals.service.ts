@@ -9,6 +9,10 @@ export const goalsService = {
     const { data } = await api.get(`/goals/${id}`)
     return data
   },
+  getSummary: async (id: string) => {
+    const { data } = await api.get(`/goals/${id}/summary`)
+    return data
+  },
   create: async (dto: Record<string, unknown>) => {
     const { data } = await api.post('/goals', dto)
     return data

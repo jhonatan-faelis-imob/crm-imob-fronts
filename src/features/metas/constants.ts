@@ -8,16 +8,16 @@ export type FunnelStageKey =
   | 'agendamentos'
   | 'fechamentos'
 
-export const FUNNEL_STAGES: { key: FunnelStageKey; label: string }[] = [
-  { key: 'ligacoes', label: 'Ligações' },
-  { key: 'prospeccoes', label: 'Prospecções' },
-  { key: 'qualificacoes', label: 'Qualificações' },
-  { key: 'simulacoes', label: 'Simulações' },
-  { key: 'agendamentos', label: 'Agendamentos' },
-  { key: 'fechamentos', label: 'Fechamentos' },
-]
+export type FunnelApiKey = 'calls' | 'prospects' | 'qualifications' | 'simulations' | 'appointments' | 'closings'
 
-export const WORKING_DAYS_PER_MONTH = 20
+export const FUNNEL_STAGES: { key: FunnelStageKey; apiKey: FunnelApiKey; label: string }[] = [
+  { key: 'ligacoes', apiKey: 'calls', label: 'Ligações' },
+  { key: 'prospeccoes', apiKey: 'prospects', label: 'Prospecções' },
+  { key: 'qualificacoes', apiKey: 'qualifications', label: 'Qualificações' },
+  { key: 'simulacoes', apiKey: 'simulations', label: 'Simulações' },
+  { key: 'agendamentos', apiKey: 'appointments', label: 'Agendamentos' },
+  { key: 'fechamentos', apiKey: 'closings', label: 'Fechamentos' },
+]
 
 export const GOAL_SCOPE_META: Record<GoalScope, string> = {
   organizacao: 'Imobiliária',
