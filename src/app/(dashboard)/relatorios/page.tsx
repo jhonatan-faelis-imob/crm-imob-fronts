@@ -1,5 +1,6 @@
 'use client'
 
+import { toLocalISODate } from '@/lib/date'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { BrokerRankingTable } from '@/features/relatorios/broker-ranking-table'
@@ -43,14 +44,10 @@ interface ApiTeam {
   name: string
 }
 
-function todayIso() {
-  return new Date().toISOString().slice(0, 10)
-}
-
 const defaultPeriodFilter: PeriodFilter = {
   preset: 'mes',
-  startDate: todayIso(),
-  endDate: todayIso(),
+  startDate: toLocalISODate(),
+  endDate: toLocalISODate(),
 }
 
 export default function RelatoriosPage() {

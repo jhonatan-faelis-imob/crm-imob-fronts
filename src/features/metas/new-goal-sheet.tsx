@@ -21,11 +21,20 @@ import { goalsService } from '@/services/goals.service'
 import { teamsService } from '@/services/teams.service'
 import type { GoalScope, GoalType } from '@/types'
 import { computeFunnelFromVgv } from './calculations'
-import { FUNNEL_STAGES, GOAL_SCOPE_META, GOAL_TYPE_META } from './constants'
-import { allowedGoalScopes, goalToFormValues, mapFormToCreateGoalDto, type ApiGoal } from './api'
+import {
+  CONVERSION_RATE_FIELDS,
+  DEFAULT_CONVERSION_RATES,
+  FUNNEL_STAGES,
+  GOAL_SCOPE_META,
+  GOAL_TYPE_META,
+} from './constants'
+import { allowedGoalScopes, goalToFormValues, hasFunnel, mapFormToCreateGoalDto, type ApiGoal } from './api'
+import { invalidateGoalQueries } from './invalidate-goal-queries'
 
 const SCOPE_VALUES = Object.keys(GOAL_SCOPE_META) as [GoalScope, ...GoalScope[]]
 const TYPE_VALUES = Object.keys(GOAL_TYPE_META) as [GoalType, ...GoalType[]]
+
+const rateField = z.coerce.number({ message: 'Informe um número' }).positive('Precisa ser maior que 0')
 
 const newGoalSchema = z
   .object({
@@ -34,13 +43,25 @@ const newGoalSchema = z
     type: z.enum(TYPE_VALUES, { message: 'Selecione o tipo' }),
     startDate: z.string().min(1, 'Informe a data de início'),
     endDate: z.string().min(1, 'Informe a data de fim'),
-    targetValue: z.coerce.number({ message: 'Informe um valor válido' }).positive('Informe um valor válido'),
+    targetValue: z.coerce.number().optional(),
     individualVgv: z.coerce.number().optional(),
     individualTicket: z.coerce.number().optional(),
     individualCommissionPct: z.coerce.number().optional(),
+    rates: z.object({
+      appointmentsPerClosing: rateField,
+      simulationsPerAppointment: rateField,
+      qualificationsPerSimulation: rateField,
+      prospectsPerQualification: rateField,
+      callsPerProspect: rateField,
+    }),
   })
   .superRefine((data, ctx) => {
-    if (data.scope !== 'individual') return
+    if (!hasFunnel(data)) {
+      if (!data.targetValue || data.targetValue <= 0) {
+        ctx.addIssue({ code: 'custom', message: 'Informe um valor válido', path: ['targetValue'] })
+      }
+      return
+    }
     if (!data.individualVgv || data.individualVgv <= 0) {
       ctx.addIssue({ code: 'custom', message: 'Informe o VGV desejado', path: ['individualVgv'] })
     }
@@ -89,10 +110,13 @@ export function NewGoalSheet({
     formState: { errors, isSubmitting },
   } = useForm<NewGoalFormData>({
     resolver: zodResolver(newGoalSchema),
-    defaultValues: goal ? goalToFormValues(goal) : undefined,
+    defaultValues: goal ? goalToFormValues(goal) : { rates: DEFAULT_CONVERSION_RATES },
   })
 
   const scope = useWatch({ control, name: 'scope' })
+  const type = useWatch({ control, name: 'type' })
+  const rates = useWatch({ control, name: 'rates' })
+  const withFunnel = hasFunnel({ scope, type })
   // Gerente e diretor não pertencem a uma equipe; o coordenador usa sempre a própria
   const canPickTeam = user?.role === 'diretor' || user?.role === 'gerente'
   const showTeamField = scope === 'equipe' && canPickTeam
@@ -107,22 +131,26 @@ export function NewGoalSheet({
   const individualTicket = useWatch({ control, name: 'individualTicket' })
   const individualCommissionPct = useWatch({ control, name: 'individualCommissionPct' })
 
-  const funnelPreview =
-    scope === 'individual'
-      ? computeFunnelFromVgv(
-          Number(individualVgv) || 0,
-          Number(individualTicket) || 0,
-          Number(individualCommissionPct) || 0
-        )
-      : null
+  // Campo apagado durante a digitação vale o padrão, para a prévia não zerar o funil
+  const previewRates = { ...DEFAULT_CONVERSION_RATES }
+  for (const { key } of CONVERSION_RATE_FIELDS) {
+    previewRates[key] = Number(rates?.[key]) || DEFAULT_CONVERSION_RATES[key]
+  }
+
+  const funnelPreview = withFunnel
+    ? computeFunnelFromVgv(
+        Number(individualVgv) || 0,
+        Number(individualTicket) || 0,
+        Number(individualCommissionPct) || 0,
+        previewRates
+      )
+    : null
 
   const saveGoal = useMutation({
     mutationFn: (dto: Record<string, unknown>) =>
       isEditing ? goalsService.update(goal.id, dto) : goalsService.create(dto),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['goals'] })
-      queryClient.invalidateQueries({ queryKey: ['goal'] })
-      queryClient.invalidateQueries({ queryKey: ['goal-summary'] })
+      invalidateGoalQueries(queryClient)
       toast.add({ title: isEditing ? 'Meta atualizada com sucesso!' : 'Meta criada com sucesso!', type: 'success' })
       reset()
       onOpenChange(false)
@@ -243,23 +271,25 @@ export function NewGoalSheet({
             </div>
           </div>
 
-          <div>
-            <label htmlFor="targetValue" className={labelClassName}>
-              Valor da meta
-            </label>
-            <input
-              id="targetValue"
-              type="number"
-              min="0"
-              step="1000"
-              placeholder="5000000"
-              className={inputClassName}
-              {...register('targetValue')}
-            />
-            {errors.targetValue && <p className={errorClassName}>{errors.targetValue.message}</p>}
-          </div>
+          {!withFunnel && (
+            <div>
+              <label htmlFor="targetValue" className={labelClassName}>
+                Valor da meta
+              </label>
+              <input
+                id="targetValue"
+                type="number"
+                min="0"
+                step={type === 'vgv' ? '1000' : '1'}
+                placeholder={type === 'vgv' ? '5000000' : '50'}
+                className={inputClassName}
+                {...register('targetValue')}
+              />
+              {errors.targetValue && <p className={errorClassName}>{errors.targetValue.message}</p>}
+            </div>
+          )}
 
-          {scope === 'individual' && (
+          {withFunnel && (
             <div className="space-y-4 rounded-[12px] border-[0.5px] border-neutral-200 p-4">
               <p className="text-[13px] font-medium text-neutral-900">Funil individual</p>
 
@@ -316,6 +346,31 @@ export function NewGoalSheet({
                   <p className={errorClassName}>{errors.individualCommissionPct.message}</p>
                 )}
               </div>
+
+              <details open={errors.rates ? true : undefined} className="rounded-[12px] bg-neutral-100 p-3">
+                <summary className="cursor-pointer text-[13px] font-medium text-neutral-900">
+                  Taxas de conversão (avançado)
+                </summary>
+                <div className="mt-3 space-y-3">
+                  {CONVERSION_RATE_FIELDS.map(({ key, label }) => (
+                    <div key={key}>
+                      <label htmlFor={key} className="mb-1 block text-xs text-neutral-600">
+                        {label}
+                      </label>
+                      <input
+                        id={key}
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        inputMode="decimal"
+                        className={inputClassName}
+                        {...register(`rates.${key}`)}
+                      />
+                      {errors.rates?.[key] && <p className={errorClassName}>{errors.rates[key]?.message}</p>}
+                    </div>
+                  ))}
+                </div>
+              </details>
 
               {funnelPreview && (
                 <div className="rounded-[12px] bg-neutral-100 p-3">

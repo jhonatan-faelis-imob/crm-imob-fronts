@@ -1,4 +1,5 @@
 import type { GoalScope } from '@/types'
+import type { ApiGoalSummary } from './api'
 
 export interface GoalSummary {
   id: string
@@ -6,6 +7,8 @@ export interface GoalSummary {
   target: number
   realized: number
   scope: GoalScope
+  type: string
+  pace?: ApiGoalSummary['pace']
 }
 
 export interface RankingEntry {
@@ -13,6 +16,6 @@ export interface RankingEntry {
   name: string
   vgv: number
   units: number
-  goalPct: number
+  goalPct: number | null
   isCurrentUser?: boolean
 }

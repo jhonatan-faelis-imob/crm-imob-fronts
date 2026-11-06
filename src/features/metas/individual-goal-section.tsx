@@ -2,9 +2,10 @@ import { CalendarCheck, ArrowRight, Pencil, Target } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatPercent } from './calculations'
+import { formatGoalValue, formatPercent } from './calculations'
 import { FUNNEL_STAGES } from './constants'
 import { FunnelStageCard } from './funnel-stage-card'
+import { PaceBadge } from './pace-badge'
 import { ProgressBar } from './progress-bar'
 import type { ApiGoal, ApiGoalSummary } from './api'
 
@@ -49,7 +50,7 @@ export function IndividualGoalSection({
     return <Skeleton className="h-64 rounded-[16px]" />
   }
 
-  const { vgv, units, period, funnel } = summary
+  const { vgv, units, period, funnel, progress, pace } = summary
   const avgTicket = Number(goal.avgTicket ?? 0)
   const commission = vgv.target * (Number(goal.commissionPct ?? 0) / 100)
 
@@ -78,8 +79,8 @@ export function IndividualGoalSection({
         </div>
       ) : (
         <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <Stat label="Meta de VGV" value={formatCurrency(vgv.target)} />
-          <Stat label="VGV realizado" value={formatCurrency(vgv.current)} />
+          <Stat label="Meta" value={formatGoalValue(goal.type, progress.target)} />
+          <Stat label="Realizado" value={formatGoalValue(goal.type, progress.current)} />
           <Stat label="Unidades vendidas" value={String(units.current)} />
           <Stat label="Dias restantes" value={String(period.daysLeft)} />
         </div>
@@ -87,11 +88,18 @@ export function IndividualGoalSection({
 
       <div className="mt-4">
         <div className="flex items-center justify-between text-xs font-medium text-neutral-600">
-          <span>{formatCurrency(vgv.current)} em vendas</span>
-          <span>{formatPercent(vgv.percent)}</span>
+          <span>
+            {goal.type === 'vgv'
+              ? `${formatCurrency(progress.current)} em vendas`
+              : `${formatGoalValue(goal.type, progress.current)} de ${formatGoalValue(goal.type, progress.target)}`}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <PaceBadge pace={pace} />
+            {formatPercent(progress.percent)}
+          </span>
         </div>
         <div className="mt-1.5">
-          <ProgressBar value={vgv.percent} />
+          <ProgressBar value={progress.percent} />
         </div>
       </div>
 

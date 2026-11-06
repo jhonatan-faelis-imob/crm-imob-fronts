@@ -20,7 +20,6 @@ import { mapFormValuesToCreateLeadDto, type ApiLead } from '../../api-mapper'
 import type { BrokerOption } from '../../lead-form/tab-basic-info'
 import type { LeadFormValues } from '../../lead-form/schema'
 import { NewLeadDialog } from '../../new-lead-dialog'
-import { useStageModals } from '../../stage-move-provider'
 import { useMoveLeadToStage } from '../../use-move-lead-to-stage'
 import { AiAnalysisDialog } from './ai-analysis-dialog'
 import {
@@ -49,8 +48,7 @@ const tabTriggerClassName =
 export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead }) {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { requestLost } = useStageModals()
-  const { moveLead } = useMoveLeadToStage()
+  const { moveLead, markLost } = useMoveLeadToStage()
 
   const [activeTab, setActiveTab] = useState<string>('timeline')
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -260,7 +258,7 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
         lead={lead}
         onEdit={() => openEdit(0)}
         onTransfer={() => console.log('Transferir corretor', lead.id)}
-        onMarkAsLost={() => requestLost(lead.id)}
+        onMarkAsLost={() => markLost(lead)}
         onArchive={() => archiveLead.mutate()}
         onSelectStage={(stage) => moveLead(lead, stage)}
       />

@@ -31,7 +31,7 @@ export function RankingSection({ entries }: { entries: RankingEntry[] }) {
                     <span className="truncate text-sm font-medium text-neutral-900">
                       {entry.name}
                     </span>
-                    {position === 1 && <Trophy className="h-4 w-4 shrink-0 text-amber-500" />}
+                    {position === 1 && entry.vgv > 0 && <Trophy className="h-4 w-4 shrink-0 text-amber-500" />}
                   </div>
                   <span className="text-xs text-neutral-400">{entry.units} unidades</span>
                 </div>
@@ -39,12 +39,16 @@ export function RankingSection({ entries }: { entries: RankingEntry[] }) {
                   <p className="text-sm font-semibold text-neutral-900">
                     {formatCurrency(entry.vgv)}
                   </p>
-                  <p className="text-xs text-neutral-400">{entry.goalPct}% da meta</p>
+                  <p className="text-xs text-neutral-400">
+                    {entry.goalPct === null ? 'Sem meta' : `${entry.goalPct}% da meta`}
+                  </p>
                 </div>
               </div>
-              <div className="mt-2 pl-8">
-                <ProgressBar value={entry.goalPct} />
-              </div>
+              {entry.goalPct !== null && (
+                <div className="mt-2 pl-8">
+                  <ProgressBar value={entry.goalPct} />
+                </div>
+              )}
             </li>
           )
         })}

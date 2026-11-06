@@ -1,7 +1,7 @@
 import { Pencil } from 'lucide-react'
-import { formatCurrency } from '@/lib/utils'
-import { formatPercent, getGoalStatusBorderClass } from './calculations'
+import { formatGoalValue, formatPercent, getGoalStatusBorderClass } from './calculations'
 import { GOAL_SCOPE_BADGE, GOAL_SCOPE_META } from './constants'
+import { PaceBadge } from './pace-badge'
 import { ProgressBar } from './progress-bar'
 import type { GoalSummary } from './types'
 
@@ -44,12 +44,15 @@ export function GoalSummaryCard({
         )}
       </div>
       <p className="mt-2 text-[28px] font-semibold text-neutral-900">
-        {formatCurrency(goal.realized)}
+        {formatGoalValue(goal.type, goal.realized)}
       </p>
-      <p className="text-xs text-neutral-400">de {formatCurrency(goal.target)}</p>
+      <p className="text-xs text-neutral-400">de {formatGoalValue(goal.type, goal.target)}</p>
       <div className="mt-3 flex items-center justify-between text-xs font-medium text-neutral-600">
         <span>Progresso</span>
-        <span>{formatPercent(pct)}</span>
+        <span className="flex items-center gap-1.5">
+          {goal.pace && <PaceBadge pace={goal.pace} />}
+          {formatPercent(pct)}
+        </span>
       </div>
       <div className="mt-1.5">
         <ProgressBar value={pct} />

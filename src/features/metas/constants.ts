@@ -19,6 +19,30 @@ export const FUNNEL_STAGES: { key: FunnelStageKey; apiKey: FunnelApiKey; label: 
   { key: 'fechamentos', apiKey: 'closings', label: 'Fechamentos' },
 ]
 
+export interface ConversionRates {
+  appointmentsPerClosing: number
+  simulationsPerAppointment: number
+  qualificationsPerSimulation: number
+  prospectsPerQualification: number
+  callsPerProspect: number
+}
+
+export const DEFAULT_CONVERSION_RATES: ConversionRates = {
+  appointmentsPerClosing: 3,
+  simulationsPerAppointment: 2,
+  qualificationsPerSimulation: 2,
+  prospectsPerQualification: 3,
+  callsPerProspect: 5,
+}
+
+export const CONVERSION_RATE_FIELDS: { key: keyof ConversionRates; label: string }[] = [
+  { key: 'callsPerProspect', label: 'Quantas ligações, em média, para cada prospecção' },
+  { key: 'prospectsPerQualification', label: 'Quantas prospecções, em média, para cada qualificação' },
+  { key: 'qualificationsPerSimulation', label: 'Quantas qualificações, em média, para cada simulação' },
+  { key: 'simulationsPerAppointment', label: 'Quantas simulações, em média, para cada agendamento' },
+  { key: 'appointmentsPerClosing', label: 'Quantos agendamentos, em média, para cada fechamento' },
+]
+
 export const GOAL_SCOPE_META: Record<GoalScope, string> = {
   organizacao: 'Imobiliária',
   equipe: 'Equipe',

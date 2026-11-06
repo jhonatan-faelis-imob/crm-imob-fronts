@@ -1,5 +1,12 @@
 import type { GoalScope, GoalType } from '@/types'
-import { GOAL_SCOPE_META, GOAL_TYPE_META, type FunnelApiKey, type Period } from './constants'
+import {
+  DEFAULT_CONVERSION_RATES,
+  GOAL_SCOPE_META,
+  GOAL_TYPE_META,
+  type ConversionRates,
+  type FunnelApiKey,
+  type Period,
+} from './constants'
 
 export interface ApiGoal {
   id: string
@@ -12,6 +19,8 @@ export interface ApiGoal {
   periodStart: string
   periodEnd: string
   targetVgv: string | number | null
+  targetValue: string | number | null
+  conversionRates: Partial<ConversionRates> | null
   avgTicket: string | number | null
   commissionPct: string | number | null
   goalUnits: number | null
@@ -54,7 +63,9 @@ export interface ApiGoalSummary {
   period: { start: string; end: string; daysTotal: number; daysElapsed: number; daysLeft: number }
   vgv: { target: number; current: number; percent: number }
   units: { target: number; current: number; percent: number }
-  // Só em meta individual: equipe e organização devolvem apenas vgv e units
+  progress: { current: number; target: number; percent: number }
+  pace: { expectedPercent: number; actualPercent: number; status: 'adiantado' | 'no_ritmo' | 'atrasado' }
+  // Só em meta individual de VGV; as demais devolvem apenas os blocos acima
   funnel?: {
     realized: FunnelCounts
     target: FunnelCounts
@@ -63,6 +74,8 @@ export interface ApiGoalSummary {
   }
   today?: ApiGoalDailyEntry | null
 }
+
+export type ApiAutoFill = FunnelCounts & { date: string }
 
 // O backend não guarda um "escopo" — ele é derivado de teamId/userId, exatamente como
 // documentado na tabela de metas do CLAUDE.md (organização = nenhum dos dois, equipe =
@@ -140,26 +153,33 @@ interface NewGoalFormShape {
   type: GoalType
   startDate: string
   endDate: string
-  targetValue: number
+  targetValue?: number
   individualVgv?: number
   individualTicket?: number
   individualCommissionPct?: number
+  rates: ConversionRates
+}
+
+export function hasFunnel(data: { scope?: GoalScope; type?: GoalType }) {
+  return data.scope === 'individual' && (!data.type || data.type === 'vgv')
 }
 
 // Pré-popula o formulário de "Nova meta" (reutilizado para edição) a partir de uma meta existente.
 export function goalToFormValues(goal: ApiGoal): NewGoalFormShape {
   const scope = goalScope(goal)
   const targetVgv = Number(goal.targetVgv ?? 0)
+  const withFunnel = hasFunnel({ scope, type: goal.type as GoalType })
   return {
     scope,
     teamId: goal.teamId ?? undefined,
     type: goal.type as GoalType,
     startDate: goal.periodStart.slice(0, 10),
     endDate: goal.periodEnd.slice(0, 10),
-    targetValue: targetVgv,
-    individualVgv: scope === 'individual' ? targetVgv : undefined,
-    individualTicket: scope === 'individual' ? Number(goal.avgTicket ?? 0) : undefined,
-    individualCommissionPct: scope === 'individual' ? Number(goal.commissionPct ?? 0) : undefined,
+    targetValue: goal.type === 'vgv' ? targetVgv : Number(goal.targetValue ?? goal.targetVgv ?? 0),
+    individualVgv: withFunnel ? targetVgv : undefined,
+    individualTicket: withFunnel ? Number(goal.avgTicket ?? 0) : undefined,
+    individualCommissionPct: withFunnel ? Number(goal.commissionPct ?? 0) : undefined,
+    rates: { ...DEFAULT_CONVERSION_RATES, ...goal.conversionRates },
   }
 }
 
@@ -168,6 +188,7 @@ export function goalToFormValues(goal: ApiGoal): NewGoalFormShape {
 // individuais) — por isso preferimos os campos individuais quando o escopo é 'individual'.
 // userId não é enviado: o backend usa o dono atual da meta ou, ao criar, o usuário logado.
 export function mapFormToCreateGoalDto(data: NewGoalFormShape): Record<string, unknown> {
+  const withFunnel = hasFunnel(data)
   return {
     scope: data.scope,
     title: `Meta de ${GOAL_TYPE_META[data.type]} — ${GOAL_SCOPE_META[data.scope]}`,
@@ -175,9 +196,11 @@ export function mapFormToCreateGoalDto(data: NewGoalFormShape): Record<string, u
     period: inferPeriod(data.startDate, data.endDate),
     periodStart: data.startDate,
     periodEnd: data.endDate,
-    targetVgv: data.scope === 'individual' ? data.individualVgv : data.targetValue,
-    avgTicket: data.scope === 'individual' ? data.individualTicket : null,
-    commissionPct: data.scope === 'individual' ? data.individualCommissionPct : null,
+    targetVgv: withFunnel ? data.individualVgv : data.type === 'vgv' ? data.targetValue : null,
+    targetValue: data.type === 'vgv' ? null : data.targetValue,
+    avgTicket: withFunnel ? data.individualTicket : null,
+    commissionPct: withFunnel ? data.individualCommissionPct : null,
+    conversionRates: withFunnel ? data.rates : undefined,
     teamId: data.scope === 'equipe' ? data.teamId || undefined : undefined,
   }
 }

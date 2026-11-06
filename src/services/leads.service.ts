@@ -1,5 +1,12 @@
 import api from '@/lib/api'
 
+export interface ActiveSale {
+  id: string
+  saleValue: number
+  status: string
+  soldAt: string
+}
+
 export const leadsService = {
   findAll: async (params?: Record<string, string>) => {
     const { data } = await api.get('/leads', { params })
@@ -16,6 +23,10 @@ export const leadsService = {
   update: async (id: string, dto: Record<string, unknown>) => {
     const { data } = await api.patch(`/leads/${id}`, dto)
     return data
+  },
+  getActiveSale: async (id: string): Promise<ActiveSale | null> => {
+    const { data } = await api.get(`/leads/${id}/active-sale`)
+    return data || null
   },
   updateStage: async (id: string, funnelStageId: string) => {
     const { data } = await api.patch(`/leads/${id}/stage`, { funnelStageId })

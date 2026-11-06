@@ -529,6 +529,25 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
 
 ---
 
+## Metas — regras atuais
+
+- **Registros diários:** `goal_daily_entries` é a fonte oficial do funil. Um registro por meta, usuário e dia; salvar
+  de novo substitui o total do dia. `daily_activities` está **sem uso** (só aparece em `prisma/reset.ts`) e não deve
+  receber código novo.
+- **Datas:** no front, `toLocalISODate()` de `src/lib/date.ts` (nunca `toISOString()` para montar dia). No back,
+  `toDateOnly()` para colunas `@db.Date` e `businessDayBounds()` para filtrar colunas com horário pelo dia de
+  America/Sao_Paulo, ambos em `src/common/utils/date.ts`.
+- **Histórico de etapas:** `lead_stage_history` recebe uma linha em `updateStage`, `markAsLost` e na criação de lead
+  com etapa. `toStageName` guarda o nome normalizado (sem acento, minúsculo) e alimenta `GET /goals/auto-fill`, que
+  conta leads distintos por etapa.
+- **Taxas de conversão:** `Goal.conversionRates` (JSON) gera o funil de meta individual de VGV. Vazio usa o padrão
+  3 / 2 / 2 / 3 / 5, equivalente aos multiplicadores 3, 6, 12, 36 e 180. Cada etapa arredonda para cima, igual em
+  `goals.service.ts` e `features/metas/calculations.ts`.
+- **Progresso:** `GET /goals/:id/summary` devolve `progress` conforme `Goal.type` e `pace`. O funil só existe em meta
+  individual de VGV.
+
+---
+
 ## Status do Projeto
 
 - [x] Decisões de arquitetura

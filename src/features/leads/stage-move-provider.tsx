@@ -3,10 +3,23 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
 import { createContext, useContext, useState, type ReactNode } from 'react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { toast } from '@/components/ui/toast'
+import { invalidateGoalQueries } from '@/features/metas/invalidate-goal-queries'
+import { formatCurrency } from '@/lib/utils'
 import { funnelStagesService } from '@/services/funnel-stages.service'
-import { leadsService } from '@/services/leads.service'
+import { leadsService, type ActiveSale } from '@/services/leads.service'
 import { salesService, type CreateSaleDto } from '@/services/sales.service'
+import { useAuthStore } from '@/store/auth.store'
 import type { ApiFunnelStage } from './api-mapper'
 import { LostReasonModal } from './components/lost-reason-modal'
 import { RegisterSaleModal, type SaleLead } from './components/register-sale-modal'
@@ -17,28 +30,33 @@ interface SaleTarget {
   stage: ApiFunnelStage | undefined
 }
 
+export type LeaveWonDecision = { proceed: false; cancelSaleId?: undefined } | { proceed: true; cancelSaleId?: string }
+
 interface StageModalsContextValue {
   requestSale: (lead: SaleLead, stage: ApiFunnelStage) => void
-  requestLost: (leadId: string) => void
+  requestLost: (leadId: string, cancelSaleId?: string) => void
+  confirmLeaveWon: (leadId: string) => Promise<LeaveWonDecision>
+  cancelSale: (saleId: string) => Promise<boolean>
   regularize: (leads: SaleLead[]) => void
 }
 
 const StageModalsContext = createContext<StageModalsContextValue | null>(null)
 
-// Telas que leem vendas mas não seguem o prefixo reports-*
-const SALE_QUERY_KEYS = new Set(['broker-ranking', 'sales-by-property', 'sales-history'])
-
-function isSaleReportKey(key: unknown) {
-  return typeof key === 'string' && (key.startsWith('reports-') || SALE_QUERY_KEYS.has(key))
-}
+// PATCH /sales/:id/status exige coordenador ou acima
+const CAN_CANCEL_SALE_ROLES = new Set(['coordenador', 'gerente', 'diretor'])
 
 // Montado em leads/layout.tsx: uma única instância de cada modal atende a página de Leads
 // (Kanban, card, lista) e o detalhe do lead, em vez de um modal por card.
 export function StageMoveProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient()
+  const role = useAuthStore((state) => state.user?.role)
   const [queue, setQueue] = useState<SaleTarget[]>([])
   const [queueSize, setQueueSize] = useState(0)
-  const [lostLeadId, setLostLeadId] = useState<string | null>(null)
+  const [lostTarget, setLostTarget] = useState<{ leadId: string; cancelSaleId?: string } | null>(null)
+  const [leaveWon, setLeaveWon] = useState<{
+    sale: ActiveSale
+    resolve: (decision: LeaveWonDecision) => void
+  } | null>(null)
 
   const { data: stages } = useQuery<ApiFunnelStage[]>({
     queryKey: ['funnel-stages'],
@@ -46,24 +64,17 @@ export function StageMoveProvider({ children }: { children: ReactNode }) {
   })
 
   const current = queue.at(0)
+  const canCancelSale = role !== undefined && CAN_CANCEL_SALE_ROLES.has(role)
 
   function advance() {
     setQueue((items) => items.slice(1))
   }
 
-  function invalidateSaleQueries(leadId: string) {
-    for (const queryKey of [
-      ['leads'],
-      ['lead', leadId],
-      ['goals'],
-      ['goal-summary'],
-      ['dashboard'],
-      ['pending-leads'],
-      ['properties'],
-    ]) {
+  function invalidateLeadQueries(leadId: string) {
+    for (const queryKey of [['leads'], ['lead', leadId], ['pending-leads'], ['properties']]) {
       queryClient.invalidateQueries({ queryKey })
     }
-    queryClient.invalidateQueries({ predicate: (query) => isSaleReportKey(query.queryKey[0]) })
+    invalidateGoalQueries(queryClient)
   }
 
   const confirmSale = useMutation({
@@ -87,7 +98,7 @@ export function StageMoveProvider({ children }: { children: ReactNode }) {
       }
     },
     onSuccess: ({ isDuplicate, stageMoved }, { target }) => {
-      invalidateSaleQueries(target.lead.id)
+      invalidateLeadQueries(target.lead.id)
       advance()
 
       if (!stageMoved) {
@@ -114,12 +125,29 @@ export function StageMoveProvider({ children }: { children: ReactNode }) {
     },
   })
 
+  async function cancelSale(saleId: string) {
+    try {
+      await salesService.updateStatus(saleId, 'cancelado', 'Lead movido para outra etapa')
+      invalidateGoalQueries(queryClient)
+      queryClient.invalidateQueries({ queryKey: ['pending-leads'] })
+      toast.add({ title: 'Venda cancelada', type: 'success' })
+      return true
+    } catch {
+      toast.add({ title: 'Não foi possível cancelar a venda', type: 'error' })
+      return false
+    }
+  }
+
   const markAsLost = useMutation({
-    mutationFn: ({ leadId, reason }: { leadId: string; reason: string }) => leadsService.markAsLost(leadId, reason),
-    onSuccess: (_data, { leadId }) => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] })
-      queryClient.invalidateQueries({ queryKey: ['lead', leadId] })
-      setLostLeadId(null)
+    mutationFn: async ({ leadId, reason, cancelSaleId }: { leadId: string; reason: string; cancelSaleId?: string }) => {
+      if (cancelSaleId && !(await cancelSale(cancelSaleId))) return false
+      await leadsService.markAsLost(leadId, reason)
+      return true
+    },
+    onSuccess: (wasMarked, { leadId }) => {
+      if (!wasMarked) return
+      invalidateLeadQueries(leadId)
+      setLostTarget(null)
       toast.add({ title: 'Lead marcado como perdido', type: 'success' })
     },
     onError: () => {
@@ -138,8 +166,35 @@ export function StageMoveProvider({ children }: { children: ReactNode }) {
     setQueue(leads.map((lead) => ({ lead, stage: wonStage })))
   }
 
+  async function confirmLeaveWon(leadId: string): Promise<LeaveWonDecision> {
+    let sale: ActiveSale | null
+    try {
+      sale = await leadsService.getActiveSale(leadId)
+    } catch {
+      toast.add({ title: 'Não foi possível verificar a venda deste lead', type: 'error' })
+      return { proceed: false }
+    }
+    if (!sale) return { proceed: true }
+
+    const activeSale = sale
+    return new Promise((resolve) => setLeaveWon({ sale: activeSale, resolve }))
+  }
+
+  function answerLeaveWon(decision: LeaveWonDecision) {
+    leaveWon?.resolve(decision)
+    setLeaveWon(null)
+  }
+
   return (
-    <StageModalsContext.Provider value={{ requestSale, requestLost: setLostLeadId, regularize }}>
+    <StageModalsContext.Provider
+      value={{
+        requestSale,
+        requestLost: (leadId, cancelSaleId) => setLostTarget({ leadId, cancelSaleId }),
+        confirmLeaveWon,
+        cancelSale,
+        regularize,
+      }}
+    >
       {children}
       <RegisterSaleModal
         lead={current?.lead}
@@ -152,16 +207,53 @@ export function StageMoveProvider({ children }: { children: ReactNode }) {
       />
       {/* key: o modal guarda o motivo em estado local, que não pode vazar para o próximo lead */}
       <LostReasonModal
-        key={lostLeadId}
-        open={lostLeadId !== null}
+        key={lostTarget?.leadId}
+        open={lostTarget !== null}
         onOpenChange={(nextOpen) => {
-          if (!nextOpen) setLostLeadId(null)
+          if (!nextOpen) setLostTarget(null)
         }}
         onConfirm={(reason) => {
-          if (lostLeadId) markAsLost.mutate({ leadId: lostLeadId, reason })
+          if (lostTarget) markAsLost.mutate({ ...lostTarget, reason })
         }}
         isSubmitting={markAsLost.isPending}
       />
+      <AlertDialog
+        open={leaveWon !== null}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) answerLeaveWon({ proceed: false })
+        }}
+      >
+        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
+          <AlertDialogHeader className="p-4 sm:p-6">
+            <AlertDialogTitle>Lead com venda registrada</AlertDialogTitle>
+            <AlertDialogDescription>
+              Este lead tem uma venda de {formatCurrency(Number(leaveWon?.sale.saleValue ?? 0))} registrada.{' '}
+              {canCancelSale
+                ? 'Deseja cancelar a venda? Ela deixará de contar nas metas e no ranking.'
+                : 'Ela continuará contando nas metas e no ranking. Só um coordenador pode cancelar a venda.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mx-0 mb-0 flex-col gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:flex-col sm:p-6">
+            {canCancelSale && (
+              <AlertDialogAction
+                onClick={() => answerLeaveWon({ proceed: true, cancelSaleId: leaveWon?.sale.id })}
+                className="h-11 w-full rounded-[8px] bg-danger px-4 text-white hover:bg-danger hover:opacity-90 sm:h-10"
+              >
+                Cancelar a venda e mover
+              </AlertDialogAction>
+            )}
+            <AlertDialogAction
+              onClick={() => answerLeaveWon({ proceed: true })}
+              className="h-11 w-full rounded-[8px] bg-brand px-4 text-white hover:bg-brand-dark sm:h-10"
+            >
+              Manter a venda e mover
+            </AlertDialogAction>
+            <AlertDialogCancel className="h-11 w-full rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-neutral-600 sm:h-10">
+              Voltar
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </StageModalsContext.Provider>
   )
 }

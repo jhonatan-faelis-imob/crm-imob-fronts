@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Plus, Target } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
+import { useQueries, useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/ui/empty-state'
 import { toLocalISODate } from '@/lib/date'
@@ -24,7 +24,6 @@ import {
   periodTabForGoal,
   pickDefaultGoal,
   type ApiGoal,
-  type ApiGoalSummary,
 } from '@/features/metas/api'
 import type { GoalSummary, RankingEntry } from '@/features/metas/types'
 
@@ -34,6 +33,7 @@ interface BrokerRankingEntry {
   broker: { id: string; name: string; avatarUrl: string | null } | null
   vgv: number | string
   units: number
+  goalPercent: number | null
 }
 
 function periodRange(period: Period): { startDate: string; endDate: string } {
@@ -84,11 +84,15 @@ export default function MetasPage() {
     pickDefaultGoal(periodGoals, user?.id, today) ??
     periodGoals[0]
 
-  const { data: summary } = useQuery<ApiGoalSummary>({
-    queryKey: ['goal-summary', selectedGoal?.id],
-    queryFn: () => goalsService.getSummary(selectedGoal!.id),
-    enabled: !!selectedGoal,
+  const summaryResults = useQueries({
+    queries: periodGoals.map((goal) => ({
+      queryKey: ['goal-summary', goal.id],
+      queryFn: () => goalsService.getSummary(goal.id),
+    })),
   })
+  const summaryFor = (goalId: string | undefined) =>
+    summaryResults[periodGoals.findIndex((goal) => goal.id === goalId)]?.data
+  const summary = summaryFor(selectedGoal?.id)
 
   const { startDate, endDate } = periodRange(period)
 
@@ -97,29 +101,27 @@ export default function MetasPage() {
     queryFn: () => reportsService.getBrokerRanking(startDate, endDate),
   })
 
-  const summaries: GoalSummary[] = periodGoals.map((goal) => ({
-    id: goal.id,
-    label: goal.title,
-    target: Number(goal.targetVgv ?? 0),
-    realized: Number(goal.currentVgv ?? 0),
-    scope: goalScope(goal),
-  }))
-
-  const rankingEntries: RankingEntry[] = (ranking ?? []).map((entry, index) => {
-    const brokerGoal = (goals ?? []).find(
-      (goal) => goal.userId === entry.broker?.id && matchesPeriodTab(goal, period),
-    )
-    const target = brokerGoal ? Number(brokerGoal.targetVgv ?? 0) : 0
-    const vgv = Number(entry.vgv)
+  const summaries: GoalSummary[] = periodGoals.map((goal) => {
+    const goalSummary = summaryFor(goal.id)
     return {
-      id: entry.broker?.id ?? `sem-corretor-${index}`,
-      name: entry.broker?.name ?? 'Corretor removido',
-      vgv,
-      units: entry.units,
-      goalPct: target > 0 ? Math.round((vgv / target) * 100) : 0,
-      isCurrentUser: entry.broker?.id === user?.id,
+      id: goal.id,
+      label: goal.title,
+      target: Number(goalSummary?.progress.target ?? 0),
+      realized: Number(goalSummary?.progress.current ?? 0),
+      scope: goalScope(goal),
+      type: goal.type,
+      pace: goalSummary?.pace,
     }
   })
+
+  const rankingEntries: RankingEntry[] = (ranking ?? []).map((entry, index) => ({
+    id: entry.broker?.id ?? `sem-corretor-${index}`,
+    name: entry.broker?.name ?? 'Corretor removido',
+    vgv: Number(entry.vgv),
+    units: Number(entry.units),
+    goalPct: entry.goalPercent,
+    isCurrentUser: entry.broker?.id === user?.id,
+  }))
 
   function openNewGoal() {
     setEditingGoal(null)
@@ -133,7 +135,7 @@ export default function MetasPage() {
 
   const selectedGoalCanEdit = selectedGoal ? canEditGoal(selectedGoal, user) : false
   const selectedGoalIsOwn = !!selectedGoal && selectedGoal.userId === user?.id
-  const canRegisterToday = selectedGoalIsOwn && isCurrentGoal(selectedGoal, today)
+  const canRegisterToday = selectedGoalIsOwn && isCurrentGoal(selectedGoal, today) && !!summary?.funnel
 
   return (
     <div className="space-y-6">

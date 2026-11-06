@@ -1,4 +1,5 @@
 import api from '@/lib/api'
+import type { ApiAutoFill, ApiGoalSummary } from '@/features/metas/api'
 
 export const goalsService = {
   findAll: async () => {
@@ -9,8 +10,12 @@ export const goalsService = {
     const { data } = await api.get(`/goals/${id}`)
     return data
   },
-  getSummary: async (id: string) => {
+  getSummary: async (id: string): Promise<ApiGoalSummary> => {
     const { data } = await api.get(`/goals/${id}/summary`)
+    return data
+  },
+  getAutoFill: async (date: string): Promise<ApiAutoFill> => {
+    const { data } = await api.get('/goals/auto-fill', { params: { date } })
     return data
   },
   create: async (dto: Record<string, unknown>) => {

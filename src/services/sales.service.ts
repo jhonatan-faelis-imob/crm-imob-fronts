@@ -31,6 +31,10 @@ export const salesService = {
     const { data } = await api.post('/sales', dto)
     return data
   },
+  updateStatus: async (id: string, status: string, reason?: string) => {
+    const { data } = await api.patch(`/sales/${id}/status`, { status, reason })
+    return data
+  },
   getPendingLeads: async (): Promise<PendingLead[]> => {
     const { data } = await api.get('/sales/pending-leads')
     return data

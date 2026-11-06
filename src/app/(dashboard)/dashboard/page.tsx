@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { toLocalISODate } from '@/lib/date'
 import { useQuery } from '@tanstack/react-query'
 import {
   Bell,
@@ -120,7 +121,7 @@ function monthRange() {
   const now = new Date()
   const start = new Date(now.getFullYear(), now.getMonth(), 1)
   const end = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-  return { startDate: start.toISOString().slice(0, 10), endDate: end.toISOString().slice(0, 10) }
+  return { startDate: toLocalISODate(start), endDate: toLocalISODate(end) }
 }
 
 function RankingCard({
@@ -246,11 +247,13 @@ export default function DashboardPage() {
     }))
   const maxFunnelCount = Math.max(1, ...funnelByStage.map((f) => f.count))
 
-  const rankingByVgv = (ranking ?? [])
+  // O endpoint inclui quem não vendeu; o dashboard mostra só o pódio do período
+  const rankingWithSales = (ranking ?? []).filter((entry) => entry.units > 0)
+  const rankingByVgv = rankingWithSales
     .slice()
     .sort((a, b) => Number(b.vgv) - Number(a.vgv))
     .map((entry, index) => ({ ...entry, position: index + 1 }))
-  const rankingByUnits = (ranking ?? [])
+  const rankingByUnits = rankingWithSales
     .slice()
     .sort((a, b) => b.units - a.units)
     .map((entry, index) => ({ ...entry, position: index + 1 }))

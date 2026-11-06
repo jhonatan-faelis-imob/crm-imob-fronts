@@ -1,4 +1,5 @@
-import type { FunnelStageKey } from './constants'
+import { formatCurrency } from '@/lib/utils'
+import type { ConversionRates, FunnelStageKey } from './constants'
 
 export interface ComputedFunnel {
   units: number
@@ -9,17 +10,18 @@ export interface ComputedFunnel {
 export function computeFunnelFromVgv(
   vgv: number,
   avgTicket: number,
-  commissionPct: number
+  commissionPct: number,
+  rates: ConversionRates
 ): ComputedFunnel | null {
   if (!vgv || !avgTicket || vgv <= 0 || avgTicket <= 0) return null
 
   // Mesmo arredondamento do backend: não existe meia unidade vendida
   const fechamentos = Math.ceil(vgv / avgTicket)
-  const agendamentos = fechamentos * 3
-  const simulacoes = agendamentos * 2
-  const qualificacoes = simulacoes * 2
-  const prospeccoes = qualificacoes * 3
-  const ligacoes = prospeccoes * 5
+  const agendamentos = Math.ceil(fechamentos * rates.appointmentsPerClosing)
+  const simulacoes = Math.ceil(agendamentos * rates.simulationsPerAppointment)
+  const qualificacoes = Math.ceil(simulacoes * rates.qualificationsPerSimulation)
+  const prospeccoes = Math.ceil(qualificacoes * rates.prospectsPerQualification)
+  const ligacoes = Math.ceil(prospeccoes * rates.callsPerProspect)
 
   return {
     units: fechamentos,
@@ -33,6 +35,10 @@ export function computeFunnelFromVgv(
       fechamentos,
     },
   }
+}
+
+export function formatGoalValue(type: string, value: number) {
+  return type === 'vgv' ? formatCurrency(value) : value.toLocaleString('pt-BR')
 }
 
 export function formatPercent(value: number) {

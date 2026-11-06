@@ -2,10 +2,12 @@
 
 import { useMutation, useQueryClient, type QueryKey } from '@tanstack/react-query'
 import { toast } from '@/components/ui/toast'
+import { invalidateGoalQueries } from '@/features/metas/invalidate-goal-queries'
 import { leadsService } from '@/services/leads.service'
+import type { Lead } from '@/types'
 import type { ApiFunnelStage, ApiLead } from './api-mapper'
 import type { SaleLead } from './components/register-sale-modal'
-import { useStageModals } from './stage-move-provider'
+import { useStageModals, type LeaveWonDecision } from './stage-move-provider'
 import { isLostStage, isWonStage } from './utils/stage-utils'
 
 interface LeadsQueryData {
@@ -23,12 +25,14 @@ interface MoveLeadContext {
   previousLead: ApiLead | undefined
 }
 
+type MovableLead = SaleLead & Pick<Lead, 'status'>
+
 // Único ponto de decisão de mudança de etapa, usado por Kanban, card ("Mover para..."),
 // lista e detalhe. Ganho e Perdido só abrem o modal: a etapa não muda (nem de forma
 // otimista) até a confirmação, então cancelar não tem nada a desfazer.
 export function useMoveLeadToStage() {
   const queryClient = useQueryClient()
-  const { requestSale, requestLost } = useStageModals()
+  const { requestSale, requestLost, confirmLeaveWon, cancelSale } = useStageModals()
 
   const mutation = useMutation<unknown, unknown, MoveLeadVariables, MoveLeadContext>({
     mutationFn: ({ leadId, stage }) => leadsService.updateStage(leadId, stage.id),
@@ -67,11 +71,22 @@ export function useMoveLeadToStage() {
     onSettled: (_data, _error, { leadId }) => {
       queryClient.invalidateQueries({ queryKey: ['leads'] })
       queryClient.invalidateQueries({ queryKey: ['lead', leadId] })
+      invalidateGoalQueries(queryClient)
     },
   })
 
+  // Quem sai de Ganho pode ter venda ativa; Lead.status já vem derivado da etapa
+  async function askAboutSale(lead: MovableLead): Promise<LeaveWonDecision> {
+    return lead.status === 'ganho' ? confirmLeaveWon(lead.id) : { proceed: true }
+  }
+
+  async function markLost(lead: MovableLead) {
+    const decision = await askAboutSale(lead)
+    if (decision.proceed) requestLost(lead.id, decision.cancelSaleId)
+  }
+
   return {
-    moveLead: (lead: SaleLead, stage: ApiFunnelStage) => {
+    moveLead: async (lead: MovableLead, stage: ApiFunnelStage) => {
       if (lead.funnelStageId === stage.id) return
 
       if (isWonStage(stage.name)) {
@@ -79,11 +94,17 @@ export function useMoveLeadToStage() {
         return
       }
       if (isLostStage(stage.name)) {
-        requestLost(lead.id)
+        await markLost(lead)
         return
       }
+
+      const decision = await askAboutSale(lead)
+      if (!decision.proceed) return
+      if (decision.cancelSaleId && !(await cancelSale(decision.cancelSaleId))) return
+
       mutation.mutate({ leadId: lead.id, stage })
     },
+    markLost,
     isMoving: mutation.isPending,
   }
 }
