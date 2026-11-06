@@ -1,5 +1,6 @@
 import type { DefaultValues } from 'react-hook-form'
 import type { Lead } from '@/types'
+import { applyMask, cepMask, cpfMask, phoneMask } from './masks'
 import type { LeadFormValues } from './schema'
 
 function toCurrencyMaskValue(value: number | undefined) {
@@ -25,9 +26,9 @@ export function leadToFormValues(lead: Lead): DefaultValues<LeadFormValues> {
       source: lead.source,
       name: lead.name,
       maritalStatus: lead.maritalStatus ?? '',
-      cpf: lead.cpf ?? '',
-      phone: lead.phone,
-      phone2: lead.phone2 ?? '',
+      cpf: applyMask(cpfMask, lead.cpf ?? ''),
+      phone: applyMask(phoneMask, lead.phone),
+      phone2: applyMask(phoneMask, lead.phone2 ?? ''),
       income: toCurrencyMaskValue(lead.income),
       interestValue: toCurrencyMaskValue(lead.interestValue),
       fgtsValue: toCurrencyMaskValue(lead.fgtsValue),
@@ -46,7 +47,7 @@ export function leadToFormValues(lead: Lead): DefaultValues<LeadFormValues> {
       responsibleBrokerId: lead.ownerId,
     },
     address: {
-      cep: lead.addressCep ?? '',
+      cep: applyMask(cepMask, lead.addressCep ?? ''),
       street: lead.addressStreet ?? '',
       number: lead.addressNumber ?? '',
       complement: lead.addressComplement ?? '',
@@ -59,6 +60,7 @@ export function leadToFormValues(lead: Lead): DefaultValues<LeadFormValues> {
       birthplace: lead.birthplace ?? '',
       rg: lead.rg ?? '',
       rgIssueDate: '',
+      education: '',
       incomeForAnalysis: '',
       birthDate: isoToDDMMYYYY(lead.birthDate),
       occupation: lead.occupation ?? '',

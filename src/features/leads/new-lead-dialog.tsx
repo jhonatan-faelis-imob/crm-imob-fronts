@@ -1,8 +1,20 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
-import { FormProvider, useForm, type FieldErrors, type FieldPath } from 'react-hook-form'
+import { ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { FormProvider, useForm, useWatch, type FieldErrors } from 'react-hook-form'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -11,6 +23,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { Lead } from '@/types'
 import { TabAddress } from './lead-form/tab-address'
 import { TabBasicInfo, type BrokerOption } from './lead-form/tab-basic-info'
@@ -19,6 +32,7 @@ import { TabPreponents } from './lead-form/tab-preponents'
 import { leadToFormValues } from './lead-form/from-lead'
 import { leadFormDefaultValues, leadFormSchema, type LeadFormValues } from './lead-form/schema'
 
+// Each tab key matches its top-level section in leadFormSchema
 const TABS = [
   { key: 'basic', label: 'Dados básicos' },
   { key: 'address', label: 'Endereço' },
@@ -26,27 +40,7 @@ const TABS = [
   { key: 'preponents', label: 'Preponentes' },
 ] as const
 
-const BASIC_INFO_FIELDS: FieldPath<LeadFormValues>[] = [
-  'basic.personType',
-  'basic.source',
-  'basic.name',
-  'basic.maritalStatus',
-  'basic.cpf',
-  'basic.phone',
-  'basic.phone2',
-  'basic.income',
-  'basic.email',
-  'basic.intent',
-  'basic.urgency',
-  'basic.propertyType',
-  'basic.tags',
-  'basic.notes',
-  'basic.isInvestor',
-  'basic.isInterested',
-  'basic.isOwner',
-  'basic.capturedByBrokerId',
-  'basic.responsibleBrokerId',
-]
+const navButtonClassName = 'size-11 rounded-[8px] border-[1.5px] border-neutral-200 text-neutral-600 sm:size-10'
 
 // Owns the form state (useForm + activeTab). Mounted fresh via a `key` on the parent
 // every time the dialog opens (or targets a different lead/tab), so state always starts
@@ -54,44 +48,55 @@ const BASIC_INFO_FIELDS: FieldPath<LeadFormValues>[] = [
 function LeadFormBody({
   lead,
   initialTab,
-  isEditing,
   brokers,
   onClose,
+  onCancel,
+  onDirtyChange,
   onSubmitLead,
 }: {
   lead?: Lead
   initialTab: number
-  isEditing: boolean
   brokers: BrokerOption[]
   onClose: () => void
+  onCancel: () => void
+  onDirtyChange: (isDirty: boolean) => void
   onSubmitLead: (data: LeadFormValues) => Promise<void>
 }) {
   const [activeTab, setActiveTab] = useState(initialTab)
-  const [isSaving, setIsSaving] = useState(false)
 
   const form = useForm<LeadFormValues>({
     resolver: zodResolver(leadFormSchema),
+    mode: 'onChange',
     defaultValues: lead ? leadToFormValues(lead) : leadFormDefaultValues,
   })
-  const { handleSubmit, trigger } = form
+  const { control, handleSubmit } = form
+  const { isValid, isSubmitting, dirtyFields } = form.formState
+  const canSave = isValid
 
-  async function goToTab(index: number) {
-    if (index === activeTab) return
-    if (index > activeTab && activeTab === 0) {
-      const isValid = await trigger(BASIC_INFO_FIELDS)
-      if (!isValid) return
-    }
-    setActiveTab(index)
+  // dirtyFields compares field by field: isDirty would stay true after undoing an edit,
+  // because the required selects report '' against an undefined default
+  const hasChanges = Object.keys(dirtyFields).length > 0
+  useEffect(() => {
+    onDirtyChange(hasChanges)
+  }, [hasChanges, onDirtyChange])
+
+  // formState.errors only holds fields the user already changed, so a required field
+  // that is still empty has to come from parsing the current values
+  const values = useWatch({ control })
+  const invalidSections = new Set(leadFormSchema.safeParse(values).error?.issues.map((issue) => issue.path[0]))
+  const pendingTab = TABS.find((tab) => invalidSections.has(tab.key))
+
+  let saveHint: string | undefined
+  if (!canSave && pendingTab && pendingTab.key !== TABS[activeTab].key) {
+    saveHint =
+      pendingTab.key === 'basic'
+        ? 'Preencha os campos obrigatórios na aba Dados básicos'
+        : `Corrija os campos inválidos na aba ${pendingTab.label}`
   }
 
   async function onSubmit(data: LeadFormValues) {
-    try {
-      setIsSaving(true)
-      await onSubmitLead(data)
-      onClose()
-    } finally {
-      setIsSaving(false)
-    }
+    await onSubmitLead(data)
+    onClose()
   }
 
   function onInvalid(formErrors: FieldErrors<LeadFormValues>) {
@@ -108,14 +113,19 @@ function LeadFormBody({
           <button
             key={tab.key}
             type="button"
-            onClick={() => goToTab(index)}
-            className={`shrink-0 whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
+            onClick={() => setActiveTab(index)}
+            className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
               activeTab === index
                 ? 'border-brand text-brand'
                 : 'border-transparent text-neutral-400 hover:text-neutral-600'
             }`}
           >
             {index + 1}. {tab.label}
+            {invalidSections.has(tab.key) && (
+              <span className="h-2 w-2 rounded-full bg-danger">
+                <span className="sr-only">Campos pendentes</span>
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -129,34 +139,64 @@ function LeadFormBody({
         </form>
       </FormProvider>
 
-      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-between gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
-        <button
+      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row items-center justify-between gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:justify-between sm:p-6">
+        <Button
           type="button"
-          onClick={() => goToTab(activeTab - 1)}
-          disabled={activeTab === 0}
-          className="rounded-[8px] border-[1.5px] border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-600 disabled:cursor-not-allowed disabled:opacity-50"
+          variant="ghost"
+          onClick={onCancel}
+          disabled={isSubmitting}
+          aria-label="Cancelar"
+          className="h-11 min-w-11 rounded-[8px] border-[0.5px] border-neutral-200 px-3 text-neutral-600 sm:h-10"
         >
-          Anterior
-        </button>
+          <X className="min-[360px]:hidden" />
+          <span className="hidden min-[360px]:inline">Cancelar</span>
+        </Button>
 
-        {activeTab < TABS.length - 1 ? (
-          <button
+        <div className="flex items-center gap-2">
+          <Button
             type="button"
-            onClick={() => goToTab(activeTab + 1)}
-            className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+            variant="outline"
+            size="icon"
+            onClick={() => setActiveTab((prev) => prev - 1)}
+            disabled={activeTab === 0}
+            aria-label="Aba anterior"
+            className={navButtonClassName}
           >
-            Próximo
-          </button>
-        ) : (
-          <button
+            <ChevronLeft />
+          </Button>
+
+          <Button
             type="button"
-            onClick={handleSubmit(onSubmit, onInvalid)}
-            disabled={isSaving}
-            className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-70"
+            variant="outline"
+            size="icon"
+            onClick={() => setActiveTab((prev) => prev + 1)}
+            disabled={activeTab === TABS.length - 1}
+            aria-label="Próxima aba"
+            className={navButtonClassName}
           >
-            {isSaving ? 'Salvando...' : isEditing ? 'Salvar alterações' : 'Salvar lead'}
-          </button>
-        )}
+            <ChevronRight />
+          </Button>
+
+          {/* Disabled buttons fire no pointer events, so the tooltip hangs on a wrapper.
+              The button stays outside <form> on purpose: a linked submit button would make
+              Enter in any input (preponent form included) save the lead. */}
+          <Tooltip disabled={!saveHint}>
+            <TooltipTrigger
+              delay={0}
+              render={<span tabIndex={saveHint ? 0 : undefined} className={saveHint ? 'cursor-not-allowed rounded-[8px]' : undefined} />}
+            >
+              <Button
+                type="button"
+                onClick={handleSubmit(onSubmit, onInvalid)}
+                disabled={!canSave || isSubmitting}
+                className="h-11 rounded-[8px] bg-brand px-4 text-white hover:bg-brand-dark sm:h-10"
+              >
+                {isSubmitting ? 'Salvando...' : 'Salvar'}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{saveHint}</TooltipContent>
+          </Tooltip>
+        </div>
       </DialogFooter>
     </>
   )
@@ -178,9 +218,25 @@ export function NewLeadDialog({
   onSubmitLead: (data: LeadFormValues) => Promise<void>
 }) {
   const isEditing = lead !== undefined
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [isDiscardDialogOpen, setIsDiscardDialogOpen] = useState(false)
+
+  // Also runs for the header X, Esc and backdrop click, not only the Cancelar button
+  function handleOpenChange(nextOpen: boolean) {
+    if (!nextOpen && hasUnsavedChanges) {
+      setIsDiscardDialogOpen(true)
+      return
+    }
+    onOpenChange(nextOpen)
+  }
+
+  function handleDiscard() {
+    setIsDiscardDialogOpen(false)
+    onOpenChange(false)
+  }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="grid-cols-none flex w-[calc(100%-2rem)] max-w-2xl flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0 sm:max-w-2xl max-h-[90vh]">
         <DialogHeader className="shrink-0 gap-1 p-4 pr-12 sm:p-6 sm:pr-14 sm:pb-4">
           <DialogTitle>{lead ? `Editar lead — ${lead.name}` : 'Novo lead'}</DialogTitle>
@@ -193,12 +249,33 @@ export function NewLeadDialog({
           key={`${open}-${lead?.id ?? 'new'}-${initialTab}`}
           lead={lead}
           initialTab={initialTab}
-          isEditing={isEditing}
           brokers={brokers}
           onClose={() => onOpenChange(false)}
+          onCancel={() => handleOpenChange(false)}
+          onDirtyChange={setHasUnsavedChanges}
           onSubmitLead={onSubmitLead}
         />
       </DialogContent>
+
+      <AlertDialog open={isDiscardDialogOpen} onOpenChange={setIsDiscardDialogOpen}>
+        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
+          <AlertDialogHeader className="p-4 sm:p-6">
+            <AlertDialogTitle>Descartar alterações?</AlertDialogTitle>
+            <AlertDialogDescription>As alterações feitas neste lead serão perdidas.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
+            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-neutral-600 sm:h-10">
+              Continuar editando
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDiscard}
+              className="h-11 rounded-[8px] bg-danger px-4 text-white hover:bg-danger hover:opacity-90 sm:h-10"
+            >
+              Descartar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   )
 }
