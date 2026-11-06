@@ -16,11 +16,12 @@ import { propertiesService } from '@/services/properties.service'
 import { tasksService } from '@/services/tasks.service'
 import { usersService } from '@/services/users.service'
 import type { Lead, Task, TaskType } from '@/types'
-import { isLostStageName, mapFormValuesToCreateLeadDto, type ApiFunnelStage, type ApiLead } from '../../api-mapper'
+import { mapFormValuesToCreateLeadDto, type ApiLead } from '../../api-mapper'
 import type { BrokerOption } from '../../lead-form/tab-basic-info'
 import type { LeadFormValues } from '../../lead-form/schema'
 import { NewLeadDialog } from '../../new-lead-dialog'
-import { LostReasonModal } from '../lost-reason-modal'
+import { useStageModals } from '../../stage-move-provider'
+import { useMoveLeadToStage } from '../../use-move-lead-to-stage'
 import { AiAnalysisDialog } from './ai-analysis-dialog'
 import {
   interactionToTimelineEntry,
@@ -48,12 +49,13 @@ const tabTriggerClassName =
 export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead }) {
   const router = useRouter()
   const queryClient = useQueryClient()
+  const { requestLost } = useStageModals()
+  const { moveLead } = useMoveLeadToStage()
 
   const [activeTab, setActiveTab] = useState<string>('timeline')
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [editInitialTab, setEditInitialTab] = useState(0)
   const [isAiDialogOpen, setIsAiDialogOpen] = useState(false)
-  const [isLostModalOpen, setIsLostModalOpen] = useState(false)
   const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [completingTask, setCompletingTask] = useState<Task | null>(null)
@@ -110,39 +112,6 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
     },
     onError: () => {
       toast.add({ title: 'Não foi possível salvar as alterações', type: 'error' })
-    },
-  })
-
-  const markAsLost = useMutation({
-    mutationFn: (lostReason: string) => leadsService.markAsLost(lead.id, lostReason),
-    onSuccess: () => {
-      invalidateLead()
-      toast.add({ title: 'Lead marcado como perdido', type: 'success' })
-    },
-    onError: () => {
-      toast.add({ title: 'Não foi possível marcar o lead como perdido', type: 'error' })
-    },
-  })
-
-  const updateStage = useMutation({
-    mutationFn: (stage: ApiFunnelStage) => leadsService.updateStage(lead.id, stage.id),
-    onMutate: async (stage) => {
-      await queryClient.cancelQueries({ queryKey: ['lead', lead.id] })
-      const previous = queryClient.getQueryData<ApiLead>(['lead', lead.id])
-      queryClient.setQueryData<ApiLead>(['lead', lead.id], (old) =>
-        old ? { ...old, funnelStageId: stage.id, funnelStage: stage } : old,
-      )
-      return { previous }
-    },
-    onError: (_error, _stage, context) => {
-      if (context?.previous) queryClient.setQueryData(['lead', lead.id], context.previous)
-      toast.add({ title: 'Não foi possível atualizar a etapa', type: 'error' })
-    },
-    onSuccess: (_data, stage) => {
-      toast.add({ title: `Etapa atualizada para ${stage.name}`, type: 'success' })
-    },
-    onSettled: () => {
-      invalidateLead()
     },
   })
 
@@ -245,22 +214,6 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
     await updateLead.mutateAsync(mapFormValuesToCreateLeadDto(data))
   }
 
-  function handleMarkAsLost() {
-    setIsLostModalOpen(true)
-  }
-
-  function handleSelectStage(stage: ApiFunnelStage) {
-    if (isLostStageName(stage.name)) {
-      setIsLostModalOpen(true)
-      return
-    }
-    updateStage.mutate(stage)
-  }
-
-  function handleConfirmLostReason(reason: string) {
-    markAsLost.mutate(reason, { onSuccess: () => setIsLostModalOpen(false) })
-  }
-
   function openEdit(tabIndex = 0) {
     setEditInitialTab(tabIndex)
     setIsEditDialogOpen(true)
@@ -307,9 +260,9 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
         lead={lead}
         onEdit={() => openEdit(0)}
         onTransfer={() => console.log('Transferir corretor', lead.id)}
-        onMarkAsLost={handleMarkAsLost}
+        onMarkAsLost={() => requestLost(lead.id)}
         onArchive={() => archiveLead.mutate()}
-        onSelectStage={handleSelectStage}
+        onSelectStage={(stage) => moveLead(lead, stage)}
       />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -393,12 +346,6 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
         onSubmitLead={handleSubmitLead}
       />
       <AiAnalysisDialog open={isAiDialogOpen} onOpenChange={setIsAiDialogOpen} leadId={lead.id} />
-      <LostReasonModal
-        open={isLostModalOpen}
-        onOpenChange={setIsLostModalOpen}
-        onConfirm={handleConfirmLostReason}
-        isSubmitting={markAsLost.isPending}
-      />
       <NewTaskDialog
         open={isNewTaskDialogOpen}
         onOpenChange={(next) => {

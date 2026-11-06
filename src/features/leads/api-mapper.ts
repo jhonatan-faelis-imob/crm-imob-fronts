@@ -112,10 +112,6 @@ export function resolveLeadStage(
   return stages.find((s) => DEFAULT_STAGE_NAME_TO_STATUS[s.name.toLowerCase().trim()] === lead.status)
 }
 
-export function isLostStageName(name: string): boolean {
-  return name.toLowerCase().trim() === 'perdido'
-}
-
 // Deriva um badge (bg pastel + texto na cor cheia) a partir da cor única armazenada na
 // etapa, já que o backend guarda só uma cor por etapa (não um par bg/text como o mock antigo).
 export function stageBadgeStyle(stage: ApiFunnelStage): { backgroundColor: string; color: string } {
@@ -217,14 +213,14 @@ export function mapApiLeadToLead(lead: ApiLead): Lead {
   }
 }
 
-function parseCurrency(value: string | undefined): number | undefined {
+export function parseCurrency(value: string | undefined): number | undefined {
   if (!value) return undefined
   const digits = value.replace(/[^\d,]/g, '').replace(',', '.')
   const parsed = Number(digits)
   return Number.isFinite(parsed) && digits !== '' ? parsed : undefined
 }
 
-function ddmmyyyyToIso(value: string | undefined): string | undefined {
+export function ddmmyyyyToIso(value: string | undefined): string | undefined {
   if (!value) return undefined
   const [day, month, year] = value.split('/')
   if (!day || !month || !year) return undefined

@@ -3,7 +3,7 @@ import type { Lead } from '@/types'
 import { applyMask, cepMask, cpfMask, phoneMask } from './masks'
 import type { LeadFormValues } from './schema'
 
-function toCurrencyMaskValue(value: number | undefined) {
+export function toCurrencyMaskValue(value: number | undefined) {
   if (value === undefined) return ''
   return `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }

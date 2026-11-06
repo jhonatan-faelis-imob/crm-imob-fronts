@@ -19,7 +19,7 @@ import type { Lead } from '@/types'
 import { funnelStagesService } from '@/services/funnel-stages.service'
 import { Skeleton } from '@/components/ui/skeleton'
 import { resolveLeadStage, type ApiFunnelStage } from '../api-mapper'
-import { useMoveLeadStage } from '../use-move-lead-stage'
+import { useMoveLeadToStage } from '../use-move-lead-to-stage'
 import { LeadCard } from '../lead-card'
 
 function DraggableLeadCard({ lead }: { lead: Lead }) {
@@ -87,7 +87,7 @@ function DroppableColumn({ stage, leads }: { stage: ApiFunnelStage; leads: Lead[
 
 export function KanbanBoard({ leads }: { leads: Lead[] }) {
   const [activeId, setActiveId] = useState<string | null>(null)
-  const { moveLead } = useMoveLeadStage()
+  const { moveLead } = useMoveLeadToStage()
 
   const { data: stages } = useQuery<ApiFunnelStage[]>({
     queryKey: ['funnel-stages'],
@@ -121,7 +121,7 @@ export function KanbanBoard({ leads }: { leads: Lead[] }) {
     const currentStage = resolveLeadStage(lead, orderedStages)
     if (currentStage?.id === targetStage.id) return
 
-    moveLead(leadId, targetStage)
+    moveLead(lead, targetStage)
   }
 
   if (!stages) {

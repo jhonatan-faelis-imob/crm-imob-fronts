@@ -132,7 +132,7 @@ function RankingCard({
 }: {
   title: string
   entries: BrokerRankingEntry[]
-  formatValue: (value: number) => string
+  formatValue: (entry: BrokerRankingEntry) => string
   monthLabel: string
   isLoading: boolean
 }) {
@@ -169,7 +169,7 @@ function RankingCard({
               </span>
               {entry.position === 1 && <Trophy className="h-4 w-4 shrink-0 text-amber-500" />}
               <span className="shrink-0 text-sm font-semibold text-neutral-900">
-                {formatValue(Number(entry.vgv))}
+                {formatValue(entry)}
               </span>
             </li>
           ))}
@@ -403,14 +403,14 @@ export default function DashboardPage() {
         <RankingCard
           title="Ranking — quantidade de vendas"
           entries={rankingByUnits}
-          formatValue={(value) => String(value)}
+          formatValue={(entry) => String(entry.units)}
           monthLabel={currentMonthLabel}
           isLoading={isRankingLoading}
         />
         <RankingCard
           title="Ranking — VGV"
           entries={rankingByVgv}
-          formatValue={formatCurrency}
+          formatValue={(entry) => formatCurrency(Number(entry.vgv))}
           monthLabel={currentMonthLabel}
           isLoading={isRankingLoading}
         />

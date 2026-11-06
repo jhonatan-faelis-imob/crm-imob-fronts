@@ -8,7 +8,7 @@ import type { Lead } from '@/types'
 import { funnelStagesService } from '@/services/funnel-stages.service'
 import { SOURCE_META } from './constants'
 import { resolveLeadStage, type ApiFunnelStage } from './api-mapper'
-import { useMoveLeadStage } from './use-move-lead-stage'
+import { useMoveLeadToStage } from './use-move-lead-to-stage'
 import { StagePopover } from './components/stage-popover'
 
 function formatLastContact(lead: Lead) {
@@ -18,7 +18,7 @@ function formatLastContact(lead: Lead) {
 }
 
 export function LeadsListView({ leads }: { leads: Lead[] }) {
-  const { moveLead } = useMoveLeadStage()
+  const { moveLead } = useMoveLeadToStage()
   const { data: stages } = useQuery<ApiFunnelStage[]>({
     queryKey: ['funnel-stages'],
     queryFn: funnelStagesService.findAll,
@@ -58,7 +58,7 @@ export function LeadsListView({ leads }: { leads: Lead[] }) {
                   <StagePopover
                     stages={stages ?? []}
                     currentStage={currentStage}
-                    onSelect={(stage) => moveLead(lead.id, stage)}
+                    onSelect={(stage) => moveLead(lead, stage)}
                   />
                 </td>
                 <td className="hidden px-4 py-3 text-neutral-600 md:table-cell">{source.label}</td>

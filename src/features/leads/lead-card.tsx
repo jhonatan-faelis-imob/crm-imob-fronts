@@ -17,7 +17,7 @@ import { funnelStagesService } from '@/services/funnel-stages.service'
 import { SOURCE_META } from './constants'
 import { LEAD_URGENCY_META } from './lead-form/options'
 import { resolveLeadStage, type ApiFunnelStage } from './api-mapper'
-import { useMoveLeadStage } from './use-move-lead-stage'
+import { useMoveLeadToStage } from './use-move-lead-to-stage'
 import { MoveStageDialog } from './components/move-stage-dialog'
 
 const MAX_VISIBLE_TAGS = 2
@@ -25,7 +25,7 @@ const MAX_VISIBLE_TAGS = 2
 export function LeadCard({ lead }: { lead: Lead }) {
   const router = useRouter()
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
-  const { moveLead } = useMoveLeadStage()
+  const { moveLead } = useMoveLeadToStage()
 
   const { data: stages } = useQuery<ApiFunnelStage[]>({
     queryKey: ['funnel-stages'],
@@ -139,7 +139,7 @@ export function LeadCard({ lead }: { lead: Lead }) {
       onOpenChange={setIsMoveDialogOpen}
       stages={stages ?? []}
       currentStageId={currentStage?.id}
-      onSelect={(stage) => moveLead(lead.id, stage)}
+      onSelect={(stage) => moveLead(lead, stage)}
     />
     </>
   )

@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/toast'
 import { FiltersBar, defaultLeadFilters, type LeadFilters } from '@/features/leads/filters-bar'
 import { formatVgv, KanbanBoard } from '@/features/leads/components/kanban-board'
+import { PendingSalesBanner } from '@/features/leads/components/pending-sales-banner'
 import { LeadsListView } from '@/features/leads/list-view'
 import { NewLeadDialog } from '@/features/leads/new-lead-dialog'
 import {
@@ -135,6 +136,8 @@ export default function LeadsPage() {
           </button>
         </div>
       </div>
+
+      <PendingSalesBanner />
 
       <FiltersBar filters={filters} onChange={setFilters} brokers={brokerOptions} />
 
