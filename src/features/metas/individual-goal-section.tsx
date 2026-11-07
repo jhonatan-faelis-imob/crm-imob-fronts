@@ -1,4 +1,4 @@
-import { CalendarCheck, ArrowRight, Pencil, Target } from 'lucide-react'
+import { CalendarCheck, ArrowRight, Pencil, Target, Trash2 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -26,6 +26,7 @@ export function IndividualGoalSection({
   onRegisterToday,
   onCreateGoal,
   onEdit,
+  onDelete,
 }: {
   goal: ApiGoal | undefined
   summary: ApiGoalSummary | undefined
@@ -34,6 +35,7 @@ export function IndividualGoalSection({
   onRegisterToday?: () => void
   onCreateGoal: () => void
   onEdit?: () => void
+  onDelete?: () => void
 }) {
   if (!goal) {
     return (
@@ -59,14 +61,24 @@ export function IndividualGoalSection({
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-[20px] font-semibold text-neutral-900">{title}</h2>
         {canEdit && (
-          <button
-            type="button"
-            onClick={onEdit}
-            aria-label="Editar meta"
-            className="shrink-0 rounded-[8px] p-1.5 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
+          <div className="-mr-3 flex shrink-0">
+            <button
+              type="button"
+              onClick={onEdit}
+              aria-label="Editar meta"
+              className="flex h-11 w-11 items-center justify-center rounded-[8px] text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
+            >
+              <Pencil className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={onDelete}
+              aria-label="Excluir meta"
+              className="flex h-11 w-11 items-center justify-center rounded-[8px] text-danger transition-colors hover:bg-[#FFEBEE]"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
         )}
       </div>
 

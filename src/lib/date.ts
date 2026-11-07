@@ -5,3 +5,15 @@ export function toLocalISODate(date = new Date()) {
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
+
+// new Date('YYYY-MM-DD') é meia-noite UTC: em São Paulo ainda seria o dia anterior
+export function parseLocalISODate(day: string) {
+  const [year, month, date] = day.split('-').map(Number)
+  return new Date(year, month - 1, date)
+}
+
+export function addDays(day: string, amount: number) {
+  const date = parseLocalISODate(day)
+  date.setDate(date.getDate() + amount)
+  return toLocalISODate(date)
+}

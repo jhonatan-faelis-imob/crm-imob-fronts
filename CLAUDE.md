@@ -537,6 +537,10 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
 - **Datas:** no front, `toLocalISODate()` de `src/lib/date.ts` (nunca `toISOString()` para montar dia). No back,
   `toDateOnly()` para colunas `@db.Date` e `businessDayBounds()` para filtrar colunas com horário pelo dia de
   America/Sao_Paulo, ambos em `src/common/utils/date.ts`.
+- **Dia do registro:** o modal aceita qualquer dia de `periodStart` até hoje (ou até `periodEnd`, em meta encerrada) e
+  a API rejeita o resto. Dia com registro salvo mostra o salvo; sem registro, o preenchimento automático.
+- **Editar e excluir meta:** mesma regra, em `canManageGoal` (`goals.service.ts`) e `canEditGoal` (`features/metas/api.ts`).
+  A exclusão é lógica (`active = false`): meta inativa responde 404 em todas as rotas e não entra em listas nem recálculos.
 - **Histórico de etapas:** `lead_stage_history` recebe uma linha em `updateStage`, `markAsLost` e na criação de lead
   com etapa. `toStageName` guarda o nome normalizado (sem acento, minúsculo) e alimenta `GET /goals/auto-fill`, que
   conta leads distintos por etapa.

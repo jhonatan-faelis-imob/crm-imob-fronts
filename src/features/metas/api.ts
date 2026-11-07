@@ -36,7 +36,7 @@ export interface ApiGoal {
   createdAt: string
   updatedAt: string
   team?: { id: string; name: string } | null
-  user?: { id: string; name: string; avatarUrl: string | null } | null
+  user?: { id: string; name: string; avatarUrl: string | null; teamId?: string | null } | null
   _count?: { dailyEntries: number }
 }
 
@@ -57,6 +57,8 @@ export interface ApiGoalDailyEntry {
 }
 
 type FunnelCounts = Record<FunnelApiKey, number>
+
+export type ApiGoalEntry = FunnelCounts & { date: string }
 
 export interface ApiGoalSummary {
   goal: ApiGoal
@@ -105,6 +107,12 @@ export function isCurrentGoal(goal: Pick<ApiGoal, 'periodStart' | 'periodEnd'>, 
   return goal.periodStart.slice(0, 10) <= today && today <= goal.periodEnd.slice(0, 10)
 }
 
+// O registro diário vale até hoje, mas nunca depois do fim da meta
+export function lastRegisterableDay(goal: Pick<ApiGoal, 'periodEnd'>, today: string) {
+  const periodEnd = goal.periodEnd.slice(0, 10)
+  return today < periodEnd ? today : periodEnd
+}
+
 function goalPriority(goal: ApiGoal, userId: string | undefined) {
   const scope = goalScope(goal)
   if (scope === 'individual') return goal.userId === userId ? 0 : 1
@@ -137,14 +145,16 @@ export function inferPeriod(startDate: string, endDate: string): string {
   return 'custom'
 }
 
+// Espelha canManageGoal em goals.service.ts: editar e excluir seguem a mesma regra
 export function canEditGoal(
   goal: ApiGoal,
   user: { id: string; role: string; teamId?: string | null } | null,
 ): boolean {
   if (!user) return false
   if (user.role === 'diretor' || user.role === 'gerente') return true
-  if (user.role === 'coordenador' && goal.teamId && goal.teamId === user.teamId) return true
-  return goal.userId === user.id
+  if (goal.userId === user.id) return true
+  if (user.role !== 'coordenador' || !user.teamId) return false
+  return goal.teamId === user.teamId || goal.user?.teamId === user.teamId
 }
 
 interface NewGoalFormShape {

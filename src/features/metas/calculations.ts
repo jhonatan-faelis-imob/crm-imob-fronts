@@ -1,4 +1,5 @@
 import { formatCurrency } from '@/lib/utils'
+import { parseLocalISODate } from '@/lib/date'
 import type { ConversionRates, FunnelStageKey } from './constants'
 
 export interface ComputedFunnel {
@@ -35,6 +36,22 @@ export function computeFunnelFromVgv(
       fechamentos,
     },
   }
+}
+
+// "Sexta, 06 de novembro"
+export function formatDayLabel(day: string) {
+  const date = parseLocalISODate(day)
+  const weekday = new Intl.DateTimeFormat('pt-BR', { weekday: 'long' }).format(date).replace('-feira', '')
+  const month = new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(date)
+  return `${weekday.charAt(0).toUpperCase()}${weekday.slice(1)}, ${day.slice(8)} de ${month}`
+}
+
+function formatISODay(day: string) {
+  return day.slice(0, 10).split('-').reverse().join('/')
+}
+
+export function formatPeriodLabel(goal: { periodStart: string; periodEnd: string }) {
+  return `${formatISODay(goal.periodStart)} a ${formatISODay(goal.periodEnd)}`
 }
 
 export function formatGoalValue(type: string, value: number) {

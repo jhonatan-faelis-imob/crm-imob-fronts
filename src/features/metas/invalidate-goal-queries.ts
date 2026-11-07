@@ -8,7 +8,7 @@ function isSaleReportKey(key: unknown) {
 }
 
 export function invalidateGoalQueries(queryClient: QueryClient) {
-  for (const key of ['goals', 'goal', 'goal-summary', 'goals-auto-fill', 'dashboard']) {
+  for (const key of ['goals', 'goal', 'goal-summary', 'goal-entries', 'goals-auto-fill', 'dashboard']) {
     queryClient.invalidateQueries({ queryKey: [key] })
   }
   queryClient.invalidateQueries({ predicate: (query) => isSaleReportKey(query.queryKey[0]) })

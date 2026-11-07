@@ -11,6 +11,8 @@ import { goalsService } from '@/services/goals.service'
 import { reportsService } from '@/services/reports.service'
 import { PERIOD_META, type Period } from '@/features/metas/constants'
 import { DailyEntrySheet } from '@/features/metas/daily-entry-sheet'
+import { DeleteGoalDialog } from '@/features/metas/delete-goal-dialog'
+import { GoalRecordsSection } from '@/features/metas/goal-records-section'
 import { GoalSelector } from '@/features/metas/goal-selector'
 import { GoalSummaryCard } from '@/features/metas/summary-card'
 import { IndividualGoalSection } from '@/features/metas/individual-goal-section'
@@ -61,8 +63,13 @@ export default function MetasPage() {
   const [chosenPeriod, setPeriod] = useState<Period | undefined>(undefined)
   const [selectedGoalId, setSelectedGoalId] = useState<string | undefined>(undefined)
   const [isDailyEntryOpen, setIsDailyEntryOpen] = useState(false)
+  const [dailyEntryDate, setDailyEntryDate] = useState('')
+  // Cada abertura remonta o modal: o dia e os valores da abertura anterior não ficam
+  const [dailyEntrySession, setDailyEntrySession] = useState(0)
   const [isGoalSheetOpen, setIsGoalSheetOpen] = useState(false)
   const [editingGoal, setEditingGoal] = useState<ApiGoal | null>(null)
+  const [deletingGoal, setDeletingGoal] = useState<ApiGoal | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const user = useAuthStore((state) => state.user)
 
   const { data: goals, isLoading: isGoalsLoading } = useQuery<ApiGoal[]>({
@@ -133,9 +140,22 @@ export default function MetasPage() {
     setIsGoalSheetOpen(true)
   }
 
+  function openDeleteGoal(goal: ApiGoal) {
+    setDeletingGoal(goal)
+    setIsDeleteDialogOpen(true)
+  }
+
+  function openDailyEntry(date: string) {
+    setDailyEntryDate(date)
+    setDailyEntrySession((session) => session + 1)
+    setIsDailyEntryOpen(true)
+  }
+
   const selectedGoalCanEdit = selectedGoal ? canEditGoal(selectedGoal, user) : false
   const selectedGoalIsOwn = !!selectedGoal && selectedGoal.userId === user?.id
   const canRegisterToday = selectedGoalIsOwn && isCurrentGoal(selectedGoal, today) && !!summary?.funnel
+  // Inclui meta já encerrada: o último dia dela ainda pode ser preenchido depois
+  const showRecords = selectedGoalIsOwn && !!summary?.funnel && selectedGoal.periodStart.slice(0, 10) <= today
 
   return (
     <div className="space-y-6">
@@ -200,6 +220,7 @@ export default function MetasPage() {
                     goal={goal}
                     canEdit={fullGoal ? canEditGoal(fullGoal, user) : false}
                     onEdit={() => fullGoal && openEditGoal(fullGoal)}
+                    onDelete={() => fullGoal && openDeleteGoal(fullGoal)}
                   />
                 )
               })}
@@ -215,10 +236,13 @@ export default function MetasPage() {
             summary={summary}
             canEdit={selectedGoalCanEdit}
             title={selectedGoalIsOwn ? 'Minha meta do período' : selectedGoal ? `Funil — ${selectedGoal.title}` : undefined}
-            onRegisterToday={canRegisterToday ? () => setIsDailyEntryOpen(true) : undefined}
+            onRegisterToday={canRegisterToday ? () => openDailyEntry(today) : undefined}
             onCreateGoal={openNewGoal}
             onEdit={() => selectedGoal && openEditGoal(selectedGoal)}
+            onDelete={() => selectedGoal && openDeleteGoal(selectedGoal)}
           />
+
+          {showRecords && <GoalRecordsSection key={selectedGoal.id} goal={selectedGoal} onSelectDay={openDailyEntry} />}
 
           {isRankingLoading ? (
             <Skeleton className="h-64 rounded-[16px]" />
@@ -229,10 +253,18 @@ export default function MetasPage() {
       )}
 
       <DailyEntrySheet
+        key={dailyEntrySession}
         open={isDailyEntryOpen}
         onOpenChange={setIsDailyEntryOpen}
         goal={selectedGoal}
         summary={summary}
+        initialDate={dailyEntryDate}
+      />
+      <DeleteGoalDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        goal={deletingGoal}
+        onDeleted={(goalId) => setSelectedGoalId((current) => (current === goalId ? undefined : current))}
       />
       <NewGoalSheet
         key={editingGoal?.id ?? 'new'}
