@@ -24,6 +24,8 @@ export interface CompleteTaskData {
   }
 }
 
+type CompletableTask = Pick<Task, 'id' | 'title' | 'type'>
+
 const inputClassName =
   'w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-[15px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand'
 const labelClassName = 'mb-1.5 block text-[13px] font-medium text-neutral-900'
@@ -49,7 +51,7 @@ function CompleteTaskForm({
   onCancel,
   onConfirm,
 }: {
-  task: Task
+  task: CompletableTask
   onCancel: () => void
   onConfirm: (data: CompleteTaskData) => void
 }) {
@@ -209,7 +211,7 @@ export function CompleteTaskModal({
   onClose,
   onConfirm,
 }: {
-  task: Task | null
+  task: CompletableTask | null
   open: boolean
   onClose: () => void
   onConfirm: (data: CompleteTaskData) => void

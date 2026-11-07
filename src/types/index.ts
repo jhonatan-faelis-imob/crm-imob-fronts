@@ -367,3 +367,76 @@ export interface DailyActivity {
   occurredAt: string
   createdAt: string
 }
+
+export type MyDayBand = 'agora' | 'hoje' | 'atencao'
+
+export type MyDayReasonCode =
+  | 'tarefa_vencida'
+  | 'primeiro_contato'
+  | 'urgencia_imediata'
+  | 'tarefa_hoje'
+  | 'sem_contato'
+  | 'sem_proxima_tarefa'
+
+export interface MyDayReason {
+  code: MyDayReasonCode
+  label: string
+  severity: 'critical' | 'warning' | 'info'
+}
+
+export interface MyDayTask {
+  id: string
+  title: string
+  type: TaskType
+  priority: TaskPriority
+  dueDate: string
+  description: string | null
+  overdueDays: number
+}
+
+export interface MyDayLead {
+  id: string
+  name: string
+  phone: string
+  phone2: string | null
+  email: string | null
+  urgency: string
+  interestValue: number | null
+  lastContactAt: string | null
+  stage: { name: string; color: string } | null
+}
+
+export interface MyDayItem {
+  key: string
+  kind: 'lead' | 'task'
+  score: number
+  band: MyDayBand
+  reasons: MyDayReason[]
+  daysWithoutContact: number | null
+  lead: MyDayLead | null
+  tasks: MyDayTask[]
+}
+
+export interface MyDayCounts {
+  agora: number
+  hoje: number
+  atencao: number
+  total: number
+  tarefaVencida: number
+  tarefaHoje: number
+  semContato: number
+  semProximaTarefa: number
+  urgenciaImediata: number
+  primeiroContato: number
+}
+
+export interface MyDaySummary {
+  counts: MyDayCounts
+  doneToday: { tasks: number; contacts: number }
+}
+
+export interface MyDayResponse {
+  viewingUser: { id: string; name: string; role: string; teamId: string | null }
+  summary: MyDaySummary
+  items: MyDayItem[]
+}

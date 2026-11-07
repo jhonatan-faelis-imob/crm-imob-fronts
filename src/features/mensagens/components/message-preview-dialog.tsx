@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { toast } from '@/components/ui/toast'
 import { whatsappUrl } from '@/lib/whatsapp'
+import { invalidateMyDayQueries } from '@/features/meu-dia/invalidate-my-day-queries'
 import { messageTemplatesService } from '@/services/message-templates.service'
 import type { Lead } from '@/types'
 import { findPlaceholders } from '../constants'
@@ -50,9 +51,8 @@ export function MessagePreviewDialog({
         ? messageTemplatesService.sendLog(draft.templateId, lead.id, text)
         : messageTemplatesService.sendLogFree(lead.id, text),
     onSuccess: () => {
-      for (const key of [['lead', lead.id], ['leads'], ['interactions'], ['goals-auto-fill'], ['message-templates']]) {
-        queryClient.invalidateQueries({ queryKey: key })
-      }
+      invalidateMyDayQueries(queryClient, lead.id)
+      queryClient.invalidateQueries({ queryKey: ['message-templates'] })
       toast.add({ title: 'WhatsApp aberto. Interação registrada.', type: 'success' })
       onOpenChange(false)
     },

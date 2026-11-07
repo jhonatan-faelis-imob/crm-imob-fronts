@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import {
   Home,
   LayoutDashboard,
+  CalendarCheck,
   Users,
   CheckSquare,
   MessageSquareText,
@@ -16,11 +17,13 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { MyDayBadge } from '@/features/meu-dia/components/my-day-badge'
 import { getInitials } from '@/lib/utils'
 import { useAuthStore } from '@/store/auth.store'
 
 export const navItems: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/meu-dia', label: 'Meu dia', icon: CalendarCheck },
   { href: '/leads', label: 'Leads', icon: Users },
   { href: '/tarefas', label: 'Tarefas', icon: CheckSquare },
   { href: '/mensagens', label: 'Mensagens', icon: MessageSquareText },
@@ -69,6 +72,7 @@ export function Sidebar() {
             >
               <Icon className="h-5 w-5" strokeWidth={2} />
               {label}
+              {href === '/meu-dia' && <MyDayBadge className="ml-auto" />}
             </Link>
           )
         })}

@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Dialog as SheetPrimitive } from '@base-ui/react/dialog'
 import {
   LayoutDashboard,
+  CalendarCheck,
   Users,
   Target,
   Plus,
@@ -20,6 +21,7 @@ import {
   X as XIcon,
   type LucideIcon,
 } from 'lucide-react'
+import { MyDayBadge } from '@/features/meu-dia/components/my-day-badge'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/auth.store'
 
@@ -29,6 +31,7 @@ const quickCreateItems: { href: string; label: string; description: string; icon
 ]
 
 const menuNavItems: { href: string; label: string; icon: LucideIcon }[] = [
+  { href: '/meu-dia', label: 'Meu dia', icon: CalendarCheck },
   { href: '/tarefas', label: 'Tarefas', icon: CheckSquare },
   { href: '/mensagens', label: 'Mensagens', icon: MessageSquareText },
   { href: '/empreendimentos', label: 'Imóveis', icon: Building2 },
@@ -99,9 +102,10 @@ export function BottomNav() {
           type="button"
           onClick={() => setActiveSheet('menu')}
           aria-label="Menu"
-          className="flex flex-1 flex-col items-center justify-center gap-1 py-2.5"
+          className="relative flex flex-1 flex-col items-center justify-center gap-1 py-2.5"
         >
           <MenuIcon size={22} strokeWidth={2} className={isMenuActive ? 'text-brand' : 'text-neutral-400'} />
+          <MyDayBadge className="absolute left-1/2 top-1 ml-1" />
           <span className={cn('text-[10px]', isMenuActive ? 'font-semibold text-brand' : 'text-neutral-400')}>
             Menu
           </span>
@@ -138,6 +142,7 @@ export function BottomNav() {
           >
             <item.icon size={20} strokeWidth={2} />
             {item.label}
+            {item.href === '/meu-dia' && <MyDayBadge className="ml-auto" />}
           </button>
         ))}
         <button

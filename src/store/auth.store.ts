@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { queryClient } from '@/lib/query-client'
 
 interface AuthUser {
   id: string
@@ -41,6 +42,8 @@ export const useAuthStore = create<AuthStore>()(
         localStorage.setItem('accessToken', accessToken)
         localStorage.setItem('refreshToken', refreshToken)
         setAuthCookie(accessToken)
+        // Sem isso, quem entrar depois na mesma aba veria o badge e a fila do usuário anterior
+        queryClient.clear()
         set({ user, accessToken, refreshToken })
       },
       clearAuth: () => {

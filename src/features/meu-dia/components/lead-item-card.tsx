@@ -1,0 +1,170 @@
+'use client'
+
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { CheckCircle2, MessageSquarePlus, MoreHorizontal, Phone } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { LEAD_URGENCY_META } from '@/features/leads/lead-form/options'
+import { WhatsAppButton } from '@/features/mensagens/components/whatsapp-button'
+import { formatCurrency } from '@/lib/utils'
+import { telUrl } from '@/lib/whatsapp'
+import type { LeadUrgency, MyDayItem, MyDayLead, MyDayTask } from '@/types'
+import { RETURN_OPTIONS, formatTaskDate, isDueByToday, returnDate } from '../constants'
+import { ItemRibbon, ReasonChips } from './item-parts'
+
+const actionClassName =
+  'inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-[8px] border-[0.5px] border-neutral-200 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 sm:px-3'
+const menuItemClassName = 'min-h-11 sm:min-h-8'
+
+function lastContactLabel(lead: MyDayLead, days: number | null) {
+  if (!lead.lastContactAt || days === null) return 'Nunca contatado'
+  if (days === 0) return 'Último contato hoje'
+  return `Último contato há ${days} ${days === 1 ? 'dia' : 'dias'}`
+}
+
+export function LeadItemCard({
+  item,
+  lead,
+  highlight,
+  onCompleteTask,
+  onRegisterContact,
+  onScheduleReturn,
+  onPickReturnDate,
+}: {
+  item: MyDayItem
+  lead: MyDayLead
+  highlight: boolean
+  onCompleteTask: (task: MyDayTask) => void
+  onRegisterContact: () => void
+  onScheduleReturn: (date: Date) => void
+  onPickReturnDate: () => void
+}) {
+  const router = useRouter()
+  const urgency = LEAD_URGENCY_META[lead.urgency as LeadUrgency]
+  const taskToComplete = item.tasks.find(isDueByToday)
+  const visibleTasks = item.tasks.slice(0, 2)
+
+  return (
+    <article className="overflow-hidden rounded-[16px] border-[0.5px] border-neutral-200 bg-white">
+      {highlight && <ItemRibbon />}
+      <div className="space-y-3 p-4 sm:p-5">
+        <div className="flex items-start justify-between gap-3">
+          <Link
+            href={`/leads/${lead.id}`}
+            className="min-w-0 break-words text-base font-medium text-neutral-900 hover:text-brand"
+          >
+            {lead.name}
+          </Link>
+          {lead.interestValue !== null && (
+            <span className="shrink-0 text-sm font-medium text-neutral-600">{formatCurrency(lead.interestValue)}</span>
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-1.5">
+          {lead.stage && (
+            <span
+              className="rounded-full px-2 py-0.5 text-[11px] font-medium"
+              style={{ backgroundColor: `${lead.stage.color}1A`, color: lead.stage.color }}
+            >
+              {lead.stage.name}
+            </span>
+          )}
+          {urgency && (
+            <span
+              className="rounded-full px-2 py-0.5 text-[11px] font-medium"
+              style={{ backgroundColor: urgency.bg, color: urgency.text }}
+            >
+              {urgency.label}
+            </span>
+          )}
+        </div>
+
+        <ReasonChips reasons={item.reasons} />
+
+        <p className="text-xs text-neutral-400">{lastContactLabel(lead, item.daysWithoutContact)}</p>
+
+        {visibleTasks.length > 0 && (
+          <div className="divide-y-[0.5px] divide-neutral-200 rounded-[12px] bg-neutral-100 px-3">
+            {visibleTasks.map((task) => (
+              <label key={task.id} className="flex min-h-11 items-center gap-2.5 py-1.5 text-sm text-neutral-900">
+                <input
+                  type="checkbox"
+                  checked={false}
+                  onChange={() => onCompleteTask(task)}
+                  aria-label={`Concluir ${task.title}`}
+                  className="h-4 w-4 shrink-0 accent-brand"
+                />
+                <span className="min-w-0 flex-1 break-words">{task.title}</span>
+                <span
+                  className={`shrink-0 text-xs ${task.overdueDays > 0 ? 'font-medium text-danger' : 'text-neutral-400'}`}
+                >
+                  {formatTaskDate(task.dueDate)}
+                </span>
+              </label>
+            ))}
+          </div>
+        )}
+
+        <div className="flex flex-wrap items-center gap-1.5">
+          <WhatsAppButton lead={{ ...lead, phone2: lead.phone2 ?? undefined }} variant="icon" />
+          <a href={telUrl(lead.phone)} aria-label={`Ligar para ${lead.name}`} className={actionClassName}>
+            <Phone className="h-4 w-4" />
+            <span className="hidden sm:inline">Ligar</span>
+          </a>
+          {taskToComplete && (
+            <button
+              type="button"
+              onClick={() => onCompleteTask(taskToComplete)}
+              aria-label="Concluir tarefa"
+              className={actionClassName}
+            >
+              <CheckCircle2 className="h-4 w-4" />
+              <span className="hidden sm:inline">Concluir tarefa</span>
+            </button>
+          )}
+          <button type="button" onClick={onRegisterContact} aria-label="Registrar contato" className={actionClassName}>
+            <MessageSquarePlus className="h-4 w-4" />
+            <span className="hidden sm:inline">Registrar contato</span>
+          </button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={<button type="button" aria-label="Mais ações" className={`${actionClassName} sm:px-0`} />}
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52 bg-white">
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>Agendar retorno</DropdownMenuLabel>
+                {RETURN_OPTIONS.map((option) => (
+                  <DropdownMenuItem
+                    key={option.label}
+                    className={menuItemClassName}
+                    onClick={() => onScheduleReturn(returnDate(option))}
+                  >
+                    {option.label}
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuItem className={menuItemClassName} onClick={onPickReturnDate}>
+                  Escolher data
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className={menuItemClassName} onClick={() => router.push(`/leads/${lead.id}`)}>
+                Abrir lead
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+    </article>
+  )
+}

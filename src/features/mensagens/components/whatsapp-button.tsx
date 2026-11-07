@@ -21,6 +21,7 @@ const TRIGGER_CLASS_NAME = {
     'inline-flex h-11 items-center gap-2 rounded-[8px] bg-[#25D366] px-4 text-sm font-medium text-white transition-opacity hover:opacity-90',
   compact:
     'flex min-h-9 items-center gap-1 rounded-[8px] bg-[#25D366] px-2.5 py-1 text-xs font-medium text-white transition-opacity hover:opacity-90',
+  icon: 'inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-[8px] bg-[#25D366] text-sm font-medium text-white transition-opacity hover:opacity-90 sm:px-3',
 }
 
 // Cada prévia remonta o modal com o texto novo
@@ -77,8 +78,8 @@ export function WhatsAppButton({
   const picker = <TemplatePicker onChoose={choose} onOpenBlank={allowOpenBlank ? openBlank : undefined} />
   const label = (
     <>
-      <MessageCircle className={variant === 'primary' ? 'h-4 w-4' : 'h-3 w-3'} />
-      WhatsApp
+      <MessageCircle className={variant === 'compact' ? 'h-3 w-3' : 'h-4 w-4'} />
+      <span className={variant === 'icon' ? 'sr-only sm:not-sr-only' : undefined}>WhatsApp</span>
     </>
   )
 

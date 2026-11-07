@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { toast } from '@/components/ui/toast'
+import { invalidateMyDayQueries } from '@/features/meu-dia/invalidate-my-day-queries'
 import { invalidateGoalQueries } from '@/features/metas/invalidate-goal-queries'
 import { formatCurrency } from '@/lib/utils'
 import { funnelStagesService } from '@/services/funnel-stages.service'
@@ -77,6 +78,7 @@ export function StageMoveProvider({ children }: { children: ReactNode }) {
       queryClient.invalidateQueries({ queryKey })
     }
     invalidateGoalQueries(queryClient)
+    invalidateMyDayQueries(queryClient, leadId)
   }
 
   const confirmSale = useMutation({

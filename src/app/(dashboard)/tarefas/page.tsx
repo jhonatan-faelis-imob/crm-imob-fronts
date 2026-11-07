@@ -3,6 +3,7 @@
 import { Calendar, CheckSquare, List, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { invalidateMyDayQueries } from '@/features/meu-dia/invalidate-my-day-queries'
 import { CompleteTaskModal, type CompleteTaskData } from '@/features/tarefas/components/complete-task-modal'
 import { TaskDetailSheet } from '@/features/tarefas/components/task-detail-sheet'
 import { FiltersBar } from '@/features/tarefas/filters-bar'
@@ -65,8 +66,7 @@ export default function TarefasPage() {
   })
 
   function invalidateTasks() {
-    queryClient.invalidateQueries({ queryKey: ['tasks'] })
-    queryClient.invalidateQueries({ queryKey: ['tasks-summary'] })
+    invalidateMyDayQueries(queryClient)
   }
 
   const createTask = useMutation({

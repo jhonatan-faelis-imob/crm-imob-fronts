@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from '@/components/ui/toast'
 import { mapApiPropertyToProperty, type ApiProperty } from '@/features/empreendimentos/api'
 import { mapApiTaskToTask, mapCompleteDataToDto, type ApiTask } from '@/features/tarefas/api'
+import { invalidateMyDayQueries } from '@/features/meu-dia/invalidate-my-day-queries'
 import { CompleteTaskModal, type CompleteTaskData } from '@/features/tarefas/components/complete-task-modal'
 import { TaskDetailSheet } from '@/features/tarefas/components/task-detail-sheet'
 import { interactionsService } from '@/services/interactions.service'
@@ -92,14 +93,11 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
     .slice(0, 2)
 
   function invalidateLead() {
-    queryClient.invalidateQueries({ queryKey: ['lead', lead.id] })
-    queryClient.invalidateQueries({ queryKey: ['leads'] })
+    invalidateMyDayQueries(queryClient, lead.id)
   }
 
   function invalidateTasks() {
-    queryClient.invalidateQueries({ queryKey: ['tasks'] })
-    queryClient.invalidateQueries({ queryKey: ['tasks-summary'] })
-    queryClient.invalidateQueries({ queryKey: ['lead', lead.id] })
+    invalidateMyDayQueries(queryClient, lead.id)
   }
 
   const updateLead = useMutation({

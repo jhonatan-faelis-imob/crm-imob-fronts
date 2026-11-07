@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient, type QueryKey } from '@tanstack/react-query'
 import { toast } from '@/components/ui/toast'
+import { invalidateMyDayQueries } from '@/features/meu-dia/invalidate-my-day-queries'
 import { invalidateGoalQueries } from '@/features/metas/invalidate-goal-queries'
 import { leadsService } from '@/services/leads.service'
 import type { Lead } from '@/types'
@@ -69,8 +70,7 @@ export function useMoveLeadToStage() {
       toast.add({ title: `Lead movido para ${stage.name}`, type: 'success' })
     },
     onSettled: (_data, _error, { leadId }) => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] })
-      queryClient.invalidateQueries({ queryKey: ['lead', leadId] })
+      invalidateMyDayQueries(queryClient, leadId)
       invalidateGoalQueries(queryClient)
     },
   })

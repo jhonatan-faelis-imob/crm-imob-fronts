@@ -477,7 +477,7 @@ src/
   types/index.ts                 → fonte única de tipos do domínio no frontend
 ```
 
-**Rotas implementadas:** `/`, `/login`, `/dashboard`, `/leads`, `/leads/[id]`, `/empreendimentos`, `/metas`,
+**Rotas implementadas:** `/`, `/login`, `/dashboard`, `/meu-dia`, `/leads`, `/leads/[id]`, `/empreendimentos`, `/metas`,
 `/tarefas`, `/mensagens`, `/equipe`, `/relatorios`.
 **Sem páginas de detalhe ainda:** `empreendimentos/[id]`.
 
@@ -565,6 +565,40 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
   mensagem livre), que cria a interação `whatsapp`, atualiza `lastContactAt` e conta no preenchimento automático de
   ligações. Copiar texto e "Abrir sem mensagem" não registram.
 - **Número:** sempre pelo helper `whatsappUrl` de `src/lib/whatsapp.ts`.
+
+---
+
+## Meu dia — regras atuais
+
+- **Módulo:** `my-day` no backend (só leitura, sem tabela própria), `features/meu-dia` e `/meu-dia` no front. `GET /my-day`
+  devolve `{ viewingUser, summary, items }` e `GET /my-day/summary` só o resumo, usado no badge do menu. O resumo conta
+  todos os itens, não só os devolvidos.
+- **Limites:** todos em `src/modules/my-day/my-day.config.ts`. Dias sem contato: 3 no geral, 2 em Simulação, Agendamento e
+  Negociação, 1 com urgência imediata. Primeiro contato: 60 minutos de carência. Máximo de 100 itens e 500 leads lidos.
+- **Pontuação** (`my-day.scoring.ts`): a maior entre os motivos, mais os bônus.
+
+  | Motivo | Quando | Pontos |
+  |---|---|---|
+  | `tarefa_vencida` | Tarefa antes do início de hoje | 100 + min(dias, 10) × 2 |
+  | `primeiro_contato` | Nunca contatado, passada a carência | 90 |
+  | `urgencia_imediata` | `imediato` e sem contato no limite | 85 |
+  | `tarefa_hoje` | Tarefa de hoje | 70 (+10 se o horário passou) |
+  | `sem_contato` | Dias sem contato no limite da etapa | 50 + min(dias, 15) |
+  | `sem_proxima_tarefa` | Nenhuma tarefa pendente no lead | 45 |
+
+  Bônus: `imediato` +20, `um_mes` +10, `tres_meses` +5, etapa avançada +10. Faixas: 85 ou mais é `agora`, 60 a 84 é `hoje`,
+  abaixo disso `atencao`. Empate ordena por `interestValue`.
+- **Regra anti-ruído:** lead com tarefa pendente de data futura não gera `sem_contato` nem `sem_proxima_tarefa`, de qualquer
+  responsável. `urgencia_imediata` e `primeiro_contato` continuam valendo.
+- **Quem entra:** tarefas pendentes do usuário e leads dele, sempre fora de Ganho e Perdido (status ou etapa). Tarefa de lead
+  encerrado fica só em `/tarefas`. Lead de outro corretor entra apenas pela tarefa atribuída ao usuário.
+- **Ver como:** corretor só vê a si mesmo, coordenador a própria equipe, gerente e diretor a organização toda. Quem age na
+  tela de outro cria a tarefa em nome do dono da fila.
+- **Concluir tarefa (`TasksService.complete`):** com lead e tipo `ligacao`, `whatsapp`, `email`, `visita` ou `reuniao`, atualiza
+  `lastContactAt`. Com texto e tipo `ligacao` ou `whatsapp`, cria também a interação, que soma em "Registrar atividades".
+  Sem texto não cria, para não inflar as contagens. Reconcluir uma tarefa não repete nada disso.
+- **Cache:** depois de qualquer ação que mude tarefa, contato ou etapa, chamar `invalidateMyDayQueries`. O badge não usa
+  `useAuthStore`, para não quebrar a hidratação; na página, o que depende de usuário ou horário espera `useHydrated`.
 
 ---
 

@@ -4,6 +4,10 @@ function whatsappNumber(phone: string) {
   return clean.length > 11 ? clean : `55${clean}`
 }
 
+export function telUrl(phone: string) {
+  return `tel:+${whatsappNumber(phone)}`
+}
+
 export function whatsappUrl(phone: string, text?: string) {
   const url = `https://wa.me/${whatsappNumber(phone)}`
   return text ? `${url}?text=${encodeURIComponent(text)}` : url
