@@ -64,6 +64,7 @@ export type MessageTemplateType =
   | 'pos_visita'
   | 'proposta'
   | 'pos_venda'
+  | 'outro'
 
 export type GoalScope = 'organizacao' | 'equipe' | 'individual'
 export type GoalType = 'vgv' | 'unidades' | 'leads' | 'visitas' | 'contratos'
@@ -346,12 +347,14 @@ export interface Document {
 export interface MessageTemplate {
   id: string
   organizationId: string
-  type: MessageTemplateType
-  title: string
+  userId: string | null
+  name: string
+  type: MessageTemplateType | null
   content: string
-  active: boolean
+  variables: string[]
+  isPublic: boolean
+  usageCount: number
   createdAt: string
-  updatedAt: string
 }
 
 export interface DailyActivity {

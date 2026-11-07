@@ -1,6 +1,6 @@
 'use client'
 
-import { CheckCircle, Mail, MessageCircle, Pencil, Trash2 } from 'lucide-react'
+import { CheckCircle, Mail, Pencil, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
@@ -13,9 +13,10 @@ import {
   type ApiFunnelStage,
   type ApiLead,
 } from '@/features/leads/api-mapper'
+import { WhatsAppButton } from '@/features/mensagens/components/whatsapp-button'
 import { funnelStagesService } from '@/services/funnel-stages.service'
 import { leadsService } from '@/services/leads.service'
-import type { Task, TaskStatus } from '@/types'
+import type { Lead, Task, TaskStatus } from '@/types'
 import { PRIORITY_META, TASK_TYPE_META } from '../constants'
 import { formatDateBR, formatTime } from '../date-utils'
 
@@ -25,24 +26,11 @@ const STATUS_META: Record<TaskStatus, { label: string; bg: string; text: string 
   cancelada: { label: 'Cancelada', bg: '#F7F7F7', text: '#767676' },
 }
 
-function whatsappUrl(phone: string) {
-  const clean = phone.replace(/\D/g, '')
-  const number = clean.startsWith('55') ? clean : `55${clean}`
-  return `https://wa.me/${number}`
-}
-
-function PhoneRow({ phone }: { phone: string }) {
+function PhoneRow({ lead, phone }: { lead: Lead; phone: string }) {
   return (
     <div className="flex items-center justify-between gap-2">
       <span className="text-sm text-neutral-600">{phone}</span>
-      <button
-        type="button"
-        onClick={() => window.open(whatsappUrl(phone), '_blank')}
-        className="flex items-center gap-1 rounded-[8px] bg-[#E8F5E9] px-2 py-1 text-xs font-medium text-success transition-colors hover:bg-[#d3ecd5]"
-      >
-        <MessageCircle className="h-3 w-3" />
-        WhatsApp
-      </button>
+      <WhatsAppButton lead={lead} variant="compact" initialPhone={phone} allowOpenBlank />
     </div>
   )
 }
@@ -157,8 +145,8 @@ export function TaskDetailSheet({
                     )}
                   </div>
 
-                  <PhoneRow phone={lead.phone} />
-                  {lead.phone2 && <PhoneRow phone={lead.phone2} />}
+                  <PhoneRow lead={lead} phone={lead.phone} />
+                  {lead.phone2 && <PhoneRow lead={lead} phone={lead.phone2} />}
 
                   {lead.email && (
                     <div className="flex items-center gap-2 text-sm text-neutral-400">

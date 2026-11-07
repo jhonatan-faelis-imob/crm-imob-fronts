@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { Lead } from '@/types'
+import { WhatsAppButton } from '@/features/mensagens/components/whatsapp-button'
 import { funnelStagesService } from '@/services/funnel-stages.service'
 import { resolveLeadStage, type ApiFunnelStage } from '../../api-mapper'
 import { StagePopover } from '../stage-popover'
@@ -65,7 +66,8 @@ export function DetailHeader({
           )}
         </div>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
+          <WhatsAppButton lead={lead} />
           <button
             type="button"
             onClick={onEdit}

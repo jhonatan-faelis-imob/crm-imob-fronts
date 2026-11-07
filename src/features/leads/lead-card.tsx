@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { daysSince, formatCurrency, getInitials } from '@/lib/utils'
 import type { Lead } from '@/types'
+import { WhatsAppPickerDialog } from '@/features/mensagens/components/whatsapp-button'
 import { funnelStagesService } from '@/services/funnel-stages.service'
 import { SOURCE_META } from './constants'
 import { LEAD_URGENCY_META } from './lead-form/options'
@@ -25,6 +26,7 @@ const MAX_VISIBLE_TAGS = 2
 export function LeadCard({ lead }: { lead: Lead }) {
   const router = useRouter()
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
+  const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false)
   const { moveLead } = useMoveLeadToStage()
 
   const { data: stages } = useQuery<ApiFunnelStage[]>({
@@ -79,6 +81,7 @@ export function LeadCard({ lead }: { lead: Lead }) {
             onPointerDown={(event) => event.stopPropagation()}
           >
             <DropdownMenuItem onClick={() => setIsMoveDialogOpen(true)}>Mover para...</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setIsWhatsAppOpen(true)}>Enviar WhatsApp</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -141,6 +144,10 @@ export function LeadCard({ lead }: { lead: Lead }) {
       currentStageId={currentStage?.id}
       onSelect={(stage) => moveLead(lead, stage)}
     />
+    {/* Portais propagam eventos pela árvore do React: sem isso, selecionar texto arrastaria o card */}
+    <div onPointerDown={(event) => event.stopPropagation()}>
+      <WhatsAppPickerDialog lead={lead} open={isWhatsAppOpen} onOpenChange={setIsWhatsAppOpen} />
+    </div>
     </>
   )
 }

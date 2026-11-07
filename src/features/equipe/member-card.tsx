@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { formatCurrency, getInitials } from '@/lib/utils'
+import { whatsappUrl } from '@/lib/whatsapp'
 import { ROLE_META } from './constants'
 import type { Member } from './types'
 
@@ -14,7 +15,7 @@ export function MemberCard({ member, teamName }: { member: Member; teamName: str
   const roleMeta = ROLE_META[member.role]
   const goalPct =
     member.metrics.goalTarget > 0 ? Math.round((member.metrics.vgv / member.metrics.goalTarget) * 100) : 0
-  const whatsappHref = member.phone ? `https://wa.me/55${member.phone.replace(/\D/g, '')}` : undefined
+  const whatsappHref = member.phone ? whatsappUrl(member.phone) : undefined
 
   return (
     <div

@@ -13,6 +13,7 @@ import {
   Building2,
   UserPlus,
   CheckSquare,
+  MessageSquareText,
   UsersRound,
   BarChart2,
   LogOut,
@@ -29,6 +30,7 @@ const quickCreateItems: { href: string; label: string; description: string; icon
 
 const menuNavItems: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/tarefas', label: 'Tarefas', icon: CheckSquare },
+  { href: '/mensagens', label: 'Mensagens', icon: MessageSquareText },
   { href: '/empreendimentos', label: 'Imóveis', icon: Building2 },
   { href: '/equipe', label: 'Equipe', icon: UsersRound },
   { href: '/relatorios', label: 'Relatórios', icon: BarChart2 },

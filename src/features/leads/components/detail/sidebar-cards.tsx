@@ -1,6 +1,7 @@
 import { ArrowRight, Calendar, Mail, MessageCircle, Sparkles } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { formatCurrency, getInitials } from '@/lib/utils'
+import { whatsappUrl } from '@/lib/whatsapp'
 import type { Lead, Task, TaskType } from '@/types'
 import { SOURCE_META } from '../../constants'
 import { formatDateBR, formatDateTimeBR } from './format'
@@ -55,7 +56,7 @@ function ScoreRing({ score }: { score: number }) {
 export function SummaryCard({ lead, onAnalyze }: { lead: Lead; onAnalyze: () => void }) {
   const source = SOURCE_META[lead.source]
   const SourceIcon = source.icon
-  const whatsappHref = `https://wa.me/55${lead.phone.replace(/\D/g, '')}`
+  const whatsappHref = whatsappUrl(lead.phone)
 
   return (
     <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5">

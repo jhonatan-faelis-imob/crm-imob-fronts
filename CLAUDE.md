@@ -478,7 +478,7 @@ src/
 ```
 
 **Rotas implementadas:** `/`, `/login`, `/dashboard`, `/leads`, `/leads/[id]`, `/empreendimentos`, `/metas`,
-`/tarefas`, `/equipe`, `/relatorios`.
+`/tarefas`, `/mensagens`, `/equipe`, `/relatorios`.
 **Sem páginas de detalhe ainda:** `empreendimentos/[id]`.
 
 ### Padrão de formulário/modal (repetido em leads e empreendimentos)
@@ -549,6 +549,22 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
   `goals.service.ts` e `features/metas/calculations.ts`.
 - **Progresso:** `GET /goals/:id/summary` devolve `progress` conforme `Goal.type` e `pace`. O funil só existe em meta
   individual de VGV.
+
+---
+
+## Mensagens de WhatsApp — regras atuais
+
+- **Módulo:** `message-templates` no backend, `features/mensagens` e `/mensagens` no front. Modelo público é da
+  organização; privado só aparece para o dono. Sem nenhum modelo na organização, o `GET` cria os 7 padrão (`userId` nulo).
+- **Permissão:** compartilhar exige coordenador ou superior. O dono edita e exclui o modelo privado; público, só gerente
+  ou superior (`assertCanManage` e `canManageTemplate`).
+- **Variáveis:** `{{nome}}`, `{{primeiro_nome}}`, `{{empreendimento}}`, `{{corretor}}`, `{{telefone_corretor}}`,
+  `{{imobiliaria}}` e `{{saudacao}}` (horário de America/Sao_Paulo). Variável vazia ou desconhecida fica no texto e vai em
+  `missing`; o botão de abrir fica desabilitado enquanto restar `{{...}}`.
+- **Registrar interação ao abrir o WhatsApp:** "Abrir no WhatsApp" sempre chama `send-log` (ou `send-log-free`, na
+  mensagem livre), que cria a interação `whatsapp`, atualiza `lastContactAt` e conta no preenchimento automático de
+  ligações. Copiar texto e "Abrir sem mensagem" não registram.
+- **Número:** sempre pelo helper `whatsappUrl` de `src/lib/whatsapp.ts`.
 
 ---
 

@@ -156,7 +156,7 @@ export function TimelineTab({
                     </button>
                   </div>
                 </div>
-                <p className="mt-1 text-sm text-neutral-600">{entry.notes}</p>
+                <p className="mt-1 break-words text-sm text-neutral-600">{entry.notes}</p>
               </div>
             </div>
           )
