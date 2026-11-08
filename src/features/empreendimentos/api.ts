@@ -1,4 +1,4 @@
-import type { Property } from '@/types'
+import type { PortalAddressDisplay, Property } from '@/types'
 
 export interface ApiProperty {
   id: string
@@ -23,6 +23,28 @@ export interface ApiProperty {
   minIncome: string | number | null
   maxIncome: string | number | null
   propertyStatus: string | null
+  propertyType?: string | null
+  streetNumber?: string | null
+  complement?: string | null
+  lotAreaM2?: string | number | null
+  suites?: number | null
+  unitFloor?: number | null
+  buildingFloors?: number | null
+  yearBuilt?: number | null
+  condoFee?: string | number | null
+  iptuValue?: string | number | null
+  iptuPeriod?: string | null
+  features?: string[]
+  acceptsFinancing?: boolean | null
+  acceptsFgts?: boolean | null
+  exclusive?: boolean
+  commissionPct?: string | number | null
+  internalNotes?: string | null
+  sellerLeadId?: string | null
+  sellerLead?: { id: string; name: string; phone: string | null } | null
+  publishToPortals?: boolean
+  portalAddressDisplay?: string
+  portal?: { ready: boolean; missingCount: number } | null
   sold: boolean
   active: boolean
   createdAt: string
@@ -36,9 +58,13 @@ function toNumber(value: string | number | null | undefined): number | undefined
   return Number(value)
 }
 
-// O backend ainda não guarda tipo de imóvel (propertyType), datas de lançamento/entrega/venda,
-// número/complemento de endereço nem observações — esses campos existem só na UI até o
-// backend ganhar suporte (mesma limitação já documentada para o cadastro de leads).
+function toBoolean(value: boolean | null | undefined): boolean | undefined {
+  return value === null ? undefined : value
+}
+
+const ADDRESS_DISPLAYS: PortalAddressDisplay[] = ['full', 'street', 'neighborhood']
+
+// Empreendimentos ainda não guardam datas de lançamento/entrega (só na UI)
 export function mapApiPropertyToProperty(property: ApiProperty): Property {
   return {
     id: property.id,
@@ -65,6 +91,28 @@ export function mapApiPropertyToProperty(property: ApiProperty): Property {
     minIncome: toNumber(property.minIncome),
     maxIncome: toNumber(property.maxIncome),
     status: (property.propertyStatus ?? 'lancamento') as Property['status'],
+    propertyType: property.propertyType ?? undefined,
+    streetNumber: property.streetNumber ?? undefined,
+    complement: property.complement ?? undefined,
+    lotAreaM2: toNumber(property.lotAreaM2),
+    suites: property.suites ?? undefined,
+    unitFloor: property.unitFloor ?? undefined,
+    buildingFloors: property.buildingFloors ?? undefined,
+    yearBuilt: property.yearBuilt ?? undefined,
+    condoFee: toNumber(property.condoFee),
+    iptuValue: toNumber(property.iptuValue),
+    iptuPeriod: property.iptuPeriod === 'anual' || property.iptuPeriod === 'mensal' ? property.iptuPeriod : undefined,
+    features: property.features ?? [],
+    acceptsFinancing: toBoolean(property.acceptsFinancing),
+    acceptsFgts: toBoolean(property.acceptsFgts),
+    exclusive: property.exclusive ?? false,
+    commissionPct: toNumber(property.commissionPct),
+    internalNotes: property.internalNotes ?? undefined,
+    sellerLeadId: property.sellerLeadId ?? undefined,
+    sellerLeadName: property.sellerLead?.name,
+    publishToPortals: property.publishToPortals ?? false,
+    portalAddressDisplay: ADDRESS_DISPLAYS.find((value) => value === property.portalAddressDisplay) ?? 'street',
+    portal: property.portal ?? undefined,
     sold: property.sold,
     active: property.active,
     createdAt: property.createdAt,
@@ -72,7 +120,7 @@ export function mapApiPropertyToProperty(property: ApiProperty): Property {
   }
 }
 
-function parseCurrency(value: string | undefined): number | undefined {
+export function parseCurrency(value: string | undefined): number | undefined {
   if (!value) return undefined
   const digits = value.replace(/[^\d,]/g, '').replace(',', '.')
   const parsed = Number(digits)
@@ -116,48 +164,5 @@ export function mapDevelopmentFormToDto(data: DevelopmentFormShape): Record<stri
     ownerId: general.ownerId || undefined,
     description: general.description || undefined,
     propertyStatus: settings.status,
-  }
-}
-
-interface PropertyFormShape {
-  details: {
-    title: string
-    city: string
-    neighborhood?: string
-    cep?: string
-    address?: string
-    bedrooms?: string
-    bathrooms?: string
-    parkingSpots?: string
-    areaM2?: string
-    price: string
-    minIncome?: string
-    maxIncome?: string
-    ownerId?: string
-  }
-  status: {
-    status: string
-    notes?: string
-  }
-}
-
-export function mapPropertyFormToDto(data: PropertyFormShape): Record<string, unknown> {
-  const { details, status } = data
-  return {
-    kind: 'revenda',
-    title: details.title,
-    city: details.city,
-    neighborhood: details.neighborhood || undefined,
-    cep: details.cep || undefined,
-    address: details.address || undefined,
-    bedrooms: details.bedrooms ? Number(details.bedrooms) : undefined,
-    bathrooms: details.bathrooms ? Number(details.bathrooms) : undefined,
-    parkingSpots: details.parkingSpots ? Number(details.parkingSpots) : undefined,
-    areaM2: details.areaM2 ? Number(details.areaM2) : undefined,
-    price: parseCurrency(details.price),
-    minIncome: parseCurrency(details.minIncome),
-    maxIncome: parseCurrency(details.maxIncome),
-    ownerId: details.ownerId || undefined,
-    propertyStatus: status.status,
   }
 }

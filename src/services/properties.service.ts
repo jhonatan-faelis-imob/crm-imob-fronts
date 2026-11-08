@@ -1,4 +1,11 @@
 import api from '@/lib/api'
+import type {
+  AiDescribeRequest,
+  AiDescribeResponse,
+  PortalConfig,
+  PortalReadiness,
+  PortalReadinessDraft,
+} from '@/features/empreendimentos/portal/types'
 
 export const propertiesService = {
   findAll: async (params?: Record<string, string>) => {
@@ -31,6 +38,19 @@ export const propertiesService = {
   },
   unlinkLead: async (propertyId: string, leadId: string) => {
     const { data } = await api.delete(`/properties/${propertyId}/leads/${leadId}`)
+    return data
+  },
+  getPortalConfig: async () => {
+    const { data } = await api.get<PortalConfig>('/properties/portal-config')
+    return data
+  },
+  /** Avalia o rascunho do formulário; não grava nada */
+  checkReadiness: async (draft: PortalReadinessDraft) => {
+    const { data } = await api.post<PortalReadiness>('/properties/portal-readiness', draft)
+    return data
+  },
+  aiDescribe: async (request: AiDescribeRequest) => {
+    const { data } = await api.post<AiDescribeResponse>('/properties/ai/describe', request)
     return data
   },
 }

@@ -1,17 +1,23 @@
 import { Pencil, Trash2 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import type { Property } from '@/types'
-import { PROPERTY_TYPE_META, RESALE_STATUS_META, type ResaleStatus } from './constants'
+import { RESALE_STATUS_META, type ResaleStatus } from './constants'
+import { PortalChip } from './portal/portal-chip'
+import { portalTypeLabel, usePortalConfig } from './portal/use-portal-config'
 
 export function PropertyListView({
   properties,
   onEdit,
+  onOpenPortal,
   onDeactivate,
 }: {
   properties: Property[]
   onEdit: (property: Property) => void
+  onOpenPortal: (property: Property) => void
   onDeactivate: (property: Property) => void
 }) {
+  const { data: config } = usePortalConfig()
+
   return (
     <div className="overflow-x-auto rounded-[16px] border-[0.5px] border-neutral-200 bg-white">
       <table className="w-full min-w-[720px] text-left text-sm">
@@ -23,6 +29,7 @@ export function PropertyListView({
             <th className="px-4 py-3">Valor</th>
             <th className="hidden px-4 py-3 lg:table-cell">Responsável</th>
             <th className="px-4 py-3">Status</th>
+            <th className="px-4 py-3">Portais</th>
             <th className="px-4 py-3">Ações</th>
           </tr>
         </thead>
@@ -39,7 +46,7 @@ export function PropertyListView({
                 <td className="px-4 py-3">
                   <p className="font-medium text-neutral-900">{property.title}</p>
                   <p className="text-xs text-neutral-400">
-                    {property.propertyType ? PROPERTY_TYPE_META[property.propertyType] : '—'}
+                    {portalTypeLabel(config, property.propertyType) ?? '—'}
                   </p>
                 </td>
                 <td className="hidden px-4 py-3 text-neutral-600 md:table-cell">
@@ -47,7 +54,7 @@ export function PropertyListView({
                   {property.city}
                 </td>
                 <td className="hidden px-4 py-3 text-neutral-600 md:table-cell">
-                  {property.bedrooms ?? 0} qts · {property.parkingSpots ?? 0} vagas · {property.areaM2 ?? 0}m²
+                  {property.bedrooms ?? 0} qts · {property.parkingSpots ?? 0} vagas · {property.areaM2 ?? property.lotAreaM2 ?? 0}m²
                 </td>
                 <td className="px-4 py-3 font-medium text-neutral-900">
                   {formatCurrency(property.price ?? 0)}
@@ -60,6 +67,9 @@ export function PropertyListView({
                   >
                     {status.label}
                   </span>
+                </td>
+                <td className="px-4 py-3">
+                  <PortalChip property={property} onOpen={() => onOpenPortal(property)} />
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1">

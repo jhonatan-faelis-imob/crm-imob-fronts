@@ -756,6 +756,78 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
 
 ---
 
+## Revenda e portais — regras atuais
+
+- **Escopo:** só `kind = 'revenda'`. Empreendimentos não recebem os campos novos nem podem ser publicados (400).
+- **Ainda não existem:** upload de fotos e envio do XML (VRSync) para os portais. `publishToPortals` só marca o imóvel
+  como pronto; o item "Fotos (mínimo 5)" aparece com `ok: null` ("disponível na próxima etapa") e não conta.
+- **Fonte única:** `src/modules/properties/portal.config.ts` (tipos, características, limites). O front lê tudo de
+  `GET /properties/portal-config` (`usePortalConfig`, cache sem expiração) e não duplica regra. O tipo de imóvel do
+  **lead** (interesse) continua com a lista antiga de `features/empreendimentos/constants.ts`.
+- **Campos:** `areaM2` é a **área útil** e `lotAreaM2` a **área total** (a coluna não foi renomeada). `ownerId` é o
+  **corretor responsável**; `sellerLeadId` é o **proprietário** (um lead da mesma organização, senão 400; relação
+  `PropertySeller`, `onDelete: SetNull`). `features` guarda o valor em inglês aceito pelo portal.
+- **Limites:** título de 10 a 100 caracteres, descrição de 50 a 3.000 e sem HTML (`/<[^>]*>/`), fotos mínimo 5,
+  até 30 características sem repetição. A API recusa título acima de 100, descrição acima de 3.000 e HTML na descrição
+  (400 "A descrição não pode conter HTML"), só em revenda. Salvar continua permitido com poucos campos: o modal exige
+  tipo, título (3+), cidade e valor > 0.
+- **Avaliação (`portal.readiness.ts`, pura):** tipo com `vrsync`; título; descrição; `price > 0`; CEP com 8 dígitos;
+  UF com 2 letras; cidade e bairro; área (`lotAreaM2` se o tipo é `lot`, senão `areaM2`); quartos e banheiros conforme a
+  regra do tipo (`required` exige o campo; 0 só vale em studio e kitnet; `hidden` não é avaliado).
+
+  | Tipo | Portal (VRSync) | Área | Quartos | Banheiros | Andares |
+  |---|---|---|---|---|---|
+  | apartamento | Residential / Apartment | útil | obrigatório | obrigatório | sim |
+  | casa | Residential / Home | útil | obrigatório | obrigatório | não |
+  | casa_condominio | Residential / Condo | útil | obrigatório | obrigatório | não |
+  | sobrado | Residential / Sobrado | útil | obrigatório | obrigatório | não |
+  | cobertura | Residential / Penthouse | útil | obrigatório | obrigatório | sim |
+  | flat | Residential / Flat | útil | obrigatório | obrigatório | sim |
+  | kitnet | Residential / Kitnet | útil | opcional (vazio grava 0) | obrigatório | sim |
+  | studio | Residential / Studio | útil | obrigatório (0 vale) | opcional | sim |
+  | loft | Residential / Loft | útil | obrigatório | obrigatório | sim |
+  | terreno | Residential / Land Lot | total | oculto | oculto | não |
+  | chacara | Residential / Farm Ranch | total | obrigatório | obrigatório | não |
+  | fazenda_sitio | Residential / Agricultural | total | obrigatório | obrigatório | não |
+  | sala_comercial | Commercial / Office | útil | oculto | obrigatório | sim |
+  | ponto_comercial | Commercial / Business | útil | oculto | opcional | não |
+  | galpao | Commercial / Industrial | total | oculto | opcional | não |
+  | outro | — (não publicável) | útil | opcional | opcional | não |
+
+- **Características** (valor do portal → rótulo): Elevator Elevador · Pool Piscina · Private Pool Piscina privativa ·
+  BBQ Churrasqueira · Gourmet Area Espaço gourmet · Party Room Salão de festas · Playground · Gym Academia · Sports Court
+  Quadra poliesportiva · Sauna · Concierge 24h Portaria 24h · Security Camera Câmera de segurança · Electronic Gate Portão
+  eletrônico · Intercom Interfone · Alarm System Sistema de alarme · Balcony Varanda · Barbecue Balcony Churrasqueira na
+  varanda · Gourmet Balcony Varanda gourmet · Builtin Wardrobe Armário embutido · Kitchen Cabinets Armário na cozinha ·
+  Planned Furniture Móvel planejado · Furnished Mobiliado · Cooling Ar condicionado · Heating Aquecimento · Solar Energy
+  Energia solar · Pets Allowed Permite animais · Closet · Laundry Lavanderia · Backyard Quintal · Garden Area Jardim ·
+  Lavabo · American Kitchen Cozinha americana · Home Office Escritório · Fireplace Lareira · Panoramic View Vista
+  panorâmica · Corner Property Imóvel de esquina · Paved Street Rua asfaltada · Fenced Yard Condomínio fechado · Guest
+  Parking Estacionamento para visitante · Bicycles Place Bicicletário · Electric Charger Carregador elétrico · Edicule
+  Edícula · Pantry Despensa · Porcelain Porcelanato · Service Room Quarto de serviço · Slab Laje · Disabled Access Acesso
+  para deficientes · Whirlpool Hidromassagem · Blindex Box Box blindex · Natural Ventilation Ventilação natural · High
+  Ceiling Height Pé direito alto · Cold Floor Piso frio · Wood Floor Piso de madeira · Laminated Floor Piso laminado ·
+  Vinyl Floor Piso vinílico · Walls Grids Muro e grade.
+- **Publicar:** `publishToPortals = true` no create/update roda a avaliação (fotos fora) e devolve 400
+  `{ message: 'Imóvel incompleto para os portais', missing: [...] }` se faltar algo. Desligar é sempre permitido.
+- **Endpoints:** `GET /properties/portal-config`; `POST /properties/portal-readiness` (rascunho parcial, não grava;
+  é o checklist ao vivo do modal, debounce de 500 ms, `meta: { silent: true }`); `POST /properties/ai/describe`.
+  `findAll` e `findById` trazem `portal: { ready, missingCount }` nos imóveis de revenda (em memória) e `sellerLead`.
+  `findAll` aceita `publishToPortals=true|false`, e os filtros entram num `AND` (busca e preço não se sobrescrevem mais).
+  `PATCH /properties/:id` agora valida com `UpdatePropertyDto` (antes `Partial<>` passava sem validação).
+- **IA (`POST /properties/ai/describe`):** qualquer perfil, mesmo modelo do score (`GEMINI_MODEL` em `ai.service.ts`).
+  Recebe só tipo, bairro, cidade, áreas, cômodos, vagas, andar, ano, características, FGTS e financiamento (nunca rua,
+  número, CEP ou proprietário). Resposta tratada em `ai/property-description.ts` (tira cercas de código, corta o título
+  na última palavra até 100 e a descrição em 3.000); falha vira 502. **Limite de 20 chamadas por hora por usuário**,
+  contador em memória (`AiDescribeRateLimiter`): vale porque a API roda com **1 réplica**; com mais réplicas, mover para
+  Redis. Acima do limite, 429.
+- **Front:** modal de revenda em 4 abas (`new-property-dialog.tsx` e `resale-form/`): Básico, Endereço, Características,
+  Descrição e portais; rodapé igual ao do lead (Cancelar | < | > | Salvar) e ponto vermelho nas abas com pendência
+  (erro de formato ou item do checklist). O resultado da IA fica numa prévia e nunca sobrescreve texto sem confirmar.
+  Chip "Pronto p/ portais" / "Faltam N itens" nos cards e na lista abre o modal na aba 4. Filtro "Publicados nos portais".
+
+---
+
 ## Status do Projeto
 
 - [x] Decisões de arquitetura

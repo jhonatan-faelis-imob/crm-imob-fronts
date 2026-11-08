@@ -15,9 +15,18 @@ import { defaultPropertyFilters, FiltersBar, type PropertyFilters, type ViewMode
 import { NewDevelopmentDialog } from '@/features/empreendimentos/new-development-dialog'
 import { NewPropertyDialog } from '@/features/empreendimentos/new-property-dialog'
 import { PRICE_RANGE_OPTIONS } from '@/features/empreendimentos/constants'
+import { PORTAL_TAB_INDEX } from '@/features/empreendimentos/resale-form/form'
 import { PropertyCard } from '@/features/empreendimentos/property-card'
 import { PropertyListView } from '@/features/empreendimentos/property-list-view'
-import { mapApiPropertyToProperty, mapDevelopmentFormToDto, mapPropertyFormToDto, type ApiProperty } from '@/features/empreendimentos/api'
+import { mapApiPropertyToProperty, mapDevelopmentFormToDto, type ApiProperty } from '@/features/empreendimentos/api'
+import { apiErrorDetails } from '@/features/empreendimentos/portal/use-portal-config'
+
+// Mensagem da API e, no 400 dos portais, a lista do que falta
+function describeError(error: unknown) {
+  const { message, missing } = apiErrorDetails(error)
+  if (missing.length > 0) return `${message ?? 'Faltam itens'}: ${missing.join(', ')}`
+  return message
+}
 
 interface ApiUser {
   id: string
@@ -41,6 +50,7 @@ function EmpreendimentosContent() {
   const [isPropertyDialogOpen, setIsPropertyDialogOpen] = useState(false)
   const [editingDevelopment, setEditingDevelopment] = useState<Property | undefined>(undefined)
   const [editingProperty, setEditingProperty] = useState<Property | undefined>(undefined)
+  const [propertyInitialTab, setPropertyInitialTab] = useState(0)
   const queryClient = useQueryClient()
 
   const { data: propertiesData, isLoading } = useQuery<{ data: ApiProperty[] }>({
@@ -68,8 +78,8 @@ function EmpreendimentosContent() {
       invalidateProperties()
       toast.add({ title: 'Cadastrado com sucesso!', type: 'success' })
     },
-    onError: () => {
-      toast.add({ title: 'Não foi possível cadastrar', type: 'error' })
+    onError: (error) => {
+      toast.add({ title: 'Não foi possível cadastrar', description: describeError(error), type: 'error' })
     },
   })
 
@@ -80,8 +90,8 @@ function EmpreendimentosContent() {
       invalidateProperties()
       toast.add({ title: 'Atualizado com sucesso!', type: 'success' })
     },
-    onError: () => {
-      toast.add({ title: 'Não foi possível salvar as alterações', type: 'error' })
+    onError: (error) => {
+      toast.add({ title: 'Não foi possível salvar as alterações', description: describeError(error), type: 'error' })
     },
   })
 
@@ -121,8 +131,7 @@ function EmpreendimentosContent() {
     }
   }
 
-  async function handleSubmitProperty(data: Parameters<typeof mapPropertyFormToDto>[0]) {
-    const dto = mapPropertyFormToDto(data)
+  async function handleSubmitProperty(dto: Record<string, unknown>) {
     const target = requestedResale ?? editingProperty
     if (target) {
       await updateProperty.mutateAsync({ id: target.id, dto })
@@ -137,8 +146,15 @@ function EmpreendimentosContent() {
       setIsDevelopmentDialogOpen(true)
     } else {
       setEditingProperty(undefined)
+      setPropertyInitialTab(0)
       setIsPropertyDialogOpen(true)
     }
+  }
+
+  function openProperty(property: Property, tab = 0) {
+    setEditingProperty(property)
+    setPropertyInitialTab(tab)
+    setIsPropertyDialogOpen(true)
   }
 
   function handleKindChange(nextKind: PropertyKind) {
@@ -177,8 +193,10 @@ function EmpreendimentosContent() {
       filters.bedrooms === 'todos' || (property.bedrooms ?? 0) >= Number(filters.bedrooms)
     const matchesParking =
       filters.parkingSpots === 'todos' || (property.parkingSpots ?? 0) >= Number(filters.parkingSpots)
+    const matchesPortal =
+      filters.portal === 'todos' || (filters.portal === 'publicados') === (property.publishToPortals ?? false)
 
-    return matchesSearch && matchesCity && matchesStatus && matchesBedrooms && matchesParking
+    return matchesSearch && matchesCity && matchesStatus && matchesBedrooms && matchesParking && matchesPortal
   })
 
   const isEmptyForKind = kind === 'empreendimento' ? developments.length === 0 : resaleProperties.length === 0
@@ -271,10 +289,8 @@ function EmpreendimentosContent() {
             <PropertyCard
               key={property.id}
               property={property}
-              onEdit={() => {
-                setEditingProperty(property)
-                setIsPropertyDialogOpen(true)
-              }}
+              onEdit={() => openProperty(property)}
+              onOpenPortal={() => openProperty(property, PORTAL_TAB_INDEX)}
               onDeactivate={() => deactivateProperty.mutate(property.id)}
             />
           ))}
@@ -282,10 +298,8 @@ function EmpreendimentosContent() {
       ) : (
         <PropertyListView
           properties={filteredProperties}
-          onEdit={(property) => {
-            setEditingProperty(property)
-            setIsPropertyDialogOpen(true)
-          }}
+          onEdit={(property) => openProperty(property)}
+          onOpenPortal={(property) => openProperty(property, PORTAL_TAB_INDEX)}
           onDeactivate={(property) => deactivateProperty.mutate(property.id)}
         />
       )}
@@ -309,6 +323,7 @@ function EmpreendimentosContent() {
           setIsPropertyDialogOpen(open)
         }}
         property={requestedResale ?? editingProperty}
+        initialTab={requestedResale ? 0 : propertyInitialTab}
         onSubmitProperty={handleSubmitProperty}
         brokers={brokers ?? []}
       />

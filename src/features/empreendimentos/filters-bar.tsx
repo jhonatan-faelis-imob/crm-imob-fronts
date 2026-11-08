@@ -18,6 +18,8 @@ export interface PropertyFilters {
   priceRangeId: string
   bedrooms: string
   parkingSpots: string
+  /** Revenda: todos | publicados | nao_publicados (publishToPortals) */
+  portal: string
 }
 
 export const defaultPropertyFilters: PropertyFilters = {
@@ -27,6 +29,7 @@ export const defaultPropertyFilters: PropertyFilters = {
   priceRangeId: 'todas',
   bedrooms: 'todos',
   parkingSpots: 'todos',
+  portal: 'todos',
 }
 
 export type ViewMode = 'grid' | 'list'
@@ -130,6 +133,17 @@ export function FiltersBar({
                 {count}+ vagas
               </option>
             ))}
+          </select>
+
+          <select
+            value={filters.portal}
+            onChange={(event) => onChange({ ...filters, portal: event.target.value })}
+            aria-label="Publicação nos portais"
+            className={selectClassName}
+          >
+            <option value="todos">Portais: todos</option>
+            <option value="publicados">Publicados nos portais</option>
+            <option value="nao_publicados">Não publicados</option>
           </select>
         </>
       )}

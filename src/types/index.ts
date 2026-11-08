@@ -209,18 +209,21 @@ export interface Task {
   updatedAt: string
 }
 
+export type PortalAddressDisplay = 'full' | 'street' | 'neighborhood'
+
 export interface Property {
   id: string
   organizationId: string
   ownerId: string
   ownerName: string
   kind: PropertyKind
-  propertyType?: PropertyType
+  /** Tipo de revenda, valor de GET /properties/portal-config (não é o PropertyType de interesse do lead) */
+  propertyType?: string
   title: string
   description?: string
   cep?: string
   address?: string
-  number?: string
+  streetNumber?: string
   complement?: string
   neighborhood?: string
   city: string
@@ -230,8 +233,31 @@ export interface Property {
   startingPrice?: number
   maxPrice?: number
   price?: number
+  /** Área útil */
   areaM2?: number
+  /** Área total (terreno, chácara, sítio, galpão) */
+  lotAreaM2?: number
   bedrooms?: number
+  suites?: number
+  unitFloor?: number
+  buildingFloors?: number
+  yearBuilt?: number
+  condoFee?: number
+  iptuValue?: number
+  iptuPeriod?: 'anual' | 'mensal'
+  features?: string[]
+  /** null/undefined = não informado */
+  acceptsFinancing?: boolean
+  acceptsFgts?: boolean
+  exclusive?: boolean
+  commissionPct?: number
+  /** Proprietário (lead). ownerId é o corretor responsável */
+  sellerLeadId?: string
+  sellerLeadName?: string
+  publishToPortals?: boolean
+  portalAddressDisplay?: PortalAddressDisplay
+  /** Resumo dos portais (só revenda), calculado pela API */
+  portal?: { ready: boolean; missingCount: number }
   bathrooms?: number
   parkingSpots?: number
   minIncome?: number

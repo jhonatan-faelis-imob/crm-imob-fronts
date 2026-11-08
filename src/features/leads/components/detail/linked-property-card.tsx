@@ -1,6 +1,7 @@
 import { Building2, Home } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { getStatusMeta, PROPERTY_TYPE_META } from '@/features/empreendimentos/constants'
+import { getStatusMeta } from '@/features/empreendimentos/constants'
+import { portalTypeLabel, usePortalConfig } from '@/features/empreendimentos/portal/use-portal-config'
 import { formatCurrency } from '@/lib/utils'
 import type { Property } from '@/types'
 
@@ -13,14 +14,13 @@ export function LinkedPropertyCard({
   compatible?: boolean
   action?: ReactNode
 }) {
+  const { data: config } = usePortalConfig()
   const status = getStatusMeta(property.status)
   const price = property.price ?? property.startingPrice
   const typeLabel =
     property.kind === 'empreendimento'
       ? 'Empreendimento'
-      : property.propertyType
-        ? PROPERTY_TYPE_META[property.propertyType]
-        : 'Revenda'
+      : (portalTypeLabel(config, property.propertyType) ?? 'Revenda')
   const Icon = property.kind === 'empreendimento' ? Building2 : Home
 
   return (

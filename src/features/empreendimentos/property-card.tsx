@@ -8,14 +8,17 @@ import {
 import { formatCurrency } from '@/lib/utils'
 import type { Property } from '@/types'
 import { RESALE_STATUS_META, type ResaleStatus } from './constants'
+import { PortalChip } from './portal/portal-chip'
 
 export function PropertyCard({
   property,
   onEdit,
+  onOpenPortal,
   onDeactivate,
 }: {
   property: Property
   onEdit: () => void
+  onOpenPortal: () => void
   onDeactivate: () => void
 }) {
   const status = RESALE_STATUS_META[property.status as ResaleStatus]
@@ -73,12 +76,13 @@ export function PropertyCard({
           </span>
           <span className="flex items-center gap-1">
             <Ruler className="h-3.5 w-3.5" />
-            {property.areaM2 ?? 0}m²
+            {property.areaM2 ?? property.lotAreaM2 ?? 0}m²
           </span>
         </div>
 
         <p className="text-sm font-semibold text-neutral-900">{formatCurrency(property.price ?? 0)}</p>
         <p className="text-xs text-neutral-400">{property.ownerName}</p>
+        <PortalChip property={property} onOpen={onOpenPortal} />
       </div>
     </div>
   )
