@@ -7,8 +7,15 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const isPublic = PUBLIC_ROUTES.some(r => pathname.startsWith(r))
 
+  // Landing page: só a raiz exata e fora do fluxo do PWA (start_url = /?source=pwa)
+  const isLanding = pathname === '/' && request.nextUrl.searchParams.get('source') !== 'pwa'
+
   // Verificar token no cookie ou header
   const token = request.cookies.get('accessToken')?.value
+
+  if (isLanding) {
+    return token ? NextResponse.redirect(new URL('/dashboard', request.url)) : NextResponse.next()
+  }
 
   if (!isPublic && !token) {
     return NextResponse.redirect(new URL('/login', request.url))

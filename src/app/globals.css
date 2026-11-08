@@ -97,3 +97,14 @@
     font-family: var(--font-jakarta), sans-serif;
   }
 }
+
+/* Landing page: rolagem suave só quando o layout de marketing está na página */
+html:has([data-landing]) {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:has([data-landing]) {
+    scroll-behavior: auto;
+  }
+}
