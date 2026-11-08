@@ -12,6 +12,7 @@ import {
   Plus,
   Menu as MenuIcon,
   Building2,
+  Calculator,
   UserPlus,
   CheckSquare,
   BarChart2,
@@ -30,12 +31,14 @@ import { isNavItemActive, useSettingsGroup, visibleSettingsItems } from './setti
 const quickCreateItems: { href: string; label: string; description: string; icon: LucideIcon }[] = [
   { href: '/empreendimentos', label: 'Novo Imóvel', description: 'Cadastrar empreendimento ou revenda', icon: Building2 },
   { href: '/leads', label: 'Novo Lead', description: 'Adicionar cliente ao funil', icon: UserPlus },
+  { href: '/simulador', label: 'Simulação rápida', description: 'Quanto o cliente pode financiar', icon: Calculator },
 ]
 
 const menuNavItems: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/meu-dia', label: 'Meu dia', icon: CalendarCheck },
   { href: '/tarefas', label: 'Tarefas', icon: CheckSquare },
   { href: '/empreendimentos', label: 'Imóveis', icon: Building2 },
+  { href: '/simulador', label: 'Simulador', icon: Calculator },
   { href: '/relatorios', label: 'Relatórios', icon: BarChart2 },
 ]
 

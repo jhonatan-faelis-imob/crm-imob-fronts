@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { List, Plus, SquareKanban, Workflow } from 'lucide-react'
 import Link from 'next/link'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -13,7 +13,9 @@ import { FiltersBar, defaultLeadFilters, type LeadFilters } from '@/features/lea
 import { formatVgv, KanbanBoard } from '@/features/leads/components/kanban-board'
 import { PendingSalesBanner } from '@/features/leads/components/pending-sales-banner'
 import { LeadsListView } from '@/features/leads/list-view'
-import { NewLeadDialog } from '@/features/leads/new-lead-dialog'
+import { NewLeadDialog, type LeadFormInitialValues } from '@/features/leads/new-lead-dialog'
+import { toCurrencyMaskValue } from '@/features/leads/lead-form/from-lead'
+import { useSimulationDraftStore } from '@/features/simulador/simulation-draft-store'
 import {
   buildLeadsQueryParams,
   mapApiLeadToLead,
@@ -39,7 +41,23 @@ interface ApiUser {
 export default function LeadsPage() {
   const [view, setView] = useState<ViewMode>('kanban')
   const [filters, setFilters] = useState<LeadFilters>(defaultLeadFilters)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  // "Cadastrar como lead" do simulador: o rascunho (só em memória) abre o formulário preenchido
+  const [simulationPrefill] = useState<LeadFormInitialValues | undefined>(() => {
+    const draft = useSimulationDraftStore.getState().draft
+    if (!draft) return undefined
+    return {
+      income: toCurrencyMaskValue(draft.income),
+      fgtsValue: toCurrencyMaskValue(draft.fgtsValue),
+      ownResources: toCurrencyMaskValue(draft.ownResources),
+    }
+  })
+  const [isDialogOpen, setIsDialogOpen] = useState(simulationPrefill !== undefined)
+  const [usePrefill, setUsePrefill] = useState(simulationPrefill !== undefined)
+  const clearSimulationDraft = useSimulationDraftStore((state) => state.clearDraft)
+  // Já foi para o estado local: o rascunho não pode reabrir o formulário numa próxima visita
+  useEffect(() => {
+    clearSimulationDraft()
+  }, [clearSimulationDraft])
   const queryClient = useQueryClient()
   const isHydrated = useHydrated()
   const user = useAuthStore((state) => state.user)
@@ -175,7 +193,11 @@ export default function LeadsPage() {
 
       <NewLeadDialog
         open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        onOpenChange={(open) => {
+          setIsDialogOpen(open)
+          if (!open) setUsePrefill(false)
+        }}
+        initialValues={usePrefill ? simulationPrefill : undefined}
         brokers={brokerOptions}
         onSubmitLead={handleSubmitLead}
       />

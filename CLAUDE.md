@@ -478,11 +478,12 @@ src/
 ```
 
 **Rotas implementadas:** `/`, `/login`, `/dashboard`, `/meu-dia`, `/leads`, `/leads/[id]`, `/empreendimentos`, `/metas`,
-`/tarefas`, `/mensagens`, `/equipe`, `/relatorios`, `/cadencias`, `/documentos`.
+`/tarefas`, `/mensagens`, `/equipe`, `/relatorios`, `/cadencias`, `/documentos`, `/simulador`.
 
 ### Menu (Sidebar e sheet "Menu" do BottomNav)
 
-- Nível principal: Dashboard, Meu dia, Leads, Tarefas, Empreendimentos, Metas, Relatórios e, no fim, o grupo
+- Nível principal: Dashboard, Meu dia, Leads, Tarefas, Empreendimentos, Simulador (todos os perfis, lista estática), Metas,
+  Relatórios e, no fim, o grupo
   **Configurações** (Settings, expansível com ChevronDown). Os subitens ficam em `src/components/layout/settings-nav.ts`:
 
   | Subitem | Rota | Quem vê |
@@ -714,6 +715,44 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
   "Checklist ainda não iniciado" e "Iniciar", que abre a aba e gera). Query `['lead-docs', id]`, só habilitada na aba; mudanças
   são otimistas e invalidam `['lead-docs', id]`, `['leads']` e `['lead', id]`. "Pedir documentos pendentes" usa o render-free e
   o `MessagePreviewDialog` (registra a interação). Chip "Docs 3/8" (`DocsChip`) no Kanban e na lista. Tela `/documentos`.
+
+---
+
+## Simulador — regras atuais
+
+- **É só estimativa e não é salvo.** Nenhuma tabela: `POST /simulations/calculate` calcula e devolve. O aviso fixo da tela diz
+  "Estimativa para atendimento. Não é aprovação de crédito: valores, prazo, juros e subsídio dependem da análise do banco."
+- **Módulo:** `simulations` no backend (`simulation.config.ts`, `simulation.calculator.ts` puro e testado), `features/simulador`
+  e `/simulador` no front. `GET /simulations/config` devolve padrões e limites. Liberado para todos os perfis.
+- **Fórmula:**
+
+  ```
+  income         = renda + rendaConjuge (se informada)
+  installment    = income × commitmentPct/100
+  financing      = installment × termFactor
+  referenceValue = financing ÷ (financingPct/100)
+  coverage       = (useFgts ? fgts : 0) + ownResources + subsidy
+  downTotal      = referenceValue − financing
+  downRemaining  = max(0, downTotal − coverage)
+  surplus        = max(0, coverage − downTotal)
+  maxPurchase    = max(referenceValue, financing + coverage)
+  ```
+
+  Arredondado a 2 casas; renda ≤ 0 dá 400 "Informe a renda".
+- **Parâmetros:** `commitmentPct` 30 (10 a 50), `termFactor` 108 (24 a 240), `financingPct` 80 (30 a 95), `nearMarginPct` 15;
+  renda até 1.000.000. Fora da faixa, 400 (class-validator).
+- **Avisos:** `fgts_nao_confirmado` (FGTS usado e `hasClt3Years === false`) e `renda_conjuge_somada`.
+- **Imóveis:** ativos, não vendidos, `propertyStatus` nulo ou fora de `esgotado | suspenso | vendido` (o nulo é tratado à parte:
+  o `notIn` do Prisma o excluiria). Preço: `startingPrice` (empreendimento, "a partir de") ou `price` (revenda, "valor"); sem
+  preço, fica de fora. **Cabe** se P ≤ maxPurchase; **quase** se P ≤ maxPurchase × 1,15. Por imóvel: `financingUsed =
+  min(financing, financingPct% × P)`, `downNeeded = P − financingUsed`, `downRemaining = max(0, downNeeded − coverage)`.
+  `incomeMatch` = renda total entre `minIncome` e `maxIncome`. Cabe antes de quase, preço decrescente, até 12.
+- **Front:** recálculo por `useQuery(['simulation', entradas])` com debounce de 400 ms, `keepPreviousData`, staleTime 60 s e
+  `meta: { silent: true }`; o `GlobalLoading` ignora queries com `meta.silent`. No detalhe do lead: botão "Simular" no card
+  Financeiro (Dialog; Sheet em tela cheia no celular) e a linha "Imóvel de referência: até R$ X" (query silenciosa, 5 min).
+  "Salvar no cadastro" grava `income`, `fgtsValue` e `ownResources` (nunca a renda do cônjuge somada). "Cadastrar como lead"
+  usa o store em memória `simulation-draft-store.ts` (nada financeiro na URL) e `NewLeadDialog initialValues`. Clicar num
+  imóvel abre `/empreendimentos?abrir=<id>`. `POST /properties/:id/leads/:leadId` repetido devolve 409.
 
 ---
 

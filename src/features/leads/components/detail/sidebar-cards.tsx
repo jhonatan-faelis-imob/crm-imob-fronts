@@ -1,4 +1,4 @@
-import { ArrowRight, Calendar, Mail, MessageCircle, Sparkles } from 'lucide-react'
+import { ArrowRight, Calculator, Calendar, Mail, MessageCircle, Sparkles } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { formatCurrency, getInitials } from '@/lib/utils'
 import { whatsappUrl } from '@/lib/whatsapp'
@@ -150,21 +150,41 @@ function FinancialRow({ label, value, strong }: { label: string; value: number |
 export function FinancialCard({
   lead,
   matchCount,
+  referenceValue,
   onViewLinkedProperties,
+  onSimulate,
 }: {
   lead: Lead
   matchCount: number
+  // Teto da simulação rápida com os dados do cadastro; undefined enquanto não há renda
+  referenceValue?: number
   onViewLinkedProperties: () => void
+  onSimulate: () => void
 }) {
   return (
     <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5">
-      <h3 className="text-sm font-semibold text-neutral-900">Financeiro</h3>
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="text-sm font-semibold text-neutral-900">Financeiro</h3>
+        <button
+          type="button"
+          onClick={onSimulate}
+          className="-my-2 inline-flex min-h-11 items-center gap-1.5 rounded-[8px] px-2 text-sm font-medium text-brand hover:bg-brand-bg"
+        >
+          <Calculator className="h-4 w-4" />
+          Simular
+        </button>
+      </div>
       <div className="mt-3 space-y-2.5 text-sm">
         <FinancialRow label="Renda" value={lead.income} />
         <FinancialRow label="FGTS" value={lead.fgtsValue} />
         <FinancialRow label="Recursos próprios" value={lead.ownResources} />
         <FinancialRow label="Valor de interesse" value={lead.interestValue} strong />
       </div>
+      {referenceValue !== undefined && (
+        <p className="mt-3 rounded-[12px] bg-neutral-100 px-3 py-2 text-xs text-neutral-600">
+          Imóvel de referência: até <strong className="text-neutral-900">{formatCurrency(referenceValue)}</strong>
+        </p>
+      )}
       {lead.income !== undefined && (
         <button
           type="button"

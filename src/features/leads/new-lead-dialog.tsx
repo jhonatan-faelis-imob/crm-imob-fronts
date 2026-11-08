@@ -45,8 +45,12 @@ const navButtonClassName = 'size-11 rounded-[8px] border-[1.5px] border-neutral-
 // Owns the form state (useForm + activeTab). Mounted fresh via a `key` on the parent
 // every time the dialog opens (or targets a different lead/tab), so state always starts
 // correct without needing an effect to imperatively reset it on prop changes.
+// Valores já mascarados, para pré-preencher um lead novo (ex.: vindo do simulador)
+export type LeadFormInitialValues = Partial<Pick<LeadFormValues['basic'], 'income' | 'fgtsValue' | 'ownResources'>>
+
 function LeadFormBody({
   lead,
+  initialValues,
   initialTab,
   brokers,
   onClose,
@@ -55,6 +59,7 @@ function LeadFormBody({
   onSubmitLead,
 }: {
   lead?: Lead
+  initialValues?: LeadFormInitialValues
   initialTab: number
   brokers: BrokerOption[]
   onClose: () => void
@@ -67,7 +72,9 @@ function LeadFormBody({
   const form = useForm<LeadFormValues>({
     resolver: zodResolver(leadFormSchema),
     mode: 'onChange',
-    defaultValues: lead ? leadToFormValues(lead) : leadFormDefaultValues,
+    defaultValues: lead
+      ? leadToFormValues(lead)
+      : { ...leadFormDefaultValues, basic: { ...leadFormDefaultValues.basic, ...initialValues } },
   })
   const { control, handleSubmit } = form
   const { isValid, isSubmitting, dirtyFields } = form.formState
@@ -206,6 +213,7 @@ export function NewLeadDialog({
   open,
   onOpenChange,
   lead,
+  initialValues,
   initialTab = 0,
   brokers,
   onSubmitLead,
@@ -213,6 +221,7 @@ export function NewLeadDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
   lead?: Lead
+  initialValues?: LeadFormInitialValues
   initialTab?: number
   brokers: BrokerOption[]
   onSubmitLead: (data: LeadFormValues) => Promise<void>
@@ -248,6 +257,7 @@ export function NewLeadDialog({
         <LeadFormBody
           key={`${open}-${lead?.id ?? 'new'}-${initialTab}`}
           lead={lead}
+          initialValues={initialValues}
           initialTab={initialTab}
           brokers={brokers}
           onClose={() => onOpenChange(false)}

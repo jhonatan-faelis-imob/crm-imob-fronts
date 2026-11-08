@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from '@/components/ui/toast'
 import { DocumentsCard } from '@/features/documentos/components/documents-card'
+import { SimulatorDialog } from '@/features/simulador/components/simulator-dialog'
 import { DocumentsTab } from '@/features/documentos/components/documents-tab'
 import { mapApiPropertyToProperty, type ApiProperty } from '@/features/empreendimentos/api'
 import { mapApiTaskToTask, mapCompleteDataToDto, type ApiTask } from '@/features/tarefas/api'
@@ -17,6 +18,7 @@ import { documentsService } from '@/services/documents.service'
 import { interactionsService } from '@/services/interactions.service'
 import { leadsService } from '@/services/leads.service'
 import { propertiesService } from '@/services/properties.service'
+import { simulationsService } from '@/services/simulations.service'
 import { tasksService } from '@/services/tasks.service'
 import { usersService } from '@/services/users.service'
 import type { Lead, LeadChecklist, LeadDocsSummary, Task, TaskType } from '@/types'
@@ -65,6 +67,7 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
   const [completingTask, setCompletingTask] = useState<Task | null>(null)
   const [openingTask, setOpeningTask] = useState<Task | null>(null)
   const [newTaskId, setNewTaskId] = useState<string | null>(null)
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false)
 
   const { data: brokers } = useQuery<BrokerOption[]>({
     queryKey: ['users'],
@@ -106,6 +109,22 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
     enabled: lead.income !== undefined,
   })
   const linkedIds = new Set(linkedProperties.map((property) => property.id))
+
+  // Linha "Imóvel de referência" do card Financeiro: silenciosa, sem imóveis, só com renda
+  const { data: referenceSimulation } = useQuery({
+    queryKey: ['simulation', 'lead-reference', lead.id, lead.income, lead.fgtsValue, lead.ownResources, lead.hasClt3Years],
+    queryFn: () =>
+      simulationsService.calculate({
+        income: lead.income ?? 0,
+        fgts: lead.fgtsValue ?? 0,
+        ownResources: lead.ownResources ?? 0,
+        hasClt3Years: lead.hasClt3Years,
+        includeProperties: false,
+      }),
+    enabled: (lead.income ?? 0) > 0,
+    staleTime: 5 * 60 * 1000,
+    meta: { silent: true },
+  })
   const incomeMatchCount = incomeMatches?.length ?? 0
   const suggestions = (incomeMatches ?? [])
     .map(mapApiPropertyToProperty)
@@ -350,7 +369,13 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
 
         <div className="order-1 space-y-4 lg:order-2 lg:col-span-1">
           <SummaryCard lead={lead} onAnalyze={() => setIsAiDialogOpen(true)} />
-          <FinancialCard lead={lead} matchCount={incomeMatchCount} onViewLinkedProperties={() => setActiveTab('imoveis')} />
+          <FinancialCard
+            lead={lead}
+            matchCount={incomeMatchCount}
+            referenceValue={(lead.income ?? 0) > 0 ? referenceSimulation?.maxPurchaseValue : undefined}
+            onViewLinkedProperties={() => setActiveTab('imoveis')}
+            onSimulate={() => setIsSimulatorOpen(true)}
+          />
           <ResponsibleCard lead={lead} onTransfer={() => console.log('Transferir corretor', lead.id)} />
           <NextTaskCard
             tasks={tasks}
@@ -370,6 +395,12 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
         initialTab={editInitialTab}
         brokers={brokerOptions}
         onSubmitLead={handleSubmitLead}
+      />
+      <SimulatorDialog
+        open={isSimulatorOpen}
+        onOpenChange={setIsSimulatorOpen}
+        lead={lead}
+        linkedPropertyIds={linkedProperties.map((property) => property.id)}
       />
       <AiAnalysisDialog open={isAiDialogOpen} onOpenChange={setIsAiDialogOpen} leadId={lead.id} />
       <NewTaskDialog

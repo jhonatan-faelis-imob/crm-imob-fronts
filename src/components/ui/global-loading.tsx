@@ -2,7 +2,8 @@
 import { useIsFetching, useIsMutating } from '@tanstack/react-query'
 
 export function GlobalLoading() {
-  const isFetching = useIsFetching()
+  // Queries com meta.silent (ex.: recálculo do simulador enquanto digita) não acionam o overlay
+  const isFetching = useIsFetching({ predicate: (query) => !query.meta?.silent })
   const isMutating = useIsMutating()
   const isLoading = isFetching > 0 || isMutating > 0
 

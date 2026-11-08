@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Building2, Plus } from 'lucide-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Property, PropertyKind } from '@/types'
@@ -23,7 +24,16 @@ interface ApiUser {
   name: string
 }
 
+// useSearchParams pede um Suspense para a página continuar estática no build
 export default function EmpreendimentosPage() {
+  return (
+    <Suspense fallback={<Skeleton className="h-64 rounded-[16px]" />}>
+      <EmpreendimentosContent />
+    </Suspense>
+  )
+}
+
+function EmpreendimentosContent() {
   const [kind, setKind] = useState<PropertyKind>('empreendimento')
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [filters, setFilters] = useState<PropertyFilters>(defaultPropertyFilters)
@@ -46,6 +56,7 @@ export default function EmpreendimentosPage() {
   const allProperties = (propertiesData?.data ?? []).map(mapApiPropertyToProperty)
   const developments = allProperties.filter((property) => property.kind === 'empreendimento')
   const resaleProperties = allProperties.filter((property) => property.kind === 'revenda')
+
 
   function invalidateProperties() {
     queryClient.invalidateQueries({ queryKey: ['properties'] })
@@ -85,10 +96,26 @@ export default function EmpreendimentosPage() {
     },
   })
 
+  // ?abrir=<id> (vindo do simulador) abre o imóvel uma vez; fechar limpa a URL
+  const router = useRouter()
+  const requestedId = useSearchParams().get('abrir')
+  const [handledId, setHandledId] = useState<string | null>(null)
+  const requested =
+    requestedId && requestedId !== handledId ? allProperties.find((property) => property.id === requestedId) : undefined
+  const requestedDevelopment = requested?.kind === 'empreendimento' ? requested : undefined
+  const requestedResale = requested?.kind === 'revenda' ? requested : undefined
+
+  function closeRequested() {
+    if (!requested) return
+    setHandledId(requested.id)
+    router.replace('/empreendimentos')
+  }
+
   async function handleSubmitDevelopment(data: Parameters<typeof mapDevelopmentFormToDto>[0]) {
     const dto = mapDevelopmentFormToDto(data)
-    if (editingDevelopment) {
-      await updateProperty.mutateAsync({ id: editingDevelopment.id, dto })
+    const target = requestedDevelopment ?? editingDevelopment
+    if (target) {
+      await updateProperty.mutateAsync({ id: target.id, dto })
     } else {
       await createProperty.mutateAsync(dto)
     }
@@ -96,8 +123,9 @@ export default function EmpreendimentosPage() {
 
   async function handleSubmitProperty(data: Parameters<typeof mapPropertyFormToDto>[0]) {
     const dto = mapPropertyFormToDto(data)
-    if (editingProperty) {
-      await updateProperty.mutateAsync({ id: editingProperty.id, dto })
+    const target = requestedResale ?? editingProperty
+    if (target) {
+      await updateProperty.mutateAsync({ id: target.id, dto })
     } else {
       await createProperty.mutateAsync(dto)
     }
@@ -263,18 +291,24 @@ export default function EmpreendimentosPage() {
       )}
 
       <NewDevelopmentDialog
-        key={editingDevelopment?.id ?? 'new-development'}
-        open={isDevelopmentDialogOpen}
-        onOpenChange={setIsDevelopmentDialogOpen}
-        development={editingDevelopment}
+        key={(requestedDevelopment ?? editingDevelopment)?.id ?? 'new-development'}
+        open={isDevelopmentDialogOpen || requestedDevelopment !== undefined}
+        onOpenChange={(open) => {
+          if (!open) closeRequested()
+          setIsDevelopmentDialogOpen(open)
+        }}
+        development={requestedDevelopment ?? editingDevelopment}
         onSubmitDevelopment={handleSubmitDevelopment}
         brokers={brokers ?? []}
       />
       <NewPropertyDialog
-        key={editingProperty?.id ?? 'new-property'}
-        open={isPropertyDialogOpen}
-        onOpenChange={setIsPropertyDialogOpen}
-        property={editingProperty}
+        key={(requestedResale ?? editingProperty)?.id ?? 'new-property'}
+        open={isPropertyDialogOpen || requestedResale !== undefined}
+        onOpenChange={(open) => {
+          if (!open) closeRequested()
+          setIsPropertyDialogOpen(open)
+        }}
+        property={requestedResale ?? editingProperty}
         onSubmitProperty={handleSubmitProperty}
         brokers={brokers ?? []}
       />

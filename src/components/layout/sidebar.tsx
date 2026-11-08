@@ -9,6 +9,7 @@ import {
   Users,
   CheckSquare,
   Building2,
+  Calculator,
   Target,
   BarChart2,
   ChevronDown,
@@ -29,6 +30,8 @@ export const navItems: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/leads', label: 'Leads', icon: Users },
   { href: '/tarefas', label: 'Tarefas', icon: CheckSquare },
   { href: '/empreendimentos', label: 'Empreendimentos', icon: Building2 },
+  // Lista estática, sem filtro por cargo: todos os perfis simulam
+  { href: '/simulador', label: 'Simulador', icon: Calculator },
   { href: '/metas', label: 'Metas', icon: Target },
   { href: '/relatorios', label: 'Relatórios', icon: BarChart2 },
 ]
