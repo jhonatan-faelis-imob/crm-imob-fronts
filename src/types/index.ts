@@ -177,6 +177,8 @@ export interface Lead {
   active: boolean
   lastContactAt?: string
   hasPendingTask: boolean
+  // Resumo do checklist de documentos; null enquanto o checklist não foi aberto
+  docs?: LeadDocsSummary | null
   createdAt: string
   updatedAt: string
 }
@@ -472,4 +474,65 @@ export interface CadenceStage {
 export interface CadenceResult {
   created: { id: string; title: string; type: TaskType; dueDate: string }[]
   cancelled: number
+}
+
+export type DocumentCategory = 'pessoal' | 'renda' | 'fgts' | 'imovel' | 'outro'
+export type DocumentHolder = 'titular' | 'conjuge'
+export type DocumentAppliesWhen = 'always' | 'has_fgts'
+export type ChecklistStatus = 'pendente' | 'recebido' | 'aprovado' | 'recusado' | 'dispensado'
+
+export interface LeadDocsSummary {
+  requiredTotal: number
+  requiredApproved: number
+  received: number
+  pendingRequired: number
+}
+
+export interface DocumentRequirement {
+  id: string
+  organizationId: string
+  name: string
+  description: string | null
+  category: DocumentCategory
+  holder: DocumentHolder
+  required: boolean
+  appliesWhen: DocumentAppliesWhen
+  orderIndex: number
+  active: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ChecklistItem {
+  id: string
+  organizationId: string
+  leadId: string
+  // null = item avulso, criado só para este cliente
+  requirementId: string | null
+  name: string
+  description: string | null
+  category: DocumentCategory
+  holder: DocumentHolder
+  required: boolean
+  status: ChecklistStatus
+  notes: string | null
+  receivedAt: string | null
+  approvedAt: string | null
+  updatedBy: string | null
+  orderIndex: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ChecklistSummary {
+  counts: Record<ChecklistStatus, number>
+  requiredTotal: number
+  requiredApproved: number
+  percent: number | null
+  pendingRequired: number
+}
+
+export interface LeadChecklist {
+  items: ChecklistItem[]
+  summary: ChecklistSummary
 }

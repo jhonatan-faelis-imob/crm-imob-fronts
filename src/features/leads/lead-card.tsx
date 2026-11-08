@@ -18,6 +18,7 @@ import { funnelStagesService } from '@/services/funnel-stages.service'
 import { SOURCE_META } from './constants'
 import { LEAD_URGENCY_META } from './lead-form/options'
 import { resolveLeadStage, type ApiFunnelStage } from './api-mapper'
+import { DocsChip } from '@/features/documentos/components/docs-chip'
 import { useMoveLeadToStage } from './use-move-lead-to-stage'
 import { MoveStageDialog } from './components/move-stage-dialog'
 
@@ -93,13 +94,18 @@ export function LeadCard({ lead }: { lead: Lead }) {
         {source.label}
       </div>
 
-      {urgency && (
-        <span
-          className="mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium"
-          style={{ backgroundColor: urgency.bg, color: urgency.text }}
-        >
-          {urgency.emoji} {urgency.label}
-        </span>
+      {(urgency || lead.docs) && (
+        <div className="mt-2 flex flex-wrap items-center gap-1">
+          {urgency && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium"
+              style={{ backgroundColor: urgency.bg, color: urgency.text }}
+            >
+              {urgency.emoji} {urgency.label}
+            </span>
+          )}
+          <DocsChip docs={lead.docs} />
+        </div>
       )}
 
       <p className="mt-2 text-sm font-semibold text-neutral-900">

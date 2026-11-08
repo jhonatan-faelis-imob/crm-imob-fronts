@@ -478,7 +478,7 @@ src/
 ```
 
 **Rotas implementadas:** `/`, `/login`, `/dashboard`, `/meu-dia`, `/leads`, `/leads/[id]`, `/empreendimentos`, `/metas`,
-`/tarefas`, `/mensagens`, `/equipe`, `/relatorios`, `/cadencias`.
+`/tarefas`, `/mensagens`, `/equipe`, `/relatorios`, `/cadencias`, `/documentos`.
 
 ### Menu (Sidebar e sheet "Menu" do BottomNav)
 
@@ -490,9 +490,10 @@ src/
   | Mensagens | `/mensagens` | todos |
   | Equipe | `/equipe` | todos (mesma regra de antes) |
   | Cadências | `/cadencias` | gerente ou superior (`canManageCadences`) |
+  | Documentos | `/documentos` | gerente ou superior (`canManageDocuments`) |
 
 - Sem nenhum subitem visível, o grupo some. O grupo fica destacado e abre sozinho em `/mensagens`, `/equipe` e `/cadencias`
-  (`useSettingsGroup`); fora delas começa recolhido. As três páginas mostram "Configurações" em muted acima do título.
+  (`useSettingsGroup`), e também em `/documentos`; fora delas começa recolhido. As três páginas mostram "Configurações" em muted acima do título.
 - **Hidratação:** a primeira renderização usa a lista completa e estática; o filtro por cargo (e o nome do usuário no rodapé
   do Sidebar) só entra depois de `useHydrated()`. O lint (react-hooks 7) não aceita `setState` em `useEffect`, por isso o
   "mounted" é o `useHydrated`.
@@ -671,6 +672,48 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
   dois montam o toast com `cadenceToastDescription`. Chip `AutoTaskChip` (Zap) em lista, calendário (só ícone), detalhe da
   tarefa, aba de tarefas do lead e Meu dia. Kanban mostra um Info com os passos ativos (`['cadences']`, staleTime 5 min) num
   Popover que abre no toque e no hover.
+
+---
+
+## Checklist de documentos — regras atuais
+
+- **Upload ainda não existe.** O checklist só marca status; o model `Document` (arquivos) não é usado nem alterado por isto.
+- **Models:** `DocumentRequirement` (`document_requirements`) é a lista padrão da imobiliária: `name`, `description`,
+  `category` (`pessoal | renda | fgts | imovel | outro`), `holder` (`titular | conjuge`), `required`, `appliesWhen`
+  (`always | has_fgts`), `orderIndex`, `active`. `LeadChecklistItem` (`lead_checklist_items`) é a cópia por lead, com `status`,
+  `notes`, `receivedAt`, `approvedAt`, `updatedBy` e `requirementId` (sem FK; nulo = item avulso). Nome e descrição são cópia:
+  renomear o padrão não mexe nos leads. `@@unique([leadId, requirementId, holder])` segura geração concorrente.
+- **Padrão:** organização com zero exigências (contando as inativas) recebe as 11 de `default-requirements.ts`. Contar as
+  inativas impede que os padrão voltem depois de a lista ser esvaziada de propósito. Excluir é só `active = false`; máximo de
+  40 ativas.
+- **Geração (`ensureChecklist`):** só na primeira abertura (lead sem nenhum item), no `GET /documents/lead/:leadId` e em
+  `{{documentos_pendentes}}`. Usa só exigências ativas; `conjuge` exige `spouseName` ou `maritalStatus` `casado`/`uniao_estavel`;
+  `has_fgts` exige `fgtsValue > 0`. `createMany({ skipDuplicates: true })`. Depois disso, mudanças no padrão só entram por
+  `POST .../sync`, que acrescenta o que falta (requirementId + holder) e não remove nem altera nada.
+- **Status:** `pendente | recebido | aprovado | recusado | dispensado`. `recebido` grava `receivedAt` se nulo; `aprovado` grava
+  `approvedAt` e `receivedAt` se nulo; `pendente` limpa os dois; `recusado` e `dispensado` não mexem nas datas. Sempre grava
+  `updatedBy` (PATCH e bulk). Regra em `checklist-rules.ts`.
+- **Resumo:** `requiredTotal` (obrigatórios fora de `dispensado`), `requiredApproved`, `percent` (null sem obrigatórios) e
+  `pendingRequired` (obrigatórios em `pendente` ou `recusado`). `GET /leads` e `GET /leads/:id` trazem `docs:
+  { requiredTotal, requiredApproved, received, pendingRequired }` ou `null` sem checklist, via um `groupBy` por página.
+- **Endpoints (`@Controller('documents')`):**
+
+  | Endpoint | Quem |
+  |---|---|
+  | `GET /documents/requirements` (todas, ativas e inativas) | todos |
+  | `POST`, `PATCH /:id`, `DELETE /:id` (desativa), `PATCH /reorder` em `/documents/requirements` | gerente+ |
+  | `GET /documents/lead/:leadId` → `{ items, summary }`; `POST .../sync` → `{ created }` | quem vê o lead |
+  | `POST /documents/lead/:leadId/items` (avulso, máx. 60 por lead); `POST .../bulk` (`{ ids, status }`, máx. 50) | quem vê o lead |
+  | `PATCH /documents/items/:id` (`status`, `notes`; `name` só em avulso); `DELETE` só avulso ("Use ‘Dispensar’…") | quem vê o lead |
+
+  Acesso pelo `LeadsService.assertLeadAccess(user, leadId)` (mesma regra do detalhe); itens carregam o lead e passam por
+  `assertCanView`.
+- **`{{documentos_pendentes}}`:** uma linha "• Nome" por obrigatório em `pendente`/`recusado` (" (cônjuge)" quando for), titular
+  primeiro. Sem nenhum, a variável fica vazia e vai para `missing`. Só é calculada quando o texto contém a variável.
+- **Front:** aba "Documentos" no detalhe (chip aprovados/obrigatórios) e cartão lateral (`documents-card.tsx`; `docs` nulo mostra
+  "Checklist ainda não iniciado" e "Iniciar", que abre a aba e gera). Query `['lead-docs', id]`, só habilitada na aba; mudanças
+  são otimistas e invalidam `['lead-docs', id]`, `['leads']` e `['lead', id]`. "Pedir documentos pendentes" usa o render-free e
+  o `MessagePreviewDialog` (registra a interação). Chip "Docs 3/8" (`DocsChip`) no Kanban e na lista. Tela `/documentos`.
 
 ---
 

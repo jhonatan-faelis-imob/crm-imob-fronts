@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { MessageSquareText, UsersRound, Workflow, type LucideIcon } from 'lucide-react'
+import { FileCheck, MessageSquareText, UsersRound, Workflow, type LucideIcon } from 'lucide-react'
 import { canManageCadences } from '@/features/cadencias/constants'
+import { canManageDocuments } from '@/features/documentos/constants'
 
 export interface SettingsNavItem {
   href: string
@@ -16,6 +17,7 @@ export const SETTINGS_NAV_ITEMS: SettingsNavItem[] = [
   // Equipe continua visível para todos, como era no menu principal
   { href: '/equipe', label: 'Equipe', icon: UsersRound },
   { href: '/cadencias', label: 'Cadências', icon: Workflow, canSee: (role) => canManageCadences({ role }) },
+  { href: '/documentos', label: 'Documentos', icon: FileCheck, canSee: (role) => canManageDocuments({ role }) },
 ]
 
 export function isNavItemActive(pathname: string, href: string) {

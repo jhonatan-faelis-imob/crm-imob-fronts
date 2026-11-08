@@ -1,4 +1,4 @@
-import type { Lead, LeadStatus, LeadTag } from '@/types'
+import type { Lead, LeadDocsSummary, LeadStatus, LeadTag } from '@/types'
 import type { ApiInteraction, ApiLeadProperty } from './components/detail/api'
 import type { LeadFilters } from './filters-bar'
 import type { LeadFormValues } from './lead-form/schema'
@@ -66,6 +66,7 @@ export interface ApiLead {
   funnelStage: ApiFunnelStage | null
   tags: { tag: { id: string; name: string } }[]
   _count?: { tasks: number; interactions: number }
+  docs?: LeadDocsSummary | null
   // Só vêm preenchidos na resposta de GET /leads/:id (detalhe) — findAll (lista) não inclui.
   interactions?: ApiInteraction[]
   properties?: ApiLeadProperty[]
@@ -208,6 +209,7 @@ export function mapApiLeadToLead(lead: ApiLead): Lead {
     active: lead.active,
     lastContactAt: lead.lastContactAt ?? undefined,
     hasPendingTask: (lead._count?.tasks ?? 0) > 0,
+    docs: lead.docs ?? null,
     createdAt: lead.createdAt,
     updatedAt: lead.updatedAt,
   }

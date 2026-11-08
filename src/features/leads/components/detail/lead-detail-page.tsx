@@ -6,17 +6,20 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from '@/components/ui/toast'
+import { DocumentsCard } from '@/features/documentos/components/documents-card'
+import { DocumentsTab } from '@/features/documentos/components/documents-tab'
 import { mapApiPropertyToProperty, type ApiProperty } from '@/features/empreendimentos/api'
 import { mapApiTaskToTask, mapCompleteDataToDto, type ApiTask } from '@/features/tarefas/api'
 import { invalidateMyDayQueries } from '@/features/meu-dia/invalidate-my-day-queries'
 import { CompleteTaskModal, type CompleteTaskData } from '@/features/tarefas/components/complete-task-modal'
 import { TaskDetailSheet } from '@/features/tarefas/components/task-detail-sheet'
+import { documentsService } from '@/services/documents.service'
 import { interactionsService } from '@/services/interactions.service'
 import { leadsService } from '@/services/leads.service'
 import { propertiesService } from '@/services/properties.service'
 import { tasksService } from '@/services/tasks.service'
 import { usersService } from '@/services/users.service'
-import type { Lead, Task, TaskType } from '@/types'
+import type { Lead, LeadChecklist, LeadDocsSummary, Task, TaskType } from '@/types'
 import { mapFormValuesToCreateLeadDto, type ApiLead } from '../../api-mapper'
 import type { BrokerOption } from '../../lead-form/tab-basic-info'
 import type { LeadFormValues } from '../../lead-form/schema'
@@ -42,6 +45,7 @@ const TABS = [
   { value: 'dados', label: 'Dados cadastrais' },
   { value: 'tarefas', label: 'Tarefas' },
   { value: 'imoveis', label: 'Imóveis vinculados' },
+  { value: 'documentos', label: 'Documentos' },
 ] as const
 
 const tabTriggerClassName =
@@ -80,6 +84,21 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
     queryFn: () => tasksService.findAll({ leadId: lead.id, limit: '100' }),
   })
   const tasks = (tasksData?.data ?? []).map(mapApiTaskToTask)
+
+  // Só lê o cache: quem busca (e gera o checklist) é a aba Documentos, ao abrir
+  const { data: checklist } = useQuery<LeadChecklist>({
+    queryKey: ['lead-docs', lead.id],
+    queryFn: () => documentsService.getChecklist(lead.id),
+    enabled: false,
+  })
+  const docs: LeadDocsSummary | null = checklist
+    ? {
+        requiredTotal: checklist.summary.requiredTotal,
+        requiredApproved: checklist.summary.requiredApproved,
+        received: checklist.summary.counts.recebido,
+        pendingRequired: checklist.summary.pendingRequired,
+      }
+    : (apiLead.docs ?? null)
 
   const { data: incomeMatches } = useQuery<ApiProperty[]>({
     queryKey: ['properties', 'income-match', lead.income],
@@ -277,6 +296,11 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
               {TABS.map((tab) => (
                 <TabsTrigger key={tab.value} value={tab.value} className={tabTriggerClassName}>
                   {tab.label}
+                  {tab.value === 'documentos' && docs && docs.requiredTotal > 0 && (
+                    <span className="ml-1.5 rounded-full bg-neutral-100 px-1.5 py-0.5 text-[11px] font-medium text-neutral-600">
+                      {docs.requiredApproved}/{docs.requiredTotal}
+                    </span>
+                  )}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -310,6 +334,9 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
                 />
               )}
             </TabsContent>
+            <TabsContent value="documentos" className="mt-4">
+              <DocumentsTab lead={lead} />
+            </TabsContent>
             <TabsContent value="imoveis" className="mt-4">
               <LinkedPropertiesTab
                 linkedProperties={linkedProperties}
@@ -332,6 +359,7 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
             onOpenDetail={setOpeningTask}
           />
           <CadenceCard leadId={lead.id} onOpenTask={setOpeningTask} onAddTask={openNewTaskDialog} />
+          <DocumentsCard docs={docs} onOpen={() => setActiveTab('documentos')} />
         </div>
       </div>
 

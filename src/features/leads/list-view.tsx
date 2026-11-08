@@ -3,6 +3,7 @@
 import { Eye, ListTodo, Pencil } from 'lucide-react'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
+import { DocsChip } from '@/features/documentos/components/docs-chip'
 import { daysSince, formatCurrency } from '@/lib/utils'
 import type { Lead } from '@/types'
 import { funnelStagesService } from '@/services/funnel-stages.service'
@@ -50,9 +51,12 @@ export function LeadsListView({ leads }: { leads: Lead[] }) {
                 }`}
               >
                 <td className="px-4 py-3 font-medium text-neutral-900">
-                  <Link href={`/leads/${lead.id}`} className="hover:text-brand hover:underline">
-                    {lead.name}
-                  </Link>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <Link href={`/leads/${lead.id}`} className="hover:text-brand hover:underline">
+                      {lead.name}
+                    </Link>
+                    <DocsChip docs={lead.docs} />
+                  </div>
                 </td>
                 <td className="px-4 py-3">
                   <StagePopover

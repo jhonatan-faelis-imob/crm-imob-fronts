@@ -24,6 +24,8 @@ export const TEMPLATE_VARIABLES = [
   { key: 'corretor', sample: 'João Lima' },
   { key: 'telefone_corretor', sample: '(11) 99999-0000' },
   { key: 'imobiliaria', sample: 'Imobiliária Exemplo' },
+  // Lista dos obrigatórios em pendente ou recusado do checklist do lead
+  { key: 'documentos_pendentes', sample: '• CPF\n• Comprovante de renda do cônjuge' },
 ]
 
 const PLACEHOLDER_PATTERN = /\{\{([^{}]+)\}\}/g
