@@ -6,6 +6,12 @@ import { defaultTaskFilters, type TaskFilters } from './types'
 const selectClassName =
   'rounded-[8px] border-[1.5px] border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-brand'
 
+const ORIGIN_OPTIONS: { value: TaskFilters['origin']; label: string }[] = [
+  { value: 'todas', label: 'Todas as origens' },
+  { value: 'automaticas', label: 'Automáticas' },
+  { value: 'manuais', label: 'Manuais' },
+]
+
 const PERIOD_OPTIONS: { value: TaskFilters['period']; label: string }[] = [
   { value: 'todos', label: 'Qualquer período' },
   { value: 'hoje', label: 'Hoje' },
@@ -97,6 +103,19 @@ export function FiltersBar({
           {brokers.map((broker) => (
             <option key={broker.id} value={broker.id}>
               {broker.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={filters.origin}
+          onChange={(event) => onChange({ ...filters, origin: event.target.value as TaskFilters['origin'] })}
+          aria-label="Origem"
+          className={selectClassName}
+        >
+          {ORIGIN_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
             </option>
           ))}
         </select>

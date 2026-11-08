@@ -69,6 +69,7 @@ export function buildTaskParams(filters: TaskFilters): Record<string, string> {
 
   const period = PERIOD_TO_API[filters.period]
   if (period) params.period = period
+  if (filters.origin !== 'todas') params.auto = filters.origin === 'automaticas' ? 'true' : 'false'
 
   return params
 }

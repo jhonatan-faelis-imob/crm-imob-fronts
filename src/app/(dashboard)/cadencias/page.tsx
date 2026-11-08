@@ -2,6 +2,7 @@
 
 import { Accordion } from '@base-ui/react/accordion'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
 import { ArrowLeft, ChevronDown, Lock, Workflow } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -21,12 +22,27 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/toast'
 import { CadenceStepDialog } from '@/features/cadencias/components/cadence-step-dialog'
 import { StageSteps } from '@/features/cadencias/components/stage-steps'
-import { canManageCadences } from '@/features/cadencias/constants'
+import { MAX_STEP_TITLE_LENGTH, canManageCadences } from '@/features/cadencias/constants'
+import { invalidateCadenceQueries } from '@/features/cadencias/invalidate-cadence-queries'
 import { useHydrated } from '@/lib/use-hydrated'
 import { useIsMobile } from '@/lib/use-is-mobile'
-import { cadencesService } from '@/services/cadences.service'
+import { cadencesService, type ApplyExistingPreview } from '@/services/cadences.service'
 import { useAuthStore } from '@/store/auth.store'
 import type { CadenceStage, CadenceStep } from '@/types'
+
+function apiMessage(error: unknown) {
+  const message = isAxiosError(error) ? error.response?.data?.message : undefined
+  return typeof message === 'string' ? message : undefined
+}
+
+function plural(count: number, singular: string, pluralText: string) {
+  return `${count} ${count === 1 ? singular : pluralText}`
+}
+
+function duplicateTitle(title: string) {
+  const suffix = ' (cópia)'
+  return `${title.slice(0, MAX_STEP_TITLE_LENGTH - suffix.length)}${suffix}`
+}
 
 function StageHeader({ stage }: { stage: CadenceStage }) {
   const activeCount = stage.cadenceSteps.filter((step) => step.active).length
@@ -57,6 +73,7 @@ export default function CadenciasPage() {
   const [dialogSession, setDialogSession] = useState(0)
   const [deleting, setDeleting] = useState<CadenceStep | null>(null)
   const [togglingId, setTogglingId] = useState<string | null>(null)
+  const [applying, setApplying] = useState<{ stage: CadenceStage; preview: ApplyExistingPreview } | null>(null)
 
   const { data: stages, isLoading, isError } = useQuery({
     queryKey: ['cadences'],
@@ -69,7 +86,7 @@ export default function CadenciasPage() {
       cadencesService.updateStep(step.id, { active }),
     onMutate: ({ step }) => setTogglingId(step.id),
     onSuccess: (_data, { active }) => {
-      queryClient.invalidateQueries({ queryKey: ['cadences'] })
+      invalidateCadenceQueries(queryClient)
       toast.add({ title: active ? 'Passo ativado' : 'Passo desativado', type: 'success' })
     },
     onError: () => toast.add({ title: 'Não foi possível alterar o passo', type: 'error' }),
@@ -79,11 +96,89 @@ export default function CadenciasPage() {
   const removeStep = useMutation({
     mutationFn: (step: CadenceStep) => cadencesService.removeStep(step.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cadences'] })
+      invalidateCadenceQueries(queryClient)
       toast.add({ title: 'Passo excluído', type: 'success' })
       setDeleting(null)
     },
     onError: () => toast.add({ title: 'Não foi possível excluir o passo', type: 'error' }),
+  })
+
+  const duplicateStep = useMutation({
+    mutationFn: (step: CadenceStep) =>
+      cadencesService.createStep({
+        funnelStageId: step.funnelStageId,
+        title: duplicateTitle(step.title),
+        description: step.description ?? undefined,
+        type: step.type,
+        priority: step.priority,
+        offsetDays: step.offsetDays,
+        dueTime: step.dueTime,
+        skipWeekends: step.skipWeekends,
+        active: step.active,
+      }),
+    onSuccess: () => {
+      invalidateCadenceQueries(queryClient)
+      toast.add({ title: 'Passo duplicado', type: 'success' })
+    },
+    onError: (error) =>
+      toast.add({ title: 'Não foi possível duplicar o passo', description: apiMessage(error), type: 'error' }),
+  })
+
+  // Otimista: a lista já aparece na nova ordem; se falhar, volta ao que o servidor tem
+  const reorderSteps = useMutation({
+    mutationFn: ({ stageId, orderedIds }: { stageId: string; orderedIds: string[] }) =>
+      cadencesService.reorderSteps(stageId, orderedIds),
+    onMutate: async ({ stageId, orderedIds }) => {
+      await queryClient.cancelQueries({ queryKey: ['cadences'] })
+      queryClient.setQueryData<CadenceStage[]>(['cadences'], (old) =>
+        old?.map((stage) => {
+          if (stage.id !== stageId) return stage
+          const byId = new Map(stage.cadenceSteps.map((step) => [step.id, step]))
+          const cadenceSteps = orderedIds.flatMap((id, index) => {
+            const step = byId.get(id)
+            return step ? [{ ...step, orderIndex: index }] : []
+          })
+          return { ...stage, cadenceSteps }
+        }),
+      )
+    },
+    onError: () => toast.add({ title: 'Não foi possível salvar a nova ordem', type: 'error' }),
+    onSettled: () => invalidateCadenceQueries(queryClient),
+  })
+
+  const previewApply = useMutation({
+    mutationFn: (stage: CadenceStage) => cadencesService.previewApplyExisting(stage.id),
+    onSuccess: (preview, stage) => {
+      if (preview.tasksToCreate === 0) {
+        toast.add({
+          title: 'Nada a criar',
+          description: 'Os leads desta etapa já têm as tarefas da cadência, ou não têm corretor responsável.',
+          type: 'success',
+        })
+        return
+      }
+      setApplying({ stage, preview })
+    },
+    onError: (error) =>
+      toast.add({ title: 'Não foi possível calcular as tarefas', description: apiMessage(error), type: 'error' }),
+  })
+
+  const applyExisting = useMutation({
+    mutationFn: (stage: CadenceStage) => cadencesService.applyExisting(stage.id),
+    onSuccess: ({ created, leads }) => {
+      invalidateCadenceQueries(queryClient)
+      // A seção "Cadência" de qualquer lead aberto pode ter ganhado tarefas
+      queryClient.invalidateQueries({ queryKey: ['cadence-lead'] })
+      setApplying(null)
+      toast.add({
+        title: created
+          ? `Criei ${plural(created, 'tarefa', 'tarefas')} para ${plural(leads, 'lead', 'leads')}`
+          : 'Nenhuma tarefa nova',
+        type: 'success',
+      })
+    },
+    onError: (error) =>
+      toast.add({ title: 'Não foi possível aplicar a cadência', description: apiMessage(error), type: 'error' }),
   })
 
   function openDialog(stage: CadenceStage | null, step: CadenceStep | null) {
@@ -114,9 +209,18 @@ export default function CadenciasPage() {
       stage={stage}
       togglingId={togglingId}
       onAdd={() => openDialog(stage, null)}
-      onEdit={(step) => openDialog(stage, step)}
-      onDelete={setDeleting}
-      onToggle={(step, active) => toggleStep.mutate({ step, active })}
+      actions={{
+        onEdit: (step) => openDialog(stage, step),
+        onDuplicate: (step) => duplicateStep.mutate(step),
+        onDelete: setDeleting,
+        onToggle: (step, active) => toggleStep.mutate({ step, active }),
+      }}
+      onReorder={(orderedIds) => reorderSteps.mutate({ stageId: stage.id, orderedIds })}
+      onApplyExisting={() => previewApply.mutate(stage)}
+      isApplying={
+        (previewApply.isPending && previewApply.variables?.id === stage.id) ||
+        (applyExisting.isPending && applyExisting.variables?.id === stage.id)
+      }
     />
   )
 
@@ -130,6 +234,7 @@ export default function CadenciasPage() {
           <ArrowLeft className="h-4 w-4" />
           Leads
         </Link>
+        <p className="text-xs font-medium text-neutral-400">Configurações</p>
         <h1 className="text-[28px] font-semibold text-neutral-900">Cadências</h1>
         <p className="mt-1 max-w-2xl text-sm text-neutral-400">
           Quando um lead entra numa etapa, o sistema cria estas tarefas para o corretor responsável. Quando o lead
@@ -228,6 +333,45 @@ export default function CadenciasPage() {
               className="h-11 rounded-[8px] bg-danger px-4 text-white hover:bg-danger hover:opacity-90 sm:h-10"
             >
               Sim, excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={applying !== null}
+        onOpenChange={(open) => {
+          if (!open && !applyExisting.isPending) setApplying(null)
+        }}
+      >
+        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
+          <AlertDialogHeader className="p-4 sm:p-6">
+            <AlertDialogTitle>Aplicar aos leads de {applying?.stage.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {applying &&
+                `Vou criar ${plural(applying.preview.tasksToCreate, 'tarefa', 'tarefas')} para ${plural(
+                  applying.preview.leads,
+                  'lead',
+                  'leads',
+                )}. Continuar?`}{' '}
+              Leads que já têm a tarefa pendente de um passo não recebem outra.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mx-0 mb-0 flex-col-reverse gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:flex-row sm:justify-end sm:p-6">
+            <AlertDialogCancel
+              disabled={applyExisting.isPending}
+              className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-neutral-600 sm:h-10"
+            >
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (applying) applyExisting.mutate(applying.stage)
+              }}
+              disabled={applyExisting.isPending}
+              className="h-11 rounded-[8px] bg-brand px-4 text-white hover:bg-brand-dark sm:h-10"
+            >
+              Criar tarefas
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

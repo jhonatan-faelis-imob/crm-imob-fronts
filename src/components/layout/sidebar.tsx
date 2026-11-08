@@ -8,30 +8,72 @@ import {
   CalendarCheck,
   Users,
   CheckSquare,
-  MessageSquareText,
   Building2,
   Target,
-  UsersRound,
   BarChart2,
+  ChevronDown,
   LogOut,
+  Settings,
   type LucideIcon,
 } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { MyDayBadge } from '@/features/meu-dia/components/my-day-badge'
-import { getInitials } from '@/lib/utils'
+import { useHydrated } from '@/lib/use-hydrated'
+import { cn, getInitials } from '@/lib/utils'
 import { useAuthStore } from '@/store/auth.store'
+import { isNavItemActive, useSettingsGroup, visibleSettingsItems } from './settings-nav'
 
 export const navItems: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/meu-dia', label: 'Meu dia', icon: CalendarCheck },
   { href: '/leads', label: 'Leads', icon: Users },
   { href: '/tarefas', label: 'Tarefas', icon: CheckSquare },
-  { href: '/mensagens', label: 'Mensagens', icon: MessageSquareText },
   { href: '/empreendimentos', label: 'Empreendimentos', icon: Building2 },
   { href: '/metas', label: 'Metas', icon: Target },
-  { href: '/equipe', label: 'Equipe', icon: UsersRound },
   { href: '/relatorios', label: 'Relatórios', icon: BarChart2 },
 ]
+
+function SettingsGroup({ pathname, role, isHydrated }: { pathname: string; role?: string; isHydrated: boolean }) {
+  const { isActive, isOpen, toggle } = useSettingsGroup(pathname)
+  const items = visibleSettingsItems(isHydrated, role)
+  if (items.length === 0) return null
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={toggle}
+        aria-expanded={isOpen}
+        aria-controls="sidebar-settings"
+        className={cn(
+          'flex w-full items-center gap-3 rounded-[8px] px-3 py-2.5 text-sm font-medium transition-colors',
+          isActive ? 'bg-brand-bg text-brand' : 'text-neutral-600 hover:bg-neutral-100',
+        )}
+      >
+        <Settings className="h-5 w-5" strokeWidth={2} />
+        Configurações
+        <ChevronDown className={cn('ml-auto h-4 w-4 transition-transform', isOpen && 'rotate-180')} />
+      </button>
+      {isOpen && (
+        <div id="sidebar-settings" className="mt-1 space-y-1 pl-5">
+          {items.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                'flex items-center gap-3 rounded-[8px] px-3 py-2 text-sm font-medium transition-colors',
+                isNavItemActive(pathname, href) ? 'bg-brand-bg text-brand' : 'text-neutral-600 hover:bg-neutral-100',
+              )}
+            >
+              <Icon className="h-4 w-4" strokeWidth={2} />
+              {label}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 const roleLabels: Record<string, string> = {
   diretor: 'Diretor',
@@ -44,7 +86,10 @@ const roleLabels: Record<string, string> = {
 export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
-  const user = useAuthStore((state) => state.user)
+  const isHydrated = useHydrated()
+  // O usuário vem do localStorage: antes da montagem o HTML não pode depender dele
+  const storedUser = useAuthStore((state) => state.user)
+  const user = isHydrated ? storedUser : null
   const clearAuth = useAuthStore((state) => state.clearAuth)
 
   function handleLogout() {
@@ -76,6 +121,7 @@ export function Sidebar() {
             </Link>
           )
         })}
+        <SettingsGroup pathname={pathname} role={user?.role} isHydrated={isHydrated} />
       </nav>
 
       <div className="flex items-center gap-2 border-t-[0.5px] border-neutral-200 px-4 py-4">

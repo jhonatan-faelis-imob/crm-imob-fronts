@@ -93,6 +93,7 @@ export default function EquipePage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
+          <p className="text-xs font-medium text-neutral-400">Configurações</p>
           <h1 className="text-[28px] font-semibold text-neutral-900">Equipe</h1>
           <p className="mt-1 text-sm text-neutral-400">
             {isLoading ? 'Carregando...' : `${members.length} membros · ${teams.length} equipes`}

@@ -1,7 +1,6 @@
 'use client'
 
 import { CheckCircle, Mail, Pencil, Trash2 } from 'lucide-react'
-import { AutoTaskChip } from './auto-task-chip'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
@@ -17,15 +16,10 @@ import {
 import { WhatsAppButton } from '@/features/mensagens/components/whatsapp-button'
 import { funnelStagesService } from '@/services/funnel-stages.service'
 import { leadsService } from '@/services/leads.service'
-import type { Lead, Task, TaskStatus } from '@/types'
-import { PRIORITY_META, TASK_TYPE_META } from '../constants'
+import type { Lead, Task } from '@/types'
+import { PRIORITY_META, TASK_STATUS_META as STATUS_META, TASK_TYPE_META } from '../constants'
 import { formatDateBR, formatTime } from '../date-utils'
-
-const STATUS_META: Record<TaskStatus, { label: string; bg: string; text: string }> = {
-  pendente: { label: 'Pendente', bg: '#EBF5FF', text: '#0070F3' },
-  concluida: { label: 'Concluída', bg: '#E8F5E9', text: '#008A05' },
-  cancelada: { label: 'Cancelada', bg: '#F7F7F7', text: '#767676' },
-}
+import { AutoTaskChip } from './auto-task-chip'
 
 function PhoneRow({ lead, phone }: { lead: Lead; phone: string }) {
   return (

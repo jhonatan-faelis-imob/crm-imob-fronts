@@ -20,7 +20,7 @@ import type { Lead } from '@/types'
 import { funnelStagesService } from '@/services/funnel-stages.service'
 import { cadencesService } from '@/services/cadences.service'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { formatOffset, readableStepTitle } from '@/features/cadencias/constants'
 import type { CadenceStep } from '@/types'
 import { resolveLeadStage, type ApiFunnelStage } from '../api-mapper'
@@ -52,19 +52,23 @@ const CADENCE_STALE_TIME = 5 * 60 * 1000
 function CadenceHint({ steps }: { steps: CadenceStep[] }) {
   if (steps.length === 0) return null
   return (
-    <Tooltip>
-      <TooltipTrigger
+    // Popover: abre no toque (celular) e no hover (desktop); o Tooltip não abria no toque
+    <Popover>
+      <PopoverTrigger
+        openOnHover
+        delay={150}
         render={
           <button
             type="button"
             aria-label="Tarefas automáticas desta etapa"
-            className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-400 transition-colors hover:text-neutral-900"
+            // Área de toque de 44px sem empurrar o cabeçalho da coluna
+            className="-m-2.5 flex h-11 w-11 items-center justify-center rounded-full text-neutral-400 transition-colors hover:text-neutral-900"
           />
         }
       >
         <Info className="h-3.5 w-3.5" />
-      </TooltipTrigger>
-      <TooltipContent side="bottom" align="start" className="max-w-64">
+      </PopoverTrigger>
+      <PopoverContent side="bottom" align="start" className="w-64 bg-neutral-900 px-3 py-2 text-xs text-white ring-0">
         <p className="mb-1 font-medium">Tarefas automáticas</p>
         <ul className="space-y-0.5">
           {steps.map((step) => (
@@ -73,8 +77,8 @@ function CadenceHint({ steps }: { steps: CadenceStep[] }) {
             </li>
           ))}
         </ul>
-      </TooltipContent>
-    </Tooltip>
+      </PopoverContent>
+    </Popover>
   )
 }
 

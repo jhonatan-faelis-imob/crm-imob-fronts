@@ -9,6 +9,8 @@ const AFFECTED_KEYS = [
   'interactions',
   'goals-auto-fill',
   'dashboard',
+  // Seção "Cadência" do detalhe do lead: lista as tarefas automáticas da etapa
+  'cadence-lead',
 ]
 
 export function invalidateMyDayQueries(queryClient: QueryClient, leadId?: string) {

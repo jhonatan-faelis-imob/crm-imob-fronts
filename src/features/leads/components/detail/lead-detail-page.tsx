@@ -23,6 +23,7 @@ import type { LeadFormValues } from '../../lead-form/schema'
 import { NewLeadDialog } from '../../new-lead-dialog'
 import { useMoveLeadToStage } from '../../use-move-lead-to-stage'
 import { AiAnalysisDialog } from './ai-analysis-dialog'
+import { CadenceCard } from './cadence-card'
 import {
   interactionToTimelineEntry,
   mapApiInteractionToInteraction,
@@ -330,6 +331,7 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
             onScheduleNew={openNewTaskDialog}
             onOpenDetail={setOpeningTask}
           />
+          <CadenceCard leadId={lead.id} onOpenTask={setOpeningTask} onAddTask={openNewTaskDialog} />
         </div>
       </div>
 

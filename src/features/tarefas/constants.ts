@@ -22,6 +22,12 @@ export const PRIORITY_META: Record<TaskPriority, { label: string; bg: string; te
 
 export const TASK_STATUSES: TaskStatus[] = ['pendente', 'concluida', 'cancelada']
 
+export const TASK_STATUS_META: Record<TaskStatus, { label: string; bg: string; text: string }> = {
+  pendente: { label: 'Pendente', bg: '#EBF5FF', text: '#0070F3' },
+  concluida: { label: 'Concluída', bg: '#E8F5E9', text: '#008A05' },
+  cancelada: { label: 'Cancelada', bg: '#F7F7F7', text: '#767676' },
+}
+
 export const STATUS_FILTER_META: Record<TaskStatus, string> = {
   pendente: 'Pendentes',
   concluida: 'Concluídas',

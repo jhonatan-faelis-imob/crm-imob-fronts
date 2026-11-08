@@ -11,6 +11,7 @@ import { PRIORITY_META, TASK_PRIORITIES, TASK_TYPES, TASK_TYPE_META } from '@/fe
 import { cadencesService } from '@/services/cadences.service'
 import type { CadenceStage, CadenceStep, TaskPriority, TaskType } from '@/types'
 import { MAX_STEP_TITLE_LENGTH, previewDueDate } from '../constants'
+import { invalidateCadenceQueries } from '../invalidate-cadence-queries'
 
 const stepSchema = z.object({
   title: z
@@ -78,7 +79,7 @@ export function CadenceStepDialog({
       return cadencesService.createStep({ ...data, funnelStageId: stage.id })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cadences'] })
+      invalidateCadenceQueries(queryClient)
       toast.add({ title: step ? 'Passo atualizado' : 'Passo adicionado', type: 'success' })
       onOpenChange(false)
     },

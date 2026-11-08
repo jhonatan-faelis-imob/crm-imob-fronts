@@ -14,16 +14,18 @@ import {
   Building2,
   UserPlus,
   CheckSquare,
-  MessageSquareText,
-  UsersRound,
   BarChart2,
+  ChevronDown,
   LogOut,
+  Settings,
   X as XIcon,
   type LucideIcon,
 } from 'lucide-react'
 import { MyDayBadge } from '@/features/meu-dia/components/my-day-badge'
+import { useHydrated } from '@/lib/use-hydrated'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/auth.store'
+import { isNavItemActive, useSettingsGroup, visibleSettingsItems } from './settings-nav'
 
 const quickCreateItems: { href: string; label: string; description: string; icon: LucideIcon }[] = [
   { href: '/empreendimentos', label: 'Novo Imóvel', description: 'Cadastrar empreendimento ou revenda', icon: Building2 },
@@ -33,9 +35,7 @@ const quickCreateItems: { href: string; label: string; description: string; icon
 const menuNavItems: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/meu-dia', label: 'Meu dia', icon: CalendarCheck },
   { href: '/tarefas', label: 'Tarefas', icon: CheckSquare },
-  { href: '/mensagens', label: 'Mensagens', icon: MessageSquareText },
   { href: '/empreendimentos', label: 'Imóveis', icon: Building2 },
-  { href: '/equipe', label: 'Equipe', icon: UsersRound },
   { href: '/relatorios', label: 'Relatórios', icon: BarChart2 },
 ]
 
@@ -45,11 +45,15 @@ export function BottomNav() {
   const pathname = usePathname()
   const router = useRouter()
   const clearAuth = useAuthStore((state) => state.clearAuth)
+  const role = useAuthStore((state) => state.user?.role)
+  const isHydrated = useHydrated()
   const [activeSheet, setActiveSheet] = useState<ActiveSheet>(null)
+  const settings = useSettingsGroup(pathname)
+  // Filtro por cargo só depois da montagem, como no Sidebar
+  const settingsItems = visibleSettingsItems(isHydrated, role)
 
-  const isMenuActive = menuNavItems.some(
-    ({ href }) => pathname === href || pathname.startsWith(`${href}/`)
-  )
+  const isMenuActive =
+    settings.isActive || menuNavItems.some(({ href }) => isNavItemActive(pathname, href))
 
   function closeSheet() {
     setActiveSheet(null)
@@ -145,6 +149,42 @@ export function BottomNav() {
             {item.href === '/meu-dia' && <MyDayBadge className="ml-auto" />}
           </button>
         ))}
+        {settingsItems.length > 0 && (
+          <div className="border-b-[0.5px] border-[#F0F0F0]">
+            <button
+              type="button"
+              onClick={settings.toggle}
+              aria-expanded={settings.isOpen}
+              aria-controls="menu-settings"
+              className={cn(
+                'flex min-h-11 w-full items-center gap-3.5 py-3.5 text-left text-[15px] font-medium',
+                settings.isActive ? 'text-brand' : 'text-neutral-900',
+              )}
+            >
+              <Settings size={20} strokeWidth={2} />
+              Configurações
+              <ChevronDown size={18} className={cn('ml-auto transition-transform', settings.isOpen && 'rotate-180')} />
+            </button>
+            {settings.isOpen && (
+              <div id="menu-settings" className="space-y-1 pb-2 pl-6">
+                {settingsItems.map((item) => (
+                  <button
+                    key={item.href}
+                    type="button"
+                    onClick={() => handleNavigate(item.href)}
+                    className={cn(
+                      'flex min-h-11 w-full items-center gap-3 rounded-[8px] px-3 text-left text-[15px] font-medium',
+                      isNavItemActive(pathname, item.href) ? 'bg-brand-bg text-brand' : 'text-neutral-900',
+                    )}
+                  >
+                    <item.icon size={18} strokeWidth={2} />
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
         <button
           type="button"
           onClick={handleLogout}

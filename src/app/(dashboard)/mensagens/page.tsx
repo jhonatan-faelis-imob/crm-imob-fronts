@@ -67,7 +67,10 @@ export default function MensagensPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-[28px] font-semibold text-neutral-900">Mensagens</h1>
+        <div>
+          <p className="text-xs font-medium text-neutral-400">Configurações</p>
+          <h1 className="text-[28px] font-semibold text-neutral-900">Mensagens</h1>
+        </div>
         <button
           type="button"
           onClick={() => openForm(null)}
