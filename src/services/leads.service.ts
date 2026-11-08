@@ -1,4 +1,5 @@
 import api from '@/lib/api'
+import type { CadenceResult } from '@/types'
 
 export interface ActiveSale {
   id: string
@@ -6,6 +7,13 @@ export interface ActiveSale {
   status: string
   soldAt: string
   brokerId: string | null
+}
+
+// PATCH /leads/:id/stage devolve o lead mais `cadence`; o resto do lead segue sem tipo aqui
+export interface StageChangeResponse {
+  id: string
+  funnelStageId: string | null
+  cadence?: CadenceResult
 }
 
 export const leadsService = {
@@ -29,8 +37,8 @@ export const leadsService = {
     const { data } = await api.get(`/leads/${id}/active-sale`)
     return data || null
   },
-  updateStage: async (id: string, funnelStageId: string) => {
-    const { data } = await api.patch(`/leads/${id}/stage`, { funnelStageId })
+  updateStage: async (id: string, funnelStageId: string): Promise<StageChangeResponse> => {
+    const { data } = await api.patch<StageChangeResponse>(`/leads/${id}/stage`, { funnelStageId })
     return data
   },
   markAsLost: async (id: string, lostReason: string) => {

@@ -1,11 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { List, Plus, SquareKanban } from 'lucide-react'
+import { List, Plus, SquareKanban, Workflow } from 'lucide-react'
+import Link from 'next/link'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/toast'
+import { canManageCadences } from '@/features/cadencias/constants'
+import { invalidateMyDayQueries } from '@/features/meu-dia/invalidate-my-day-queries'
 import { FiltersBar, defaultLeadFilters, type LeadFilters } from '@/features/leads/filters-bar'
 import { formatVgv, KanbanBoard } from '@/features/leads/components/kanban-board'
 import { PendingSalesBanner } from '@/features/leads/components/pending-sales-banner'
@@ -22,6 +25,8 @@ import type { LeadFormValues } from '@/features/leads/lead-form/schema'
 import { leadsService } from '@/services/leads.service'
 import { funnelStagesService } from '@/services/funnel-stages.service'
 import { usersService } from '@/services/users.service'
+import { useHydrated } from '@/lib/use-hydrated'
+import { useAuthStore } from '@/store/auth.store'
 
 type ViewMode = 'kanban' | 'list'
 
@@ -36,6 +41,10 @@ export default function LeadsPage() {
   const [filters, setFilters] = useState<LeadFilters>(defaultLeadFilters)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const queryClient = useQueryClient()
+  const isHydrated = useHydrated()
+  const user = useAuthStore((state) => state.user)
+  // Depois da hidratação: o usuário vem do localStorage e o HTML do servidor não o conhece
+  const showCadences = isHydrated && canManageCadences(user)
 
   const { data: stages } = useQuery<ApiFunnelStage[]>({
     queryKey: ['funnel-stages'],
@@ -60,6 +69,8 @@ export default function LeadsPage() {
     mutationFn: (dto: Record<string, unknown>) => leadsService.create(dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leads'] })
+      // Lead criado com etapa recebe as tarefas da cadência
+      invalidateMyDayQueries(queryClient)
       toast.add({ title: 'Lead criado com sucesso!', type: 'success' })
     },
     onError: (error: unknown) => {
@@ -103,6 +114,15 @@ export default function LeadsPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          {showCadences && (
+            <Link
+              href="/cadencias"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border-[0.5px] border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 sm:h-10"
+            >
+              <Workflow className="h-4 w-4" />
+              Cadências
+            </Link>
+          )}
           <div className="flex items-center gap-1 rounded-[8px] border-[0.5px] border-neutral-200 bg-white p-1">
             <button
               type="button"

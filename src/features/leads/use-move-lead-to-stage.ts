@@ -3,8 +3,9 @@
 import { useMutation, useQueryClient, type QueryKey } from '@tanstack/react-query'
 import { toast } from '@/components/ui/toast'
 import { invalidateMyDayQueries } from '@/features/meu-dia/invalidate-my-day-queries'
+import { cadenceToastDescription } from '@/features/cadencias/constants'
 import { invalidateGoalQueries } from '@/features/metas/invalidate-goal-queries'
-import { leadsService } from '@/services/leads.service'
+import { leadsService, type StageChangeResponse } from '@/services/leads.service'
 import type { Lead } from '@/types'
 import type { ApiFunnelStage, ApiLead } from './api-mapper'
 import type { SaleLead } from './components/register-sale-modal'
@@ -35,7 +36,7 @@ export function useMoveLeadToStage() {
   const queryClient = useQueryClient()
   const { requestSale, requestLost, confirmLeaveWon, cancelSale } = useStageModals()
 
-  const mutation = useMutation<unknown, unknown, MoveLeadVariables, MoveLeadContext>({
+  const mutation = useMutation<StageChangeResponse, unknown, MoveLeadVariables, MoveLeadContext>({
     mutationFn: ({ leadId, stage }) => leadsService.updateStage(leadId, stage.id),
     onMutate: async ({ leadId, stage }) => {
       await queryClient.cancelQueries({ queryKey: ['leads'] })
@@ -66,10 +67,15 @@ export function useMoveLeadToStage() {
       if (context?.previousLead) queryClient.setQueryData(['lead', leadId], context.previousLead)
       toast.add({ title: 'Não foi possível mover o lead', type: 'error' })
     },
-    onSuccess: (_data, { stage }) => {
-      toast.add({ title: `Lead movido para ${stage.name}`, type: 'success' })
+    onSuccess: (data, { stage }) => {
+      toast.add({
+        title: `Lead movido para ${stage.name}`,
+        description: cadenceToastDescription(data.cadence),
+        type: 'success',
+      })
     },
     onSettled: (_data, _error, { leadId }) => {
+      // Inclui tasks, my-day, my-day-summary, goals-auto-fill e ['lead', id]: a cadência cria e cancela tarefas
       invalidateMyDayQueries(queryClient, leadId)
       invalidateGoalQueries(queryClient)
     },

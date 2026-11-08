@@ -14,11 +14,12 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { toast } from '@/components/ui/toast'
+import { cadenceToastDescription } from '@/features/cadencias/constants'
 import { invalidateMyDayQueries } from '@/features/meu-dia/invalidate-my-day-queries'
 import { invalidateGoalQueries } from '@/features/metas/invalidate-goal-queries'
 import { formatCurrency } from '@/lib/utils'
 import { funnelStagesService } from '@/services/funnel-stages.service'
-import { leadsService, type ActiveSale } from '@/services/leads.service'
+import { leadsService, type ActiveSale, type StageChangeResponse } from '@/services/leads.service'
 import { salesService, type CreateSaleDto } from '@/services/sales.service'
 import { useAuthStore } from '@/store/auth.store'
 import type { ApiFunnelStage } from './api-mapper'
@@ -92,16 +93,18 @@ export function StageMoveProvider({ children }: { children: ReactNode }) {
       }
 
       const { lead, stage } = target
-      if (!stage || stage.id === lead.funnelStageId) return { isDuplicate, stageMoved: true }
+      let moved: StageChangeResponse | undefined
+      if (!stage || stage.id === lead.funnelStageId) return { isDuplicate, stageMoved: true, moved }
 
       try {
-        await leadsService.updateStage(lead.id, stage.id)
-        return { isDuplicate, stageMoved: true }
+        moved = await leadsService.updateStage(lead.id, stage.id)
+        return { isDuplicate, stageMoved: true, moved }
       } catch {
-        return { isDuplicate, stageMoved: false }
+        return { isDuplicate, stageMoved: false, moved }
       }
     },
-    onSuccess: ({ isDuplicate, stageMoved }, { target }) => {
+    onSuccess: ({ isDuplicate, stageMoved, moved }, { target }) => {
+      const cadence = cadenceToastDescription(moved?.cadence)
       invalidateLeadQueries(target.lead.id)
       advance()
 
@@ -117,11 +120,17 @@ export function StageMoveProvider({ children }: { children: ReactNode }) {
         // Sem isso, um lead que saiu de Ganho por engano nunca conseguiria voltar
         toast.add({
           title: 'Este lead já possui uma venda registrada',
-          description: 'Nenhuma venda nova foi criada. A venda existente foi mantida.',
+          description: ['Nenhuma venda nova foi criada. A venda existente foi mantida.', cadence]
+            .filter(Boolean)
+            .join(' '),
           type: 'warning',
         })
       } else {
-        toast.add({ title: 'Venda registrada com sucesso!', type: 'success' })
+        toast.add({
+          title: 'Venda registrada com sucesso!',
+          description: moved && target.stage ? `Lead movido para ${target.stage.name}. ${cadence ?? ''}`.trim() : undefined,
+          type: 'success',
+        })
       }
     },
     onError: () => {
