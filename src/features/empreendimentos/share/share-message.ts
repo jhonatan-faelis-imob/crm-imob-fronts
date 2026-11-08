@@ -8,6 +8,8 @@ export interface ShareMessageInput {
   leadName?: string | null
   kind: 'revenda' | 'empreendimento'
   title: string
+  /** Linha "🔖 Cód. X", omitida sem código */
+  code?: string | null
   neighborhood?: string | null
   city?: string | null
   bedrooms?: number | null
@@ -50,6 +52,7 @@ export function buildPropertyShareMessage(input: ShareMessageInput) {
 
   const details = [
     `🏠 *${input.title.trim()}*`,
+    input.code ? `🔖 Cód. ${input.code}` : null,
     place ? `📍 ${place}` : null,
     specs.length > 0 ? specs.join(' · ') : null,
     price,

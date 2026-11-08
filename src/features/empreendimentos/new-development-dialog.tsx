@@ -23,10 +23,13 @@ import type { Property } from '@/types'
 import { DEVELOPMENT_STATUS_META, DEVELOPMENT_STATUSES, type DevelopmentStatus } from './constants'
 import { FieldGrid, FormField, inputClassName } from './property-form/field'
 import { MaskedInput } from './property-form/masked-input'
+import { PropertyCodeField } from './property-form/property-code-field'
+import { codeErrorFrom } from './property-code'
 import { cepMask, currencyMask } from './property-form/masks'
 import { useAddressLookup } from './property-form/use-address-lookup'
 
 const generalSchema = z.object({
+  code: z.string().max(20, 'Até 20 caracteres').optional(),
   title: z.string().min(1, 'Informe o nome do empreendimento'),
   city: z.string().min(1, 'Informe a cidade'),
   neighborhood: z.string().optional(),
@@ -57,6 +60,7 @@ type DevelopmentFormValues = z.infer<typeof developmentFormSchema>
 
 const defaultValues: DefaultValues<DevelopmentFormValues> = {
   general: {
+    code: '',
     title: '',
     city: '',
     neighborhood: '',
@@ -88,6 +92,7 @@ function toCurrencyMaskValue(value: number | undefined) {
 function developmentToFormValues(development: Property): DefaultValues<DevelopmentFormValues> {
   return {
     general: {
+      code: development.code ?? '',
       title: development.title,
       city: development.city,
       neighborhood: development.neighborhood ?? '',
@@ -130,7 +135,14 @@ const TABS = [
   { key: 'settings', label: 'Configurações' },
 ] as const
 
-function TabGeneral({ brokers }: { brokers: { id: string; name: string }[] }) {
+// originalCode: undefined = cadastro novo; null = empreendimento antigo, ainda sem código
+function TabGeneral({
+  brokers,
+  originalCode,
+}: {
+  brokers: { id: string; name: string }[]
+  originalCode: string | null | undefined
+}) {
   const {
     register,
     control,
@@ -154,6 +166,22 @@ function TabGeneral({ brokers }: { brokers: { id: string; name: string }[] }) {
       <FormField label="Nome do empreendimento" htmlFor="dev-title" required error={generalErrors?.title?.message} fullWidth>
         <input id="dev-title" className={inputClassName} {...register('general.title')} />
       </FormField>
+
+      <Controller
+        control={control}
+        name="general.code"
+        render={({ field }) => (
+          <PropertyCodeField
+            id="dev-code"
+            value={field.value ?? ''}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            error={generalErrors?.code?.message}
+            isEditing={originalCode !== undefined}
+            originalCode={originalCode ?? null}
+          />
+        )}
+      />
 
       <FormField label="Cidade" htmlFor="dev-city" required error={generalErrors?.city?.message}>
         <input id="dev-city" className={inputClassName} {...register('general.city')} />
@@ -349,6 +377,13 @@ export function NewDevelopmentDialog({
       setIsSaving(true)
       await onSubmitDevelopment(data)
       closeAndReset()
+    } catch (error) {
+      // 409 (código em uso) e formato inválido aparecem no próprio campo; o resto já virou toast na página
+      const codeError = codeErrorFrom(error)
+      if (codeError) {
+        form.setError('general.code', { type: 'server', message: codeError })
+        setActiveTab(0)
+      }
     } finally {
       setIsSaving(false)
     }
@@ -402,7 +437,7 @@ export function NewDevelopmentDialog({
             noValidate
             className="flex-1 overflow-y-auto p-4 sm:p-6"
           >
-            {activeTab === 0 && <TabGeneral brokers={brokers} />}
+            {activeTab === 0 && <TabGeneral brokers={brokers} originalCode={development ? (development.code ?? null) : undefined} />}
             {activeTab === 1 && <TabSettings />}
           </form>
         </FormProvider>

@@ -121,8 +121,11 @@ export function PublicPropertyView({ share }: { share: PublicPropertyShare }) {
 
       <main className="mx-auto max-w-3xl space-y-5 px-4 py-6 sm:px-0 sm:py-8">
         <header className="space-y-3">
-          {share.typeLabel && (
-            <p className="text-[13px] font-semibold uppercase tracking-wide text-neutral-400">{share.typeLabel}</p>
+          {(share.typeLabel || share.code) && (
+            <p className="flex flex-wrap items-center gap-x-3 text-[13px] font-semibold uppercase tracking-wide text-neutral-400">
+              {share.typeLabel && <span>{share.typeLabel}</span>}
+              {share.code && <span className="font-mono normal-case tracking-normal">Cód. {share.code}</span>}
+            </p>
           )}
           <h1 className="text-[28px] font-semibold leading-tight text-neutral-900 sm:text-[36px]">{share.title}</h1>
 

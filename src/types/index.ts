@@ -217,6 +217,8 @@ export interface Property {
   ownerId: string
   ownerName: string
   kind: PropertyKind
+  /** Código do imóvel (00012, CS-01). null = imóvel antigo, ainda sem código */
+  code?: string | null
   /** Tipo de revenda, valor de GET /properties/portal-config (não é o PropertyType de interesse do lead) */
   propertyType?: string
   title: string
@@ -603,6 +605,7 @@ export interface PublicShareBroker {
 export interface PublicPropertyShare {
   status: 'disponivel' | 'reservado' | 'vendido'
   kind: 'revenda' | 'empreendimento'
+  code: string | null
   title: string
   typeLabel: string | null
   price: number | null

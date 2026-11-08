@@ -43,7 +43,7 @@ export function LinkPropertyDialog({
       <DialogContent className="flex max-h-[80vh] w-[calc(100%-2rem)] max-w-lg flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
         <DialogHeader className="shrink-0 gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
           <DialogTitle>Vincular imóvel ou empreendimento</DialogTitle>
-          <DialogDescription>Busque pelo nome ou cidade.</DialogDescription>
+          <DialogDescription>Busque pelo nome, cidade ou código.</DialogDescription>
         </DialogHeader>
 
         <div className="shrink-0 border-b-[0.5px] border-neutral-200 p-4 sm:p-6">
@@ -53,7 +53,7 @@ export function LinkPropertyDialog({
               autoFocus
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por nome ou cidade..."
+              placeholder="Buscar por nome, cidade ou código..."
               className="w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white py-2.5 pl-9 pr-3 text-[15px] text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-brand"
             />
           </div>

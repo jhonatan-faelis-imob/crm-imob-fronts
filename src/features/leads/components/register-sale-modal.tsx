@@ -17,6 +17,7 @@ import {
 import type { ApiProperty } from '@/features/empreendimentos/api'
 import { leadsService } from '@/services/leads.service'
 import { propertiesService } from '@/services/properties.service'
+import { propertyLabel } from '@/features/empreendimentos/property-code'
 import type { CreateSaleDto } from '@/services/sales.service'
 import type { Lead } from '@/types'
 import { ddmmyyyyToIso, parseCurrency, type ApiLead } from '../api-mapper'
@@ -28,7 +29,7 @@ import { currencyMask } from '../lead-form/masks'
 
 export type SaleLead = Pick<Lead, 'id' | 'name' | 'interestValue' | 'funnelStageId'>
 
-type SaleProperty = Pick<ApiProperty, 'id' | 'title'>
+type SaleProperty = Pick<ApiProperty, 'id' | 'title'> & { code?: string | null }
 
 function isRealDate(value: string) {
   const iso = ddmmyyyyToIso(value)
@@ -70,7 +71,7 @@ function PropertyPicker({
   if (selected) {
     return (
       <div className="flex items-center justify-between gap-2 rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5">
-        <span className="truncate text-[15px] text-neutral-900">{selected.title}</span>
+        <span className="truncate text-[15px] text-neutral-900">{propertyLabel(selected.title, selected.code)}</span>
         <button
           type="button"
           aria-label="Remover empreendimento"
@@ -97,7 +98,7 @@ function PropertyPicker({
             if (event.key === 'Enter') event.preventDefault()
           }}
           autoComplete="off"
-          placeholder="Buscar por nome ou cidade..."
+          placeholder="Buscar por nome, cidade ou código..."
           className={inputWithIconClassName}
         />
       </div>
@@ -112,10 +113,10 @@ function PropertyPicker({
             <button
               key={property.id}
               type="button"
-              onClick={() => onSelect({ id: property.id, title: property.title })}
+              onClick={() => onSelect({ id: property.id, title: property.title, code: property.code ?? null })}
               className="flex w-full flex-col rounded-[8px] px-3 py-2 text-left hover:bg-neutral-100"
             >
-              <span className="truncate text-sm font-medium text-neutral-900">{property.title}</span>
+              <span className="truncate text-sm font-medium text-neutral-900">{propertyLabel(property.title, property.code)}</span>
               <span className="truncate text-xs text-neutral-400">{property.city}</span>
             </button>
           ))}

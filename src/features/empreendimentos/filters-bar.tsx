@@ -58,7 +58,7 @@ export function FiltersBar({
           type="text"
           value={filters.search}
           onChange={(event) => onChange({ ...filters, search: event.target.value })}
-          placeholder="Buscar por nome ou título"
+          placeholder="Buscar por título, bairro ou código"
           className="w-full rounded-[8px] border-[1.5px] border-neutral-200 bg-white py-2 pl-9 pr-3 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-brand"
         />
       </div>

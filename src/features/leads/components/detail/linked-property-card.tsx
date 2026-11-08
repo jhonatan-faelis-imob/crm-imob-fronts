@@ -2,6 +2,7 @@ import { Building2, Home } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { getStatusMeta } from '@/features/empreendimentos/constants'
 import { portalTypeLabel, usePortalConfig } from '@/features/empreendimentos/portal/use-portal-config'
+import { propertyLabel } from '@/features/empreendimentos/property-code'
 import { formatCurrency } from '@/lib/utils'
 import type { Property } from '@/types'
 
@@ -30,7 +31,7 @@ export function LinkedPropertyCard({
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="truncate text-sm font-medium text-neutral-900">{property.title}</p>
+          <p className="truncate text-sm font-medium text-neutral-900">{propertyLabel(property.title, property.code)}</p>
           {compatible && (
             <span className="rounded-full bg-[#E8F5E9] px-2 py-0.5 text-[11px] font-medium text-success">
               Compatível

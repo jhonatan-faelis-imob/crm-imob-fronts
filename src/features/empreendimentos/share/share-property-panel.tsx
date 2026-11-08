@@ -130,6 +130,7 @@ function PanelBody({ property, onDone }: { property: Property; onDone: () => voi
         leadName: recipient === 'lead' ? lead?.name : null,
         kind: isDevelopment ? 'empreendimento' : 'revenda',
         title: property.title,
+        code: property.code,
         neighborhood: property.neighborhood,
         city: property.city,
         bedrooms: property.bedrooms,

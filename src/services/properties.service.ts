@@ -40,6 +40,11 @@ export const propertiesService = {
     const { data } = await api.delete(`/properties/${propertyId}/leads/${leadId}`)
     return data
   },
+  /** Dica do próximo código automático (não reserva nada) */
+  getNextCode: async () => {
+    const { data } = await api.get<{ hint: string }>('/properties/next-code')
+    return data
+  },
   getPortalConfig: async () => {
     const { data } = await api.get<PortalConfig>('/properties/portal-config')
     return data

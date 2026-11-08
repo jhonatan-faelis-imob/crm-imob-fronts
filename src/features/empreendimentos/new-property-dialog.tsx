@@ -19,6 +19,7 @@ import { useDebouncedValue } from '@/lib/use-debounced-value'
 import { propertiesService } from '@/services/properties.service'
 import type { Property } from '@/types'
 import type { PortalReadinessDraft, PortalReadinessKey } from './portal/types'
+import { codeErrorFrom } from './property-code'
 import { findPortalType, usePortalConfig } from './portal/use-portal-config'
 import {
   FIELD_TAB,
@@ -103,8 +104,17 @@ function ResaleForm({
   }
 
   async function onSubmit(data: ResaleFormValues) {
-    await onSubmitProperty(resaleFormToDto(data, config))
-    onSaved()
+    try {
+      await onSubmitProperty(resaleFormToDto(data, config))
+      onSaved()
+    } catch (error) {
+      // 409 (código em uso) e formato inválido aparecem no próprio campo; o resto já virou toast na página
+      const codeError = codeErrorFrom(error)
+      if (codeError) {
+        form.setError('code', { type: 'server', message: codeError })
+        setActiveTab(0)
+      }
+    }
   }
 
   function onInvalid() {
@@ -136,7 +146,9 @@ function ResaleForm({
 
       <FormProvider {...form}>
         <form onSubmit={handleSubmit(onSubmit, onInvalid)} noValidate className="flex-1 overflow-y-auto p-4 sm:p-6">
-          {activeTab === 0 && <TabBasic config={config} brokers={brokers} />}
+          {activeTab === 0 && (
+            <TabBasic config={config} brokers={brokers} isEditing={property !== undefined} originalCode={property?.code} />
+          )}
           {activeTab === 1 && <TabAddress />}
           {activeTab === 2 && <TabFeatures config={config} type={type} />}
           {activeTab === 3 && <TabPortal config={config} type={type} readiness={readiness} onGoTo={goTo} />}

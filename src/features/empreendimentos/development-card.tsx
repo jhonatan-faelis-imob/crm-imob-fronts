@@ -8,6 +8,7 @@ import {
 import { formatCurrency } from '@/lib/utils'
 import type { Property } from '@/types'
 import { DEVELOPMENT_STATUS_META, type DevelopmentStatus } from './constants'
+import { CodeChip } from './property-form/property-code-field'
 
 function formatDate(dateIso: string) {
   return new Date(dateIso).toLocaleDateString('pt-BR')
@@ -45,7 +46,10 @@ export function DevelopmentCard({
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="truncate text-[16px] font-semibold text-neutral-900">{development.title}</p>
+            <div className="flex min-w-0 items-center gap-2">
+              <p className="truncate text-[16px] font-semibold text-neutral-900">{development.title}</p>
+              <CodeChip code={development.code} className="shrink-0" />
+            </div>
             <p className="mt-0.5 text-[13px] text-neutral-400">
               {development.city}
               {development.neighborhood ? ` · ${development.neighborhood}` : ''}

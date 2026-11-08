@@ -25,6 +25,7 @@ export function PropertyListView({
       <table className="w-full min-w-[720px] text-left text-sm">
         <thead>
           <tr className="border-b-[0.5px] border-neutral-200 text-xs font-medium text-neutral-400">
+            <th className="px-4 py-3">Cód.</th>
             <th className="px-4 py-3">Imóvel</th>
             <th className="hidden px-4 py-3 md:table-cell">Localização</th>
             <th className="hidden px-4 py-3 md:table-cell">Detalhes</th>
@@ -45,6 +46,9 @@ export function PropertyListView({
                   index % 2 === 1 ? 'bg-neutral-100/50' : 'bg-white'
                 }`}
               >
+                <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-neutral-600">
+                  {property.code ?? <span className="font-sans text-neutral-400">Sem código</span>}
+                </td>
                 <td className="px-4 py-3">
                   <button
                     type="button"

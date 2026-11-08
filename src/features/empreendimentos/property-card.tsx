@@ -9,6 +9,7 @@ import { formatCurrency } from '@/lib/utils'
 import type { Property } from '@/types'
 import { RESALE_STATUS_META, type ResaleStatus } from './constants'
 import { PortalChip } from './portal/portal-chip'
+import { CodeChip } from './property-form/property-code-field'
 
 export function PropertyCard({
   property,
@@ -38,6 +39,7 @@ export function PropertyCard({
         <div className="flex h-full w-full items-center justify-center transition-transform duration-200 group-hover:scale-[1.01]">
           <Home className="h-10 w-10 text-neutral-400" strokeWidth={1.5} />
         </div>
+        <CodeChip code={property.code} className="absolute bottom-3 left-3 z-[2] bg-white/90" />
         <span
           className="absolute left-3 top-3 z-[2] rounded-full px-2.5 py-1 text-xs font-medium"
           style={{ backgroundColor: status.bg, color: status.text }}

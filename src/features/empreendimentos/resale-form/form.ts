@@ -27,6 +27,7 @@ const MAX_YEAR = new Date().getFullYear() + 5
 export const resaleFormSchema = z
   .object({
     propertyType: z.string(),
+    code: z.string().max(20, 'Até 20 caracteres'),
     title: z.string().max(100, 'O título aceita no máximo 100 caracteres'),
     price: z.string(),
     status: z.enum(RESALE_STATUSES),
@@ -88,6 +89,7 @@ export type ResaleFieldName = keyof ResaleFormValues
 
 export const resaleDefaultValues: ResaleFormValues = {
   propertyType: '',
+  code: '',
   title: '',
   price: '',
   status: 'disponivel',
@@ -130,6 +132,7 @@ export const resaleDefaultValues: ResaleFormValues = {
 /** Aba de cada campo: erros e pendências acendem o ponto da aba certa */
 export const FIELD_TAB: Record<ResaleFieldName, number> = {
   propertyType: 0,
+  code: 0,
   title: 0,
   price: 0,
   status: 0,
@@ -241,6 +244,7 @@ export function propertyToResaleValues(property: Property): ResaleFormValues {
   return {
     ...resaleDefaultValues,
     propertyType: property.propertyType ?? '',
+    code: property.code ?? '',
     title: property.title,
     price: toCurrencyMaskValue(property.price),
     status: (RESALE_STATUSES as readonly string[]).includes(property.status)
@@ -346,6 +350,8 @@ export function resaleFormToDto(values: ResaleFormValues, config: PortalConfig |
   const showRooms = (rule: string | undefined) => rule !== 'hidden'
   return {
     kind: 'revenda',
+    // Vazio: automático no cadastro, mantém o atual na edição
+    code: values.code.trim() || undefined,
     propertyType: values.propertyType,
     title: values.title.trim(),
     price: parseCurrency(values.price) ?? null,

@@ -4,6 +4,7 @@ import { Check, Link2, MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { formatCurrency } from '@/lib/utils'
 import type { SimulationProperty } from '@/services/simulations.service'
+import { propertyLabel } from '@/features/empreendimentos/property-code'
 
 const FIT_META = {
   cabe: { label: 'Cabe', bg: '#E8F5E9', text: '#008A05' },
@@ -54,7 +55,7 @@ export function SimulationProperties({
                 <Link href={`/empreendimentos?abrir=${property.id}`} className="group min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-1.5">
                     <p className="break-words text-sm font-medium text-neutral-900 group-hover:text-brand">
-                      {property.title}
+                      {propertyLabel(property.title, property.code)}
                     </p>
                     <span
                       className="rounded-full px-2 py-0.5 text-[11px] font-medium"

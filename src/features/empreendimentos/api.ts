@@ -5,6 +5,7 @@ export interface ApiProperty {
   organizationId: string
   ownerId: string | null
   kind: string
+  code?: string | null
   title: string
   description: string | null
   cep: string | null
@@ -72,6 +73,7 @@ export function mapApiPropertyToProperty(property: ApiProperty): Property {
     ownerId: property.ownerId ?? '',
     ownerName: property.owner?.name ?? 'Sem responsável',
     kind: property.kind as Property['kind'],
+    code: property.code ?? null,
     title: property.title,
     description: property.description ?? undefined,
     cep: property.cep ?? undefined,
@@ -129,6 +131,7 @@ export function parseCurrency(value: string | undefined): number | undefined {
 
 interface DevelopmentFormShape {
   general: {
+    code?: string
     title: string
     city: string
     neighborhood?: string
@@ -151,6 +154,8 @@ export function mapDevelopmentFormToDto(data: DevelopmentFormShape): Record<stri
   const { general, settings } = data
   return {
     kind: 'empreendimento',
+    // Vazio: automático no cadastro, mantém o atual na edição
+    code: general.code?.trim() || undefined,
     title: general.title,
     city: general.city,
     neighborhood: general.neighborhood || undefined,

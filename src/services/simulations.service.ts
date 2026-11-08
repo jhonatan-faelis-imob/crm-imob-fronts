@@ -31,6 +31,7 @@ export interface SimulationRequest extends Partial<SimulationParamsConfig> {
 export interface SimulationProperty {
   id: string
   kind: 'empreendimento' | 'revenda'
+  code: string | null
   title: string
   city: string
   neighborhood: string | null

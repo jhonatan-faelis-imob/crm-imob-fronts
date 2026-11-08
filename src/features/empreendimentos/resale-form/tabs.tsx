@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch'
 import { RESALE_STATUS_META, RESALE_STATUSES } from '../constants'
 import { FieldGrid, FormField, inputClassName } from '../property-form/field'
 import { MaskedInput } from '../property-form/masked-input'
+import { PropertyCodeField } from '../property-form/property-code-field'
 import { cepMask, currencyMask } from '../property-form/masks'
 import { useAddressLookup } from '../property-form/use-address-lookup'
 import type { PortalConfig, PortalPropertyType, PortalReadiness, PortalReadinessKey } from '../portal/types'
@@ -29,12 +30,17 @@ function Counter({ value, max }: { value: number; max: number }) {
 export function TabBasic({
   config,
   brokers,
+  isEditing,
+  originalCode,
 }: {
   config: PortalConfig | undefined
   brokers: { id: string; name: string }[]
+  isEditing: boolean
+  originalCode: string | null | undefined
 }) {
   const { register, control, formState } = useFormContext<ResaleFormValues>()
   const title = useWatch({ control, name: 'title' })
+  const publishToPortals = useWatch({ control, name: 'publishToPortals' })
   const { errors } = formState
   const limits = config?.limits
 
@@ -52,9 +58,22 @@ export function TabBasic({
         </select>
       </FormField>
 
-      <FormField label="Valor" htmlFor="prop-price" required>
-        <MaskedInput id="prop-price" control={control} name="price" mask={currencyMask} placeholder="R$ 0,00" />
-      </FormField>
+      <Controller
+        control={control}
+        name="code"
+        render={({ field }) => (
+          <PropertyCodeField
+            id="prop-code"
+            value={field.value}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            error={errors.code?.message}
+            isEditing={isEditing}
+            originalCode={originalCode}
+            publishedToPortals={publishToPortals}
+          />
+        )}
+      />
 
       <FormField label="Título" htmlFor="prop-title" required error={errors.title?.message} fullWidth>
         <input id="prop-title" maxLength={limits?.TITLE_MAX ?? 100} className={inputClassName} {...register('title')} />
@@ -64,6 +83,10 @@ export function TabBasic({
           </span>
           <Counter value={title.length} max={limits?.TITLE_MAX ?? 100} />
         </div>
+      </FormField>
+
+      <FormField label="Valor" htmlFor="prop-price" required>
+        <MaskedInput id="prop-price" control={control} name="price" mask={currencyMask} placeholder="R$ 0,00" />
       </FormField>
 
       <FormField label="Status" htmlFor="prop-status">

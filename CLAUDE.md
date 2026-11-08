@@ -873,6 +873,38 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
 
 ---
 
+## Código do imóvel — regras atuais
+
+- **Campo:** `Property.code` (`String?`), único por organização (`@@unique([organizationId, code])`; vários nulos não
+  conflitam). Vale para revenda e empreendimento. Aparece em todas as respostas de imóvel, na carga pública do link
+  (`code`) e na mensagem do WhatsApp (linha `🔖 Cód. X`, omitida sem código).
+- **Formato (`normalizePropertyCode`, `properties/property-code.ts`):** trim, maiúsculas e `/^[A-Z0-9][A-Z0-9._\/-]{0,19}$/`
+  (até 20 caracteres, começa por letra ou número, sem espaços). Fora disso: 400 "Use letras, números e - _ . / (até 20
+  caracteres, sem espaços)". Vazio = sem código. O front (`sanitizePropertyCodeInput`) já converte e bloqueia ao digitar.
+- **Numeração automática por organização:** `Organization.propertyCodeSeq` guarda o último número. No `create`, sem código,
+  dentro de uma `$transaction`: incremento atômico da sequência, `padStart(5, '0')` (00001; acima de 99999 só deixa de
+  preencher) e, se o número já foi digitado à mão por alguém, incrementa de novo (até 50 tentativas). P2002 na criação
+  tenta de novo até 3 vezes. Código digitado é normalizado e conferido antes: em uso = 409 `Código "X" já está em uso
+  pelo imóvel "[título]"`.
+- **Edição:** `code` ausente ou vazio mantém o atual (nunca volta a ficar vazio). Valor novo é normalizado e conferido
+  (409, ignorando o próprio imóvel). Trocar o código de um imóvel com `publishToPortals` devolve `warning` ("O código mudou.
+  Se for usado como identificador nos portais, o anúncio pode ser tratado como novo."), que vira toast.
+- **Rotas e busca:** `GET /properties/next-code` → `{ hint }` (próximo livre, só dica para o placeholder, não reserva).
+  O `search` do `findAll` também procura em `code` (contains, sem diferenciar maiúsculas), dentro do `AND`; o texto igual
+  a um código da organização traz esse imóvel primeiro (na página 1). A tela de imóveis filtra no front com a mesma regra.
+- **Script de preenchimento:** `npm run db:backfill-codes` (simulação: imprime organização, título e código novo, sem
+  gravar) e `npm run db:backfill-codes -- --apply` (grava). Por organização, numa transação: imóveis sem código por
+  `createdAt` e `id`, a partir de `propertyCodeSeq + 1`, pulando códigos ocupados, e grava o novo `propertyCodeSeq`.
+  Idempotente (só toca em quem está sem código). Plano em `planCodeBackfill` (puro, testado). Não roda sozinho.
+- **Portais (decisão pendente, etapa do XML):** o código é candidato a identificador do anúncio (`ListingID`) no envio
+  para os portais. Por isso a troca de código num imóvel publicado gera o aviso.
+- **Front:** campo "Código do imóvel" nos dois cadastros (placeholder "Automático (próximo: 00013)" pela query
+  `['properties', 'next-code']` silenciosa; "Sem código" para imóvel antigo); erro 409/400 no próprio campo
+  (`codeErrorFrom`). Chip `CodeChip` (fonte mono) nos cards, coluna "Cód." na lista, botão de copiar no viewer,
+  `[CÓDIGO] Título` (`propertyLabel`) nos seletores (vincular ao lead, registrar venda, simulador) e "Cód. X" na página `/i/`.
+
+---
+
 ## Status do Projeto
 
 - [x] Decisões de arquitetura

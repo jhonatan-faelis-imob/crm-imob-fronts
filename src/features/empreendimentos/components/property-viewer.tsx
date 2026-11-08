@@ -73,6 +73,28 @@ function situationOf(property: Property): Situation | null {
   return null
 }
 
+function CopyCode({ code }: { code: string }) {
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(code)
+      toast.add({ title: 'Código copiado', type: 'success' })
+    } catch {
+      toast.add({ title: 'Não foi possível copiar', type: 'error' })
+    }
+  }
+  return (
+    <button
+      type="button"
+      onClick={() => void copy()}
+      aria-label={`Copiar código ${code}`}
+      className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full bg-neutral-100 px-3 font-mono text-xs font-medium text-neutral-600 hover:bg-neutral-200"
+    >
+      Cód. {code}
+      <Copy className="h-3.5 w-3.5" />
+    </button>
+  )
+}
+
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="space-y-2.5">
@@ -318,7 +340,10 @@ function ViewerBody({ property, onOpenPortal }: { property: Property; onOpenPort
 
       <header className="space-y-2">
         <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">{typeLabel}</p>
-        <h2 className="text-[22px] font-semibold leading-tight text-neutral-900">{property.title}</h2>
+        <div className="flex flex-wrap items-start gap-x-3 gap-y-1">
+          <h2 className="min-w-0 flex-1 text-[22px] font-semibold leading-tight text-neutral-900">{property.title}</h2>
+          {property.code && <CopyCode code={property.code} />}
+        </div>
         {isDevelopment ? (
           <div className="text-brand">
             {property.startingPrice !== undefined && (

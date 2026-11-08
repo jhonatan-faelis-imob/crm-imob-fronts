@@ -89,9 +89,11 @@ function EmpreendimentosContent() {
   const updateProperty = useMutation({
     mutationFn: ({ id, dto }: { id: string; dto: Record<string, unknown> }) =>
       propertiesService.update(id, dto),
-    onSuccess: () => {
+    onSuccess: (data: { warning?: string }) => {
       invalidateProperties()
       toast.add({ title: 'Atualizado com sucesso!', type: 'success' })
+      // Código trocado num imóvel marcado para os portais
+      if (data?.warning) toast.add({ title: data.warning, type: 'warning' })
     },
     onError: (error) => {
       toast.add({ title: 'Não foi possível salvar as alterações', description: describeError(error), type: 'error' })
@@ -177,11 +179,24 @@ function EmpreendimentosContent() {
 
   const search = filters.search.trim().toLowerCase()
 
-  const filteredDevelopments = developments.filter((development) => {
-    const matchesSearch =
+  // Título, cidade, bairro ou código (parte dele); o código exato vem primeiro
+  function matchesText(property: Property) {
+    return (
       search === '' ||
-      development.title.toLowerCase().includes(search) ||
-      development.city.toLowerCase().includes(search)
+      property.title.toLowerCase().includes(search) ||
+      property.city.toLowerCase().includes(search) ||
+      (property.neighborhood ?? '').toLowerCase().includes(search) ||
+      (property.code ?? '').toLowerCase().includes(search)
+    )
+  }
+
+  function exactCodeFirst(list: Property[]) {
+    const exact = list.find((property) => search !== '' && (property.code ?? '').toLowerCase() === search)
+    return exact ? [exact, ...list.filter((property) => property !== exact)] : list
+  }
+
+  const filteredDevelopments = exactCodeFirst(developments.filter((development) => {
+    const matchesSearch = matchesText(development)
     const matchesCity = filters.city === 'todas' || development.city === filters.city
     const matchesStatus = filters.status === 'todos' || development.status === filters.status
     const priceRange = PRICE_RANGE_OPTIONS.find((range) => range.id === filters.priceRangeId)
@@ -193,13 +208,10 @@ function EmpreendimentosContent() {
         (priceRange.max === undefined || startingPrice <= priceRange.max))
 
     return matchesSearch && matchesCity && matchesStatus && matchesPriceRange
-  })
+  }))
 
-  const filteredProperties = resaleProperties.filter((property) => {
-    const matchesSearch =
-      search === '' ||
-      property.title.toLowerCase().includes(search) ||
-      property.city.toLowerCase().includes(search)
+  const filteredProperties = exactCodeFirst(resaleProperties.filter((property) => {
+    const matchesSearch = matchesText(property)
     const matchesCity = filters.city === 'todas' || property.city === filters.city
     const matchesStatus = filters.status === 'todos' || property.status === filters.status
     const matchesBedrooms =
@@ -210,7 +222,7 @@ function EmpreendimentosContent() {
       filters.portal === 'todos' || (filters.portal === 'publicados') === (property.publishToPortals ?? false)
 
     return matchesSearch && matchesCity && matchesStatus && matchesBedrooms && matchesParking && matchesPortal
-  })
+  }))
 
   const isEmptyForKind = kind === 'empreendimento' ? developments.length === 0 : resaleProperties.length === 0
 
