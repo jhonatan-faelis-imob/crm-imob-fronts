@@ -1,4 +1,4 @@
-import { Building2, MoreVertical } from 'lucide-react'
+import { Building2, Eye, MoreVertical } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,10 +15,12 @@ function formatDate(dateIso: string) {
 
 export function DevelopmentCard({
   development,
+  onView,
   onEdit,
   onDeactivate,
 }: {
   development: Property
+  onView: () => void
   onEdit: () => void
   onDeactivate: () => void
 }) {
@@ -28,7 +30,14 @@ export function DevelopmentCard({
   const progress = totalUnits > 0 ? Math.min(100, Math.round((soldUnits / totalUnits) * 100)) : 0
 
   return (
+    // Botão invisível cobre o card (abre o "Ver imóvel"); os controles ficam por cima (z-[2])
     <div className="group relative flex flex-col gap-4 rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4 transition-colors hover:border-brand sm:flex-row">
+      <button
+        type="button"
+        onClick={onView}
+        aria-label={`Ver imóvel: ${development.title}`}
+        className="absolute inset-0 z-[1] rounded-[16px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+      />
       <div className="flex h-40 shrink-0 items-center justify-center rounded-[12px] bg-brand-bg sm:h-auto sm:w-48">
         <Building2 className="h-10 w-10 text-brand" strokeWidth={1.5} />
       </div>
@@ -43,25 +52,36 @@ export function DevelopmentCard({
             </p>
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <button
-                  type="button"
-                  aria-label="Mais opções"
-                  className="shrink-0 rounded-[8px] p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
-                />
-              }
+          <div className="relative z-[2] flex shrink-0 items-center gap-1">
+            <button
+              type="button"
+              onClick={onView}
+              aria-label="Ver imóvel"
+              className="flex h-9 w-9 items-center justify-center rounded-[8px] text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
             >
-              <MoreVertical className="h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={onEdit}>Editar</DropdownMenuItem>
-              <DropdownMenuItem variant="destructive" onClick={onDeactivate}>
-                Desativar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              <Eye className="h-4 w-4" />
+            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <button
+                    type="button"
+                    aria-label="Mais opções"
+                    className="flex h-9 w-9 items-center justify-center rounded-[8px] text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
+                  />
+                }
+              >
+                <MoreVertical className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={onView}>Ver imóvel</DropdownMenuItem>
+                <DropdownMenuItem onClick={onEdit}>Editar</DropdownMenuItem>
+                <DropdownMenuItem variant="destructive" onClick={onDeactivate}>
+                  Desativar
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2">

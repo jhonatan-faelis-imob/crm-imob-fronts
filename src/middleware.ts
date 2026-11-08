@@ -5,6 +5,9 @@ const PUBLIC_ROUTES = ['/login', '/cadastro']
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  // Página pública do imóvel (/i/:token): aberta, e quem está logado também vê (pré-visualizar)
+  if (pathname.startsWith('/i/')) return NextResponse.next()
   const isPublic = PUBLIC_ROUTES.some(r => pathname.startsWith(r))
 
   // Landing page: só a raiz exata e fora do fluxo do PWA (start_url = /?source=pwa)

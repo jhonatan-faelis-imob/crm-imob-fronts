@@ -17,6 +17,7 @@ import { NewPropertyDialog } from '@/features/empreendimentos/new-property-dialo
 import { PRICE_RANGE_OPTIONS } from '@/features/empreendimentos/constants'
 import { PORTAL_TAB_INDEX } from '@/features/empreendimentos/resale-form/form'
 import { PropertyCard } from '@/features/empreendimentos/property-card'
+import { PropertyViewer } from '@/features/empreendimentos/components/property-viewer'
 import { PropertyListView } from '@/features/empreendimentos/property-list-view'
 import { mapApiPropertyToProperty, mapDevelopmentFormToDto, type ApiProperty } from '@/features/empreendimentos/api'
 import { apiErrorDetails } from '@/features/empreendimentos/portal/use-portal-config'
@@ -51,6 +52,8 @@ function EmpreendimentosContent() {
   const [editingDevelopment, setEditingDevelopment] = useState<Property | undefined>(undefined)
   const [editingProperty, setEditingProperty] = useState<Property | undefined>(undefined)
   const [propertyInitialTab, setPropertyInitialTab] = useState(0)
+  // "Ver imóvel": guarda o id e lê o imóvel da lista, para refletir as mudanças depois de salvar
+  const [viewingId, setViewingId] = useState<string | null>(null)
   const queryClient = useQueryClient()
 
   const { data: propertiesData, isLoading } = useQuery<{ data: ApiProperty[] }>({
@@ -148,6 +151,16 @@ function EmpreendimentosContent() {
       setEditingProperty(undefined)
       setPropertyInitialTab(0)
       setIsPropertyDialogOpen(true)
+    }
+  }
+
+  function editFromViewer(property: Property, tab = 0) {
+    setViewingId(null)
+    if (property.kind === 'empreendimento') {
+      setEditingDevelopment(property)
+      setIsDevelopmentDialogOpen(true)
+    } else {
+      openProperty(property, tab)
     }
   }
 
@@ -275,6 +288,7 @@ function EmpreendimentosContent() {
             <DevelopmentCard
               key={development.id}
               development={development}
+              onView={() => setViewingId(development.id)}
               onEdit={() => {
                 setEditingDevelopment(development)
                 setIsDevelopmentDialogOpen(true)
@@ -289,6 +303,7 @@ function EmpreendimentosContent() {
             <PropertyCard
               key={property.id}
               property={property}
+              onView={() => setViewingId(property.id)}
               onEdit={() => openProperty(property)}
               onOpenPortal={() => openProperty(property, PORTAL_TAB_INDEX)}
               onDeactivate={() => deactivateProperty.mutate(property.id)}
@@ -298,12 +313,21 @@ function EmpreendimentosContent() {
       ) : (
         <PropertyListView
           properties={filteredProperties}
+          onView={(property) => setViewingId(property.id)}
           onEdit={(property) => openProperty(property)}
           onOpenPortal={(property) => openProperty(property, PORTAL_TAB_INDEX)}
           onDeactivate={(property) => deactivateProperty.mutate(property.id)}
         />
       )}
 
+      <PropertyViewer
+        property={allProperties.find((item) => item.id === viewingId)}
+        open={viewingId !== null}
+        onOpenChange={(open) => {
+          if (!open) setViewingId(null)
+        }}
+        onEdit={editFromViewer}
+      />
       <NewDevelopmentDialog
         key={(requestedDevelopment ?? editingDevelopment)?.id ?? 'new-development'}
         open={isDevelopmentDialogOpen || requestedDevelopment !== undefined}

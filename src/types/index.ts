@@ -562,3 +562,84 @@ export interface LeadChecklist {
   items: ChecklistItem[]
   summary: ChecklistSummary
 }
+
+// ---------------- Compartilhamento de imóvel (link /i/:token) ----------------
+
+export type PropertyShareStatus = 'ativo' | 'expirado' | 'revogado'
+
+/** Link já enviado ou visto (GET /property-shares?propertyId=) */
+export interface PropertyShare {
+  id: string
+  leadId: string | null
+  leadName: string | null
+  sentAt: string | null
+  viewCount: number
+  firstViewedAt: string | null
+  lastViewedAt: string | null
+  expiresAt: string | null
+  revokedAt: string | null
+  status: PropertyShareStatus
+  url: string
+  createdBy: string | null
+}
+
+/** POST /property-shares: cria ou reaproveita o link do trio (imóvel, lead ou geral, quem criou) */
+export interface CreatedPropertyShare {
+  id: string
+  token: string
+  url: string
+  expiresAt: string | null
+  showPrice: boolean
+}
+
+export interface PublicShareBroker {
+  name: string
+  creci: string | null
+  phone: string | null
+  avatarUrl: string | null
+}
+
+/** Carga pública de GET /public/shares/:token. Só campos permitidos: nada interno chega aqui */
+export interface PublicPropertyShare {
+  status: 'disponivel' | 'reservado' | 'vendido'
+  kind: 'revenda' | 'empreendimento'
+  title: string
+  typeLabel: string | null
+  price: number | null
+  priceLabel: 'valor' | 'a partir de'
+  maxPrice: number | null
+  totalUnits: number | null
+  constructionStatusLabel: string | null
+  location: { line: string | null; neighborhood: string | null; city: string; state: string | null; mapUrl: string }
+  specs: {
+    livingArea: number | null
+    lotArea: number | null
+    bedrooms: number | null
+    suites: number | null
+    bathrooms: number | null
+    parking: number | null
+    unitFloor: number | null
+    buildingFloors: number | null
+    yearBuilt: number | null
+  }
+  conditions: {
+    condoFee: number | null
+    iptu: { value: number; period: 'anual' | 'mensal' | null } | null
+    acceptsFgts: boolean | null
+    acceptsFinancing: boolean | null
+  }
+  features: { value: string; label: string }[]
+  description: string | null
+  photos: string[]
+  broker: PublicShareBroker | null
+  organization: { name: string }
+  expiresAt: string | null
+}
+
+/** Imóvel fora do ar: nenhum dado dele */
+export interface UnavailablePropertyShare {
+  status: 'indisponivel'
+  broker: PublicShareBroker | null
+  organization: { name: string }
+  expiresAt: string | null
+}

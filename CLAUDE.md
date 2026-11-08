@@ -478,7 +478,7 @@ src/
 ```
 
 **Rotas implementadas:** `/`, `/login`, `/dashboard`, `/meu-dia`, `/leads`, `/leads/[id]`, `/empreendimentos`, `/metas`,
-`/tarefas`, `/mensagens`, `/equipe`, `/relatorios`, `/cadencias`, `/documentos`, `/simulador`.
+`/tarefas`, `/mensagens`, `/equipe`, `/relatorios`, `/cadencias`, `/documentos`, `/simulador` e a pública `/i/[token]`.
 
 ### Menu (Sidebar e sheet "Menu" do BottomNav)
 
@@ -825,6 +825,51 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
   Descrição e portais; rodapé igual ao do lead (Cancelar | < | > | Salvar) e ponto vermelho nas abas com pendência
   (erro de formato ou item do checklist). O resultado da IA fica numa prévia e nunca sobrescreve texto sem confirmar.
   Chip "Pronto p/ portais" / "Faltam N itens" nos cards e na lista abre o modal na aba 4. Filtro "Publicados nos portais".
+
+---
+
+## Ver imóvel e compartilhar — regras atuais
+
+- **Módulo:** `property-shares` no backend (tabela `property_shares`), `features/empreendimentos/components/property-viewer.tsx`,
+  `features/empreendimentos/share/` e `features/vitrine/` no front. Vale para revenda e empreendimento.
+- **Token:** `randomBytes(24).toString('base64url')` (32 caracteres, imprevisível, `@unique`). O link é
+  `${FRONTEND_URL}/i/${token}`. **`FRONTEND_URL` precisa estar definido na API** (também é a origem do CORS); sem ele, o link
+  sai com `http://localhost:3000` e a API registra um aviso.
+- **Endpoints autenticados (`/property-shares`, qualquer perfil, sempre pela organização):**
+
+  | Endpoint | Regra |
+  |---|---|
+  | `POST /property-shares` `{ propertyId, leadId?, expiresInDays?: 7\|30\|90 (30), showPrice? (true) }` | Imóvel ativo da organização (senão 404); vendido (`sold` ou status `vendido`) dá 400. Com `leadId`, `LeadsService.assertLeadAccess` (mesma regra do detalhe). Reaproveita o link ativo do trio (imóvel, lead ou geral, quem criou), renovando `expiresAt` e `showPrice` |
+  | `GET /property-shares?propertyId=` | Só links com `sentAt` ou `viewCount > 0`. Abaixo de gerente, só os que o usuário criou |
+  | `POST /property-shares/:id/revoke` | Grava `revokedAt`. Só quem criou ou gerente+ |
+  | `POST /property-shares/:id/mark-sent` `{ channel, linkToLead? }` | Grava `sentAt` (uma vez). `whatsapp` com lead cria Interaction `whatsapp` "Imóvel enviado: [título] ([url])" via `InteractionsService.create` (atualiza `lastContactAt`), sem duplicar se já houver uma deste link nos últimos 2 minutos. `linkToLead` cria o vínculo em `lead_properties` (P2002 ignorado). `link` só grava `sentAt` |
+
+- **Rota pública (`@Public()`, sem login):** `GET /public/shares/:token` → inexistente ou revogado = 404 (mesma resposta),
+  expirado = 410, imóvel inativo = 200 `{ status: 'indisponivel', broker, organization, expiresAt }` sem nenhum dado do imóvel.
+  Exceção: imóvel **vendido** (o `markAsSold` também desativa) continua com os dados e o selo "Vendido".
+  `POST /public/shares/:token/view` → 204; soma `viewCount`, grava `firstViewedAt` uma vez e `lastViewedAt`. **Robôs são
+  ignorados** (User-Agent vazio ou com bot, crawler, spider, facebookexternalhit, whatsapp, telegram, slackbot, twitterbot,
+  linkedinbot, preview, curl, wget, headless), assim como links expirados ou revogados.
+- **Campos públicos (`public-share.ts`, lista explícita + `PUBLIC_PROPERTY_SELECT`):** `status`, `kind`, `title`, `typeLabel`,
+  `price`, `priceLabel`, `maxPrice`, `totalUnits`, `constructionStatusLabel`, `location { line, neighborhood, city, state,
+  mapUrl }`, `specs { livingArea, lotArea, bedrooms, suites, bathrooms, parking, unitFloor, buildingFloors, yearBuilt }`,
+  `conditions { condoFee, iptu { value, period }, acceptsFgts, acceptsFinancing }`, `features [{ value, label }]`,
+  `description`, `photos`, `broker { name, creci, phone, avatarUrl }` (quem criou o link; telefone vazio = null),
+  `organization { name }`, `expiresAt`. **Nunca:** complement, cep, internalNotes, commissionPct, exclusive, sellerLeadId,
+  ownerId, minIncome, maxIncome, organizationId, ids nem dados do lead (o teste compara contra essa lista).
+  `showPrice = false` zera `price` e `maxPrice` ("Consulte valores"). Endereço por `portalAddressDisplay`: `full` rua e
+  número, `street` só a rua, `neighborhood` só bairro e cidade; o `mapUrl` usa só o que está sendo exibido.
+- **Fotos ainda não existem:** `photos` é sempre `[]`. A `PhotoArea` já aceita a lista (carrossel com scroll-snap).
+- **Front:**
+  - "Ver imóvel" (ícone Eye, clique no card ou menu) abre o `PropertyViewer` (Dialog no desktop, Sheet em tela cheia no
+    celular). Bloco "Só você vê" recolhido; lista "Quem já recebeu" com Copiar link e Revogar.
+  - `SharePropertyPanel`: cria/reaproveita o link **ao abrir e ao trocar lead ou "Mostrar valor"** (query
+    `['property-share-link', ...]`), para o "Abrir no WhatsApp" chamar `window.open` de forma síncrona e não ser bloqueado
+    como pop-up. Mensagem por `buildPropertyShareMessage` (pura; saudação pelo horário de America/Sao_Paulo).
+  - Página `/i/[token]` (Server Component, `cache: 'no-store'`, `robots: noindex`, `referrer: no-referrer`) com
+    `opengraph-image.tsx` e `ViewTracker` (uma visita por sessão via sessionStorage, fetch com keepalive). Os públicos
+    (`getPublic`, `recordView`) usam fetch puro com `API_BASE_URL` (`lib/api-base-url.ts`), nunca o `api.ts`.
+  - O middleware deixa `/i/` aberto e não redireciona quem está logado. `/i/` está na lista NetworkOnly do PWA.
 
 ---
 

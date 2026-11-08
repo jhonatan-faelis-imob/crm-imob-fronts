@@ -1,9 +1,8 @@
 import axios from 'axios'
+import { API_BASE_URL } from './api-base-url'
 
-// Fallback explícito para produção caso variável não seja injetada
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  'https://crm-imob-api-production.up.railway.app/api/v1'
+// Fallback explícito para produção caso variável não seja injetada (ver api-base-url.ts)
+const BASE_URL = API_BASE_URL
 
 const api = axios.create({
   baseURL: BASE_URL,

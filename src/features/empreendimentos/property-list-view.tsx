@@ -1,4 +1,4 @@
-import { Pencil, Trash2 } from 'lucide-react'
+import { Eye, Pencil, Trash2 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import type { Property } from '@/types'
 import { RESALE_STATUS_META, type ResaleStatus } from './constants'
@@ -7,11 +7,13 @@ import { portalTypeLabel, usePortalConfig } from './portal/use-portal-config'
 
 export function PropertyListView({
   properties,
+  onView,
   onEdit,
   onOpenPortal,
   onDeactivate,
 }: {
   properties: Property[]
+  onView: (property: Property) => void
   onEdit: (property: Property) => void
   onOpenPortal: (property: Property) => void
   onDeactivate: (property: Property) => void
@@ -44,7 +46,13 @@ export function PropertyListView({
                 }`}
               >
                 <td className="px-4 py-3">
-                  <p className="font-medium text-neutral-900">{property.title}</p>
+                  <button
+                    type="button"
+                    onClick={() => onView(property)}
+                    className="text-left font-medium text-neutral-900 hover:text-brand"
+                  >
+                    {property.title}
+                  </button>
                   <p className="text-xs text-neutral-400">
                     {portalTypeLabel(config, property.propertyType) ?? '—'}
                   </p>
@@ -73,6 +81,14 @@ export function PropertyListView({
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      aria-label="Ver imóvel"
+                      onClick={() => onView(property)}
+                      className="rounded-[8px] p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </button>
                     <button
                       type="button"
                       aria-label="Editar imóvel"
