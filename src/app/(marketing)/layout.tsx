@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import { Plus_Jakarta_Sans } from 'next/font/google'
+import { NavScrollState } from '@/components/landing/nav-scroll-state'
+import { RevealObserver } from '@/components/landing/reveal-observer'
+import '@/components/landing/motion.css'
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -37,9 +40,18 @@ export const viewport: Viewport = {
   userScalable: true,
 }
 
+// Liga as animações antes do primeiro paint (sem JS a classe nunca entra e nada fica escondido)
+const MOTION_READY_SCRIPT = "document.documentElement.classList.add('motion-ready')"
+const NOSCRIPT_STYLE =
+  '<style>[data-landing] [data-reveal],[data-landing] [data-stagger-item],[data-landing] .lp-in{opacity:1!important;transform:none!important;animation:none!important}</style>'
+
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
     <div data-landing className={`${jakarta.className} min-h-screen bg-white text-[#1C1B1A] antialiased`}>
+      <script dangerouslySetInnerHTML={{ __html: MOTION_READY_SCRIPT }} />
+      <noscript dangerouslySetInnerHTML={{ __html: NOSCRIPT_STYLE }} />
+      <NavScrollState />
+      <RevealObserver />
       {children}
     </div>
   )

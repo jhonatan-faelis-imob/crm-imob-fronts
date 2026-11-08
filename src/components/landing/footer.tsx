@@ -50,7 +50,7 @@ export function Footer() {
                     <a
                       href={link.href}
                       {...(link.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                      className="text-[15px] text-[#57534E] hover:text-[#C8104A]"
+                      className="text-[15px] text-[#57534E] underline-offset-4 transition-colors hover:text-[#C8104A] hover:underline"
                     >
                       {link.label}
                     </a>

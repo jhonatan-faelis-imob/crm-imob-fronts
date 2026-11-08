@@ -6,10 +6,17 @@ import { PLANS, formatBRL, planMonthlyTotal, type PlanId } from '@/lib/landing/p
 
 const MAX_USERS = 500
 
+function totalFor(planId: PlanId, users: number) {
+  const plan = PLANS.find((item) => item.id === planId) ?? PLANS[0]
+  return planMonthlyTotal(plan, plan.extraUserPrice === null ? plan.includedUsers : users)
+}
+
 export function PricingCalculator() {
   const [planId, setPlanId] = useState<PlanId>('equipe')
   const [users, setUsers] = useState(5)
   const usersId = useId()
+  // Troca animada do total: o valor anterior sai para cima enquanto o novo entra (motion.css)
+  const [totalSwap, setTotalSwap] = useState<{ previous: number | null; key: number }>({ previous: null, key: 0 })
 
   const plan = PLANS.find((item) => item.id === planId) ?? PLANS[0]
   const fixed = plan.extraUserPrice === null
@@ -17,16 +24,24 @@ export function PricingCalculator() {
   const total = planMonthlyTotal(plan, effectiveUsers)
   const extraUsers = Math.max(0, effectiveUsers - plan.includedUsers)
 
+  const swapTotal = (nextTotal: number) => {
+    if (nextTotal === total) return
+    setTotalSwap((current) => ({ previous: total, key: current.key + 1 }))
+  }
+
   const choosePlan = (id: PlanId) => {
     const next = PLANS.find((item) => item.id === id)
     if (!next) return
+    swapTotal(totalFor(id, next.includedUsers))
     setPlanId(id)
     setUsers(next.includedUsers)
   }
 
   const changeUsers = (value: number) => {
     if (Number.isNaN(value)) return
-    setUsers(Math.min(MAX_USERS, Math.max(1, Math.floor(value))))
+    const nextUsers = Math.min(MAX_USERS, Math.max(1, Math.floor(value)))
+    swapTotal(totalFor(planId, nextUsers))
+    setUsers(nextUsers)
   }
 
   return (
@@ -108,7 +123,21 @@ export function PricingCalculator() {
         </p>
         <p className="text-[14px] font-semibold text-[#57534E]" aria-live="polite">
           Total mensal{' '}
-          <span className="ml-1 text-[28px] font-extrabold tracking-[-0.02em] text-[#1C1B1A]">{formatBRL(total)}</span>
+          <span className="lp-total ml-1 text-[28px] font-extrabold tracking-[-0.02em] text-[#1C1B1A]">
+            {totalSwap.previous !== null && (
+              <span
+                key={`out-${totalSwap.key}`}
+                aria-hidden="true"
+                className="lp-total-out"
+                onAnimationEnd={() => setTotalSwap((current) => ({ ...current, previous: null }))}
+              >
+                {formatBRL(totalSwap.previous)}
+              </span>
+            )}
+            <span key={`in-${totalSwap.key}`} className={totalSwap.key > 0 ? 'lp-total-in' : undefined}>
+              {formatBRL(total)}
+            </span>
+          </span>
         </p>
       </div>
     </div>

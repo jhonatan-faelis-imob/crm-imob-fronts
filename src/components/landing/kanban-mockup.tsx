@@ -1,3 +1,4 @@
+import { motionVars } from './motion-vars'
 import { ScoreBadge } from './ui'
 
 type KanbanCard = { name: string; score: number; detail: string; highlight?: boolean }
@@ -33,6 +34,16 @@ const COLUMNS: KanbanColumn[] = [
     cards: [{ name: 'Pedro Alves', score: 94, detail: 'Aguardando banco' }],
   },
 ]
+
+// Entrada dos cards no hero (ms): começam depois do mockup e seguem coluna por coluna, 70ms entre eles
+const CARDS_START = 1100
+const CARDS_STEP = 70
+const LAST_CARD_DELAY = CARDS_START + (COLUMNS.flatMap((column) => column.cards).length - 1) * CARDS_STEP
+const RING_DELAY = LAST_CARD_DELAY + 700
+
+function cardOffset(columnIndex: number) {
+  return COLUMNS.slice(0, columnIndex).reduce((total, column) => total + column.cards.length, 0)
+}
 
 export function KanbanMockup() {
   return (
@@ -71,27 +82,32 @@ export function KanbanMockup() {
           {/* O Kanban rola na horizontal dentro do card em telas estreitas */}
           <div className="mt-4 overflow-x-auto pb-2" tabIndex={0} aria-label="Colunas do funil">
             <div className="flex gap-3">
-              {COLUMNS.map((column) => (
+              {COLUMNS.map((column, columnIndex) => (
                 <div key={column.title} className="w-[210px] shrink-0 rounded-[14px] bg-[#EFECE8] p-2.5">
                   <div className="flex items-baseline justify-between gap-2 px-1 pb-2">
                     <span className="text-[13px] font-bold text-[#1C1B1A]">{column.title}</span>
                     <span className="text-[11px] font-semibold text-[#57534E]">VGV {column.vgv}</span>
                   </div>
                   <div className="space-y-2">
-                    {column.cards.map((card) => (
+                    {column.cards.map((card, cardIndex) => {
+                      const delay = CARDS_START + (cardOffset(columnIndex) + cardIndex) * CARDS_STEP
+                      return (
                       <div
                         key={card.name}
+                        data-hero-seq
+                        style={motionVars({ d: delay, ring: card.highlight ? RING_DELAY : undefined })}
                         className={`rounded-[10px] bg-white p-3 ${
-                          card.highlight ? 'border-2 border-[#FF385C]' : 'border border-[#E6E2DD]'
+                          card.highlight ? 'lp-ring border-2 border-[#FF385C]' : 'border border-[#E6E2DD]'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2">
                           <span className="truncate text-[13px] font-semibold text-[#1C1B1A]">{card.name}</span>
-                          <ScoreBadge score={card.score} />
+                          <ScoreBadge score={card.score} delay={delay + 150} />
                         </div>
                         <p className="mt-1 text-[12px] text-[#57534E]">{card.detail}</p>
                       </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
               ))}

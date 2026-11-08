@@ -1,0 +1,492 @@
+/*
+ * Motion da landing page. Importado só em app/(marketing)/layout.tsx.
+ *
+ * Regras:
+ * - Todo seletor fica dentro de [data-landing], então nada vaza para o app.
+ * - Estados escondidos só existem com .motion-ready no <html> (posto por JS) e dentro de
+ *   prefers-reduced-motion: no-preference. Sem JS ou com reduced-motion, tudo aparece no estado final.
+ * - Só transform e opacity animam (exceções pedidas: a cor da borda nos cards de "Tudo conectado"
+ *   e a altura do FAQ via ::details-content).
+ * - Entradas usam animation com fill "backwards": o estado final é o estilo normal, então os
+ *   hovers (transform) continuam funcionando depois da entrada.
+ */
+
+[data-landing] {
+  --lp-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------- Estado final / estático (vale sempre) ---------- */
+
+/* Nav: camadas de fundo (sólida e translúcida). A troca só mexe em opacity. */
+[data-landing] .lp-nav::before,
+[data-landing] .lp-nav::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+[data-landing] .lp-nav::before {
+  background: #121212;
+}
+[data-landing] .lp-nav::after {
+  background: rgba(18, 18, 18, 0.82);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+}
+[data-landing] .lp-nav[data-scrolled]::before {
+  opacity: 0;
+}
+[data-landing] .lp-nav[data-scrolled]::after {
+  opacity: 1;
+}
+
+/* Sublinhado dos links da nav */
+[data-landing] .lp-navlink {
+  position: relative;
+}
+[data-landing] .lp-navlink::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  border-radius: 2px;
+  background: #ff385c;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+[data-landing] .lp-navlink:hover::after,
+[data-landing] .lp-navlink:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* Pulso do ponto do pill */
+[data-landing] .lp-pulse {
+  position: relative;
+}
+[data-landing] .lp-pulse::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #ff385c;
+  opacity: 0;
+}
+
+/* Palavra animada sozinha precisa de caixa própria para receber transform */
+[data-landing] .lp-word {
+  display: inline-block;
+}
+
+/* Risco da tarefa concluída (substitui o line-through) */
+[data-landing] .lp-strike {
+  position: relative;
+  display: inline-block;
+}
+[data-landing] .lp-strike::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 52%;
+  height: 1px;
+  background: currentColor;
+  transform-origin: left;
+}
+
+/* Cards com lift: sombra numa camada própria (só opacity muda) */
+[data-landing] .lp-lift {
+  position: relative;
+}
+[data-landing] .lp-lift::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 18px 40px -18px rgba(28, 27, 26, 0.3);
+  opacity: 0;
+  pointer-events: none;
+}
+[data-landing] .lp-lift-border:hover {
+  border-color: #1c1b1a;
+}
+
+/* WhatsApp: escurece com uma camada preta (opacity) */
+[data-landing] .lp-wa {
+  position: relative;
+  overflow: hidden;
+}
+[data-landing] .lp-wa::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Borda neutra por cima da borda rosa, que some para a rosa "aparecer" */
+[data-landing] .lp-border-reveal {
+  position: relative;
+}
+[data-landing] .lp-border-reveal::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 2px solid #e6e2dd;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Anel único no card destacado do Kanban */
+[data-landing] .lp-ring {
+  position: relative;
+}
+[data-landing] .lp-ring::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 2px solid #ff385c;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Total da calculadora: o valor antigo fica empilhado e invisível */
+[data-landing] .lp-total {
+  display: inline-grid;
+  /* clip-path em vez de overflow: não mexe na linha de base do texto */
+  clip-path: inset(0 -8px);
+}
+[data-landing] .lp-total > * {
+  grid-area: 1 / 1;
+}
+[data-landing] .lp-total-out {
+  display: none;
+}
+
+/* ---------- Movimento ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Transições de hover (150–200ms) */
+  [data-landing] .lp-nav::before,
+  [data-landing] .lp-nav::after {
+    transition: opacity 200ms var(--lp-ease);
+  }
+  [data-landing] .lp-navlink::after {
+    transition: transform 180ms var(--lp-ease);
+  }
+  [data-landing] .lp-btn {
+    transition:
+      background-color 180ms var(--lp-ease),
+      color 180ms var(--lp-ease),
+      transform 150ms var(--lp-ease);
+  }
+  [data-landing] .lp-btn .lp-arrow {
+    transition: transform 180ms var(--lp-ease);
+  }
+  [data-landing] .lp-btn:hover .lp-arrow {
+    transform: translateX(4px);
+  }
+  [data-landing] .lp-btn-primary:active {
+    transform: scale(0.98);
+  }
+  [data-landing] .lp-lift {
+    transition:
+      transform 180ms var(--lp-ease),
+      border-color 180ms var(--lp-ease);
+  }
+  [data-landing] .lp-lift::after {
+    transition: opacity 180ms var(--lp-ease);
+  }
+  [data-landing] .lp-lift:hover {
+    transform: translateY(-4px);
+  }
+  [data-landing] .lp-lift:hover::after {
+    opacity: 1;
+  }
+  [data-landing] .lp-tilt {
+    transition: transform 180ms var(--lp-ease);
+  }
+  [data-landing] .lp-lift:hover .lp-tilt {
+    transform: rotate(-6deg);
+  }
+  [data-landing] .lp-wa {
+    transition: transform 160ms var(--lp-ease);
+  }
+  [data-landing] .lp-wa::after {
+    transition: opacity 160ms var(--lp-ease);
+  }
+  [data-landing] .lp-wa:hover {
+    transform: translateY(-1px);
+  }
+  [data-landing] .lp-wa:hover::after {
+    opacity: 0.12;
+  }
+  [data-landing] .lp-faq-icon {
+    transition: transform 200ms var(--lp-ease);
+  }
+
+  /* Único loop da página: o ponto do pill */
+  [data-landing] .lp-pulse::after {
+    animation: lp-ring 2.4s var(--lp-ease) infinite;
+  }
+
+  /* ---- Entradas: só com JS (.motion-ready) ---- */
+
+  /* Hero: sequência ao carregar, sem observer */
+  .motion-ready [data-landing] [data-hero-seq] {
+    animation: lp-up 600ms var(--lp-ease) var(--d, 0ms) backwards;
+  }
+  .motion-ready [data-landing] [data-hero-seq='move'] {
+    animation-name: lp-move;
+  }
+  .motion-ready [data-landing] [data-hero-seq='word'] {
+    animation-name: lp-word;
+  }
+  .motion-ready [data-landing] [data-hero-seq='tilt'] {
+    animation-name: lp-tilt;
+    animation-duration: 900ms;
+  }
+  .motion-ready [data-landing] .lp-ring::before {
+    animation: lp-card-ring 900ms var(--lp-ease) var(--ring-d, 0ms) both;
+  }
+
+  /* Reveal com observer */
+  .motion-ready [data-landing] [data-reveal]:not([data-reveal='scene']):not(.is-visible),
+  .motion-ready [data-landing] [data-reveal-stagger]:not(.is-visible) [data-stagger-item],
+  .motion-ready [data-landing] [data-reveal]:not(.is-visible) .lp-in,
+  .motion-ready [data-landing] [data-reveal-stagger]:not(.is-visible) .lp-in {
+    opacity: 0;
+  }
+  .motion-ready [data-landing] [data-reveal]:not([data-reveal='scene']).is-visible {
+    animation: lp-up 600ms var(--lp-ease) var(--reveal-delay, 0ms) backwards;
+  }
+  .motion-ready [data-landing] [data-reveal='right'].is-visible {
+    animation-name: lp-right;
+  }
+  .motion-ready [data-landing] [data-reveal='scale'].is-visible {
+    animation-name: lp-scale-98;
+    animation-duration: 700ms;
+  }
+  .motion-ready [data-landing] [data-reveal-stagger].is-visible [data-stagger-item] {
+    animation: lp-up 600ms var(--lp-ease) backwards;
+    animation-delay: calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--stagger, 70ms));
+  }
+  .motion-ready [data-landing] [data-reveal-stagger].is-visible [data-stagger-item='up-lg'] {
+    animation-name: lp-up-lg;
+    animation-duration: 700ms;
+  }
+  .motion-ready [data-landing] [data-reveal-stagger].is-visible [data-stagger-item='fade'] {
+    animation-name: lp-fade;
+  }
+  .motion-ready [data-landing] [data-reveal-stagger].is-visible [data-stagger-item='scale'] {
+    animation-name: lp-scale;
+  }
+
+  /* Peças internas que entram depois do container (--d, --lp-anim, --lp-dur) */
+  .motion-ready [data-landing] .is-visible .lp-in {
+    animation: var(--lp-anim, lp-up) var(--lp-dur, 600ms) var(--lp-ease) var(--d, 0ms) backwards;
+  }
+
+  /* Check que se desenha */
+  .motion-ready [data-landing] .lp-draw path {
+    stroke-dasharray: 20;
+  }
+  .motion-ready [data-landing] .is-visible .lp-draw path {
+    animation: lp-draw 500ms var(--lp-ease) backwards;
+    animation-delay: var(--draw-delay, calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--stagger, 70ms) + 250ms));
+  }
+  .motion-ready [data-landing] [data-reveal]:not(.is-visible) .lp-draw path,
+  .motion-ready [data-landing] [data-reveal-stagger]:not(.is-visible) .lp-draw path {
+    stroke-dashoffset: 20;
+  }
+
+  /* Cena do follow-up */
+  .motion-ready [data-landing] [data-reveal='scene']:not(.is-visible) .lp-strike::after {
+    transform: scaleX(0);
+  }
+  .motion-ready [data-landing] [data-reveal='scene'].is-visible .lp-strike::after {
+    animation: lp-strike 500ms var(--lp-ease) 450ms backwards;
+  }
+  .motion-ready [data-landing] [data-reveal='scene'].is-visible .lp-nudge {
+    animation: lp-nudge 400ms ease-in-out 1000ms 2;
+  }
+  .motion-ready [data-landing] [data-reveal='scene'].is-visible .lp-border-reveal::after {
+    animation: lp-fade-out 500ms var(--lp-ease) 1900ms both;
+  }
+
+  /* Total da calculadora */
+  .motion-ready [data-landing] .lp-total-in {
+    animation: lp-total-in 260ms var(--lp-ease) backwards;
+  }
+  .motion-ready [data-landing] .lp-total-out {
+    display: block;
+    animation: lp-total-out 260ms var(--lp-ease) forwards;
+  }
+
+  /* FAQ: abertura suave onde houver suporte */
+  @supports selector(::details-content) {
+    [data-landing] .lp-faq {
+      interpolate-size: allow-keywords;
+    }
+    [data-landing] .lp-faq::details-content {
+      height: 0;
+      opacity: 0;
+      overflow: clip;
+      transition:
+        height 300ms var(--lp-ease),
+        opacity 300ms var(--lp-ease),
+        content-visibility 300ms allow-discrete;
+    }
+    [data-landing] .lp-faq[open]::details-content {
+      height: auto;
+      opacity: 1;
+    }
+  }
+}
+
+@keyframes lp-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+@keyframes lp-move {
+  from {
+    transform: translateY(16px);
+  }
+}
+@keyframes lp-up-lg {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+}
+@keyframes lp-down {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+}
+@keyframes lp-right {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+@keyframes lp-word {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+}
+@keyframes lp-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes lp-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes lp-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+@keyframes lp-scale-98 {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+@keyframes lp-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+@keyframes lp-tilt {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) rotateX(8deg) translateY(40px);
+  }
+}
+@keyframes lp-bar {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes lp-dot {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+@keyframes lp-draw {
+  from {
+    stroke-dashoffset: 20;
+  }
+}
+@keyframes lp-strike {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes lp-nudge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+@keyframes lp-ring {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  60%,
+  100% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+@keyframes lp-card-ring {
+  from {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+}
+@keyframes lp-total-in {
+  from {
+    opacity: 0;
+    transform: translateY(60%);
+  }
+}
+@keyframes lp-total-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-60%);
+  }
+}

@@ -1,19 +1,31 @@
 import { Check } from 'lucide-react'
 import { LINKS } from '@/lib/landing/links'
 import { PLANS, formatPlanPrice, type Plan } from '@/lib/landing/plans'
+import { motionVars } from './motion-vars'
 import { PricingCalculator } from './pricing-calculator'
 import { ButtonLink, Container, Eyebrow, SectionTitle } from './ui'
+
+// Entrada: os planos claros primeiro e o destacado por último, vindo de mais baixo
+const STAGGER = 90
+const ENTRY_ORDER = [...PLANS.filter((plan) => !plan.featured), ...PLANS.filter((plan) => plan.featured)].map(
+  (plan) => plan.id,
+)
+const BADGE_DELAY = (ENTRY_ORDER.length - 1) * STAGGER + 700
 
 function PlanCard({ plan }: { plan: Plan }) {
   const dark = plan.featured
   return (
     <li
+      data-stagger-item={dark ? 'up-lg' : ''}
+      style={motionVars({ i: ENTRY_ORDER.indexOf(plan.id) })}
       className={`relative flex flex-col rounded-[20px] p-7 sm:p-8 ${
-        dark ? 'bg-[#121212] text-white' : 'border border-[#E6E2DD] bg-white text-[#1C1B1A]'
+        dark ? 'bg-[#121212] text-white' : 'lp-lift border border-[#E6E2DD] bg-white text-[#1C1B1A]'
       }`}
     >
       {dark && (
-        <span className="absolute right-5 top-5 rounded-full bg-[#FF385C] px-3 py-1 text-[12px] font-bold text-[#121212]">
+        <span
+          style={motionVars({ d: BADGE_DELAY, anim: 'lp-pop', dur: 500 })}
+          className="lp-in absolute right-5 top-5 rounded-full bg-[#FF385C] px-3 py-1 text-[12px] font-bold text-[#121212]">
           Mais escolhido
         </span>
       )}
@@ -56,11 +68,11 @@ export function Pricing() {
   return (
     <section id="planos" className="scroll-mt-[72px] bg-[#F7F5F3] py-20 md:py-28">
       <Container>
-        <div className="mx-auto max-w-[760px] text-center">
+        <div data-reveal className="mx-auto max-w-[760px] text-center">
           <Eyebrow>Planos e preços</Eyebrow>
           <SectionTitle>Escolha o tamanho da sua operação.</SectionTitle>
         </div>
-        <ul className="mt-12 grid gap-5 lg:grid-cols-3">
+        <ul data-reveal-stagger={STAGGER} className="mt-12 grid gap-5 lg:grid-cols-3">
           {PLANS.map((plan) => (
             <PlanCard key={plan.id} plan={plan} />
           ))}

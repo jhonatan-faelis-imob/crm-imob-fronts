@@ -42,13 +42,13 @@ export function Features() {
   return (
     <section className="bg-white py-20 md:py-28">
       <Container>
-        <div className="max-w-[760px]">
+        <div data-reveal className="max-w-[760px]">
           <Eyebrow>Tudo conectado</Eyebrow>
           <SectionTitle>Do primeiro contato à venda assinada, num só sistema.</SectionTitle>
         </div>
-        <ul className="mt-12 grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))]">
+        <ul data-reveal-stagger="70" className="mt-12 grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))]">
           {FEATURES.map(({ icon: Icon, title, text }) => (
-            <li key={title} className="rounded-[16px] border border-[#E6E2DD] p-6">
+            <li key={title} data-stagger-item className="lp-lift lp-lift-border rounded-[16px] border border-[#E6E2DD] p-6">
               <Icon className="h-6 w-6 text-[#C8104A]" aria-hidden="true" />
               <h3 className="mt-4 text-[17px] font-bold">{title}</h3>
               <p className="mt-2 text-[15px] leading-relaxed text-[#57534E]">{text}</p>

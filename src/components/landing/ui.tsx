@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Check } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { CountUp } from './count-up'
 
 export function Container({ children, className = '' }: { children: ReactNode; className?: string }) {
   return <div className={`mx-auto w-full max-w-[1200px] px-6 ${className}`}>{children}</div>
@@ -23,7 +24,7 @@ export function SectionTitle({ children, className = '' }: { children: ReactNode
 type ButtonVariant = 'primary' | 'outline-dark-bg' | 'outline-light-bg' | 'outline-on-featured'
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: 'bg-[#E31C5F] text-white hover:bg-[#C8104A]',
+  primary: 'lp-btn-primary bg-[#E31C5F] text-white hover:bg-[#C8104A]',
   'outline-dark-bg': 'border border-[#4A4A4A] text-white hover:bg-white/10',
   'outline-light-bg': 'border border-[#1C1B1A] text-[#1C1B1A] hover:bg-[#1C1B1A] hover:text-white',
   'outline-on-featured': 'border border-white/40 text-white hover:bg-white/10',
@@ -40,7 +41,7 @@ export function ButtonLink({
   variant?: ButtonVariant
   className?: string
 }) {
-  const classes = `inline-flex min-h-12 items-center justify-center gap-2 rounded-[12px] px-6 text-[15px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF385C] ${VARIANTS[variant]} ${className}`
+  const classes = `lp-btn inline-flex min-h-12 items-center justify-center gap-2 rounded-[12px] px-6 text-[15px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF385C] ${VARIANTS[variant]} ${className}`
   if (href.startsWith('http')) {
     return (
       <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>
@@ -57,9 +58,9 @@ export function ButtonLink({
 
 export function CheckItem({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <li className="flex gap-3">
+    <li className="flex gap-3" data-stagger-item>
       <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FFE4EA]">
-        <Check className="h-3.5 w-3.5 text-[#C8104A]" strokeWidth={3} aria-hidden="true" />
+        <Check className="lp-draw h-3.5 w-3.5 text-[#C8104A]" strokeWidth={3} aria-hidden="true" />
       </span>
       <p className="text-[16px] leading-relaxed text-[#57534E]">
         <strong className="font-semibold text-[#1C1B1A]">{title}</strong> {children}
@@ -68,7 +69,8 @@ export function CheckItem({ title, children }: { title: string; children: ReactN
   )
 }
 
-export function ScoreBadge({ score }: { score: number }) {
+// delay: em ms, para a contagem esperar a entrada do card
+export function ScoreBadge({ score, delay }: { score: number; delay?: number }) {
   const hot = score >= 70
   return (
     <span
@@ -76,14 +78,24 @@ export function ScoreBadge({ score }: { score: number }) {
         hot ? 'bg-[#FFE4EA] text-[#B00D40]' : 'bg-[#F1EEEA] text-[#57534E]'
       }`}
     >
-      IA {score}
+      IA{' '}<CountUp value={score} delay={delay} duration={700} />
     </span>
   )
 }
 
-export function MockupFrame({ children, className = '' }: { children: ReactNode; className?: string }) {
+export function MockupFrame({
+  children,
+  className = '',
+  reveal = '',
+}: {
+  children: ReactNode
+  className?: string
+  /** Valor de data-reveal (motion.css): '' sobe, 'right' vem da direita, 'scene' só dispara a cena */
+  reveal?: '' | 'right' | 'scene'
+}) {
   return (
     <div
+      data-reveal={reveal}
       className={`rounded-[20px] border border-[#E6E2DD] bg-white p-5 shadow-[0_24px_60px_-24px_rgba(28,27,26,0.25)] sm:p-6 ${className}`}
     >
       {children}
