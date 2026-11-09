@@ -905,6 +905,22 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
 
 ---
 
+## PWA / service worker — regras atuais
+
+- **Geração:** `next-pwa` (Workbox) em `next.config.ts`, desligado em desenvolvimento (`disable`). O build grava
+  `public/sw.js` e `public/workbox-*.js` (no `.gitignore`). Registro em `src/components/RegisterServiceWorker.tsx`
+  (só em produção) e também pelo `register: true` do next-pwa.
+- **Desenvolvimento:** o componente **não registra** e, se achar um service worker antigo (de um `npm run build`/`start`
+  na mesma origem localhost), faz `unregister()`, apaga todos os caches e recarrega uma vez (flag `sw-dev-cleanup` no
+  sessionStorage). Era a causa do "Hydration failed" intermitente no sidebar: o SW servia o JS velho do `next dev`.
+- **Cache em produção:** navegações (`request.mode === 'navigate'`) são sempre `NetworkOnly` (primeira regra); sem a
+  rota `start-url` (`cacheStartUrl: false`, `dynamicStartUrl: false`); JS/CSS só da mesma origem, em `/_next/static/`
+  e com hash no nome. O precache do build não tem HTML. O `start_url` do manifesto (`/?source=pwa`) não mudou.
+- **Atenção:** os `urlPattern` em regex começando com `^\/` (rotas protegidas e `auth-pages`) nunca casam, porque o
+  Workbox compara com a URL completa. Elas ficam sem efeito; quem garante que HTML não entra em cache é a regra de navegação.
+
+---
+
 ## Status do Projeto
 
 - [x] Decisões de arquitetura

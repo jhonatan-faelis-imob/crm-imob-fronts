@@ -6,7 +6,16 @@ const withPWAConfig = withPWA({
   disable: process.env.NODE_ENV === 'development',
   register: true,
   skipWaiting: true,
+  // Nenhuma página HTML em cache: sem a rota "start-url" do next-pwa (que guardava o "/" para abrir offline).
+  // O start_url do manifesto não muda.
+  cacheStartUrl: false,
+  dynamicStartUrl: false,
   runtimeCaching: [
+    // Navegações (HTML) — SEMPRE rede. Primeira regra, vale antes de qualquer outra
+    {
+      urlPattern: ({ request }) => request.mode === 'navigate',
+      handler: 'NetworkOnly',
+    },
     // Fontes — cache longo
     {
       urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -33,9 +42,11 @@ const withPWAConfig = withPWA({
         expiration: { maxEntries: 64, maxAgeSeconds: 60 * 60 * 24 * 30 },
       },
     },
-    // JS e CSS estáticos
+    // JS e CSS do build — só da mesma origem, em /_next/static/ e com hash no nome (chunk.0a1b2c3d4e5f6789.js).
+    // Arquivo sem hash (ex.: o JS do `next dev`) nunca entra no cache
     {
-      urlPattern: /\.(?:js|css)$/i,
+      urlPattern: ({ url, sameOrigin }) =>
+        sameOrigin && url.pathname.startsWith('/_next/static/') && /[.-][0-9a-f]{8,}\.(?:js|css)$/i.test(url.pathname),
       handler: 'StaleWhileRevalidate',
       options: { cacheName: 'static-resources' },
     },
