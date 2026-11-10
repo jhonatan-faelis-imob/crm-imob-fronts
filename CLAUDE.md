@@ -921,6 +921,20 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
 
 ---
 
+## Deploy do backend (Railway) — regras atuais
+
+- **Produção roda sempre o JavaScript compilado: `node dist/main.js` (script `start`). Nunca `nest start`** em produção:
+  ele compila o TypeScript a cada subida e estourava a memória do container (loop de "Killed").
+- `build` = `nest build`; `postinstall` = `prisma generate`; desenvolvimento usa `start:dev` (`nest start --watch`).
+- `tsconfig.build.json` compila só `src/` (exclui `prisma`, `test`, `dist` e specs), para o arquivo principal sair em
+  `dist/main.js` e não em `dist/src/main.js`. Os scripts `prisma/*.ts` (seed, reset, etc.) rodam com `ts-node`.
+- `@nestjs/cli`, `prisma` e `typescript` ficam em devDependencies: o build precisa instalar tudo, compilar e só depois
+  podar as dependências de desenvolvimento (se um Dockerfile for criado, o `CMD` é `node dist/main.js`).
+- `GET /api/v1/health` é público (`@Public()`), não consulta o banco e devolve `{ status: 'ok' }` (healthcheck).
+- Depois do `listen`, o `main.ts` loga o RSS em MB ("Memória em repouso"), para acompanhar o consumo no log do Railway.
+
+---
+
 ## Status do Projeto
 
 - [x] Decisões de arquitetura
