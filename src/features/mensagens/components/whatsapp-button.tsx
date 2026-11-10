@@ -1,18 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { MessageCircle } from 'lucide-react'
-import { useMutation } from '@tanstack/react-query'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import { toast } from '@/components/ui/toast'
 import { useIsMobile } from '@/lib/use-is-mobile'
 import { whatsappUrl } from '@/lib/whatsapp'
-import { messageTemplatesService } from '@/services/message-templates.service'
 import type { MessageTemplate } from '@/types'
 import { MessagePreviewDialog, type MessageDraft, type WhatsAppLead } from './message-preview-dialog'
 import { TemplatePicker } from './template-picker'
+import { useMessageContext } from '../use-message-context'
+import { buildDraft } from '../utils/send-message'
 
 const PICKER_TITLE = 'Enviar WhatsApp'
 
@@ -24,8 +23,10 @@ const TRIGGER_CLASS_NAME = {
   icon: 'inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-[8px] bg-[#25D366] text-sm font-medium text-white transition-opacity hover:opacity-90 sm:px-3',
 }
 
-// Cada prévia remonta o modal com o texto novo
+// Cada prévia remonta o modal com o texto novo. O texto é montado no navegador (renderTemplateLocal):
+// nenhuma chamada de render, salvo {{documentos_pendentes}}, que o modal busca sozinho
 function useMessagePreview(lead: WhatsAppLead) {
+  const messageContext = useMessageContext(lead)
   const [draft, setDraft] = useState<MessageDraft | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const [session, setSession] = useState(0)
@@ -36,18 +37,13 @@ function useMessagePreview(lead: WhatsAppLead) {
     setIsOpen(true)
   }
 
-  const renderTemplate = useMutation({
-    mutationFn: (template: MessageTemplate) => messageTemplatesService.render(template.id, lead.id),
-    onSuccess: ({ text }, template) => show({ templateId: template.id, templateName: template.name, text }),
-    onError: () => toast.add({ title: 'Não foi possível preparar a mensagem', type: 'error' }),
-  })
-
-  function choose(template: MessageTemplate | null) {
-    if (template) renderTemplate.mutate(template)
-    else show({ templateId: null, templateName: 'Mensagem livre', text: '' })
+  // Dados já em cache (buscados ao abrir o seletor): a prévia abre na hora. Falha de rede não impede:
+  // a variável sem valor fica destacada no texto
+  async function choose(template: MessageTemplate | null) {
+    show(await buildDraft(template, messageContext.load))
   }
 
-  return { draft, isOpen, setIsOpen, session, choose }
+  return { draft, isOpen, setIsOpen, session, choose, prefetch: messageContext.prefetch }
 }
 
 export function WhatsAppButton({
@@ -67,7 +63,12 @@ export function WhatsAppButton({
 
   function choose(template: MessageTemplate | null) {
     setIsPickerOpen(false)
-    preview.choose(template)
+    void preview.choose(template)
+  }
+
+  function setPickerOpen(open: boolean) {
+    if (open) preview.prefetch()
+    setIsPickerOpen(open)
   }
 
   function openBlank() {
@@ -87,7 +88,7 @@ export function WhatsAppButton({
     <>
       {isMobile ? (
         <>
-          <button type="button" onClick={() => setIsPickerOpen(true)} className={TRIGGER_CLASS_NAME[variant]}>
+          <button type="button" onClick={() => setPickerOpen(true)} className={TRIGGER_CLASS_NAME[variant]}>
             {label}
           </button>
           <PickerSheet open={isPickerOpen} onOpenChange={setIsPickerOpen}>
@@ -95,7 +96,7 @@ export function WhatsAppButton({
           </PickerSheet>
         </>
       ) : (
-        <Popover open={isPickerOpen} onOpenChange={setIsPickerOpen}>
+        <Popover open={isPickerOpen} onOpenChange={setPickerOpen}>
           <PopoverTrigger render={<button type="button" className={TRIGGER_CLASS_NAME[variant]} />}>
             {label}
           </PopoverTrigger>
@@ -134,8 +135,15 @@ export function WhatsAppPickerDialog({
 
   function choose(template: MessageTemplate | null) {
     onOpenChange(false)
-    preview.choose(template)
+    void preview.choose(template)
   }
+
+  // Quem abre é o pai (menu do cartão do Kanban): busca os dados das variáveis assim que abre
+  const { prefetch } = preview
+  useEffect(() => {
+    if (open) prefetch()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
 
   return (
     <>

@@ -585,9 +585,23 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
 - **Variáveis:** `{{nome}}`, `{{primeiro_nome}}`, `{{empreendimento}}`, `{{corretor}}`, `{{telefone_corretor}}`,
   `{{imobiliaria}}` e `{{saudacao}}` (horário de America/Sao_Paulo). Variável vazia ou desconhecida fica no texto e vai em
   `missing`; o botão de abrir fica desabilitado enquanto restar `{{...}}`.
-- **Registrar interação ao abrir o WhatsApp:** "Abrir no WhatsApp" sempre chama `send-log` (ou `send-log-free`, na
-  mensagem livre), que cria a interação `whatsapp`, atualiza `lastContactAt` e conta no preenchimento automático de
-  ligações. Copiar texto e "Abrir sem mensagem" não registram.
+- **Duas implementações do render (front e back), mesmas fixtures:** o texto é montado no navegador por
+  `renderTemplateLocal` (`src/features/mensagens/utils/render-template.ts`), espelho de `render-template.ts` do backend
+  (mesma regex, passada única, variável vazia ou desconhecida fica no texto e entra em `missing`). As duas seguem os casos de
+  `src/features/mensagens/utils/render-fixtures.ts` (testes com vitest: `npm test`); ao mudar uma regra, mudar nos dois
+  lados e nas fixtures. **O front é a fonte da prévia:** escolher um modelo abre o modal na hora, sem chamada de render.
+- **Contexto das variáveis (`useMessageContext`):** nome do lead que está na tela; imóvel = primeiro vinculado, de
+  `GET /leads/:id` (chave `['lead', id]`, a mesma do detalhe, silenciosa, 60 s; buscada ao abrir o seletor); corretor,
+  telefone do corretor e imobiliária de `GET /auth/me` (`['me']`, 30 min), com fallback para a store.
+- **Servidor só quando necessário:** `{{documentos_pendentes}}` depende do checklist, então o modal pede
+  `render-free` só com essa variável e troca no texto. Falhou: o texto local continua, a variável fica destacada e aparece
+  "Não consegui buscar os documentos pendentes. Complete o texto à mão ou tente de novo" com "Tentar de novo". Simulador e
+  "Pedir documentos pendentes" seguem a mesma regra. "Copiar texto" nunca depende do servidor.
+- **Registrar interação ao abrir o WhatsApp:** "Abrir no WhatsApp" abre o wa.me de forma síncrona, no clique
+  (`openWhatsAppAndLog`), e só depois chama `send-log` (ou `send-log-free`, na mensagem livre), que cria a interação
+  `whatsapp`, atualiza `lastContactAt` e conta no preenchimento automático de ligações. Se o registro falhar, nada é
+  desfeito: toast "WhatsApp aberto, mas não consegui registrar a interação" com a ação "Registrar agora" (repete com o mesmo
+  texto), e o erro original só no `console.error`. Copiar texto e "Abrir sem mensagem" não registram.
 - **Número:** sempre pelo helper `whatsappUrl` de `src/lib/whatsapp.ts`.
 
 ---

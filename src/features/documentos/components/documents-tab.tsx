@@ -1,6 +1,5 @@
 'use client'
 
-import { useMutation } from '@tanstack/react-query'
 import { FileCheck, ListChecks, Plus, RefreshCw, Send, X } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -15,7 +14,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
-import { toast } from '@/components/ui/toast'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import {
   MessagePreviewDialog,
@@ -23,7 +21,8 @@ import {
   type WhatsAppLead,
 } from '@/features/mensagens/components/message-preview-dialog'
 import { ProgressBar } from '@/features/metas/progress-bar'
-import { messageTemplatesService } from '@/services/message-templates.service'
+import { useMessageContext } from '@/features/mensagens/use-message-context'
+import { prepareMessage } from '@/features/mensagens/utils/send-message'
 import type { ChecklistItem, ChecklistStatus, DocumentHolder } from '@/types'
 import { ASK_DOCUMENTS_MESSAGE } from '../constants'
 import { useLeadChecklist } from '../use-lead-checklist'
@@ -59,17 +58,16 @@ export function DocumentsTab({ lead }: { lead: WhatsAppLead }) {
   const [draft, setDraft] = useState<{ draft: MessageDraft; session: number } | null>(null)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
 
-  const askDocuments = useMutation({
-    mutationFn: () => messageTemplatesService.renderFree(lead.id, ASK_DOCUMENTS_MESSAGE),
-    onSuccess: ({ text }) => {
-      setDraft((current) => ({
-        draft: { templateId: null, templateName: 'Pedir documentos pendentes', text },
-        session: (current?.session ?? 0) + 1,
-      }))
-      setIsPreviewOpen(true)
-    },
-    onError: () => toast.add({ title: 'Não foi possível preparar a mensagem', type: 'error' }),
-  })
+  // Montada no navegador; o modal busca só {{documentos_pendentes}} no servidor
+  const messageContext = useMessageContext(lead)
+  async function askDocuments() {
+    const context = await messageContext.load()
+    setDraft((current) => ({
+      draft: { templateId: null, templateName: 'Pedir documentos pendentes', text: prepareMessage(ASK_DOCUMENTS_MESSAGE, context).text, context },
+      session: (current?.session ?? 0) + 1,
+    }))
+    setIsPreviewOpen(true)
+  }
 
   function toggleSelected(id: string) {
     setSelected((current) => {
@@ -125,8 +123,8 @@ export function DocumentsTab({ lead }: { lead: WhatsAppLead }) {
   const askButton = (
     <button
       type="button"
-      onClick={() => askDocuments.mutate()}
-      disabled={!hasPending || askDocuments.isPending}
+      onClick={() => void askDocuments()}
+      disabled={!hasPending}
       className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-[#25D366] px-4 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:h-10"
     >
       <Send className="h-4 w-4" />

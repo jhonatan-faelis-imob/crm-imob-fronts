@@ -17,7 +17,8 @@ import { MessagePreviewDialog, type MessageDraft } from '@/features/mensagens/co
 import { useDebouncedValue } from '@/lib/use-debounced-value'
 import { cn, formatCurrency } from '@/lib/utils'
 import { leadsService } from '@/services/leads.service'
-import { messageTemplatesService } from '@/services/message-templates.service'
+import { useMessageContext } from '@/features/mensagens/use-message-context'
+import { prepareMessage } from '@/features/mensagens/utils/send-message'
 import { propertiesService } from '@/services/properties.service'
 import {
   simulationsService,
@@ -204,27 +205,23 @@ export function Simulator({
     },
   })
 
-  const prepareMessage = useMutation({
-    mutationFn: (text: string) => {
-      if (!lead) throw new Error('Sem lead')
-      return messageTemplatesService.renderFree(lead.id, text)
-    },
-    onSuccess: ({ text }) => {
-      setMessage((current) => ({
-        draft: { templateId: null, templateName: 'Resumo da simulação', text },
-        session: (current?.session ?? 0) + 1,
-      }))
-      setIsPreviewOpen(true)
-    },
-    onError: () => toast.add({ title: 'Não foi possível preparar a mensagem', type: 'error' }),
-  })
+  // Texto montado no navegador (saudação, nome, corretor): sem chamada de render
+  const messageContext = useMessageContext(lead ?? null)
+  async function openSummaryMessage(content: string) {
+    const context = await messageContext.load()
+    setMessage((current) => ({
+      draft: { templateId: null, templateName: 'Resumo da simulação', text: prepareMessage(content, context).text, context },
+      session: (current?.session ?? 0) + 1,
+    }))
+    setIsPreviewOpen(true)
+  }
 
   async function copySummary() {
     if (!result) return
     try {
       // Com lead, preenche saudação e nome; copiar não registra interação
       const text = lead
-        ? (await messageTemplatesService.renderFree(lead.id, simulationSummary(result, true))).text
+        ? prepareMessage(simulationSummary(result, true), await messageContext.load()).text
         : simulationSummary(result, false)
       await navigator.clipboard.writeText(text)
       toast.add({ title: 'Resumo copiado', type: 'success' })
@@ -415,8 +412,7 @@ export function Simulator({
                   <>
                     <button
                       type="button"
-                      onClick={() => prepareMessage.mutate(simulationSummary(result, true))}
-                      disabled={prepareMessage.isPending}
+                      onClick={() => void openSummaryMessage(simulationSummary(result, true))}
                       className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-[#25D366] px-4 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60 sm:h-10"
                     >
                       <MessageCircle className="h-4 w-4" />
