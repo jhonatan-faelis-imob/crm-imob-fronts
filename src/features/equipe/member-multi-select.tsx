@@ -6,10 +6,12 @@ export function MemberMultiSelect<TFieldValues extends FieldValues>({
   control,
   name,
   options,
+  emptyText = 'Ninguém disponível.',
 }: {
   control: Control<TFieldValues>
   name: FieldPath<TFieldValues>
   options: Member[]
+  emptyText?: string
 }) {
   return (
     <Controller
@@ -63,7 +65,7 @@ export function MemberMultiSelect<TFieldValues extends FieldValues>({
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-neutral-400">Nenhum corretor disponível sem equipe.</p>
+              <p className="text-xs text-neutral-400">{emptyText}</p>
             )}
           </div>
         )

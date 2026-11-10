@@ -1,4 +1,4 @@
-import { MoreVertical, Users } from 'lucide-react'
+import { Crown, MoreVertical, Users, UsersRound } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -16,11 +16,17 @@ export function TeamCard({
   coordinator,
   brokers,
   isTopRanked,
+  canManageMembers,
+  canChangeCoordinator,
+  onManage,
 }: {
   team: TeamWithMetrics
   coordinator: Member | undefined
   brokers: Member[]
   isTopRanked: boolean
+  canManageMembers: boolean
+  canChangeCoordinator: boolean
+  onManage: () => void
 }) {
   const activeBrokersCount = brokers.filter((member) => member.active).length
   const progressPct =
@@ -53,14 +59,18 @@ export function TeamCard({
             <MoreVertical className="h-4 w-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>Editar equipe</DropdownMenuItem>
-            <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
-            <DropdownMenuItem variant="destructive">Desativar</DropdownMenuItem>
+            <DropdownMenuItem onClick={onManage}>Ver detalhes</DropdownMenuItem>
+            {canManageMembers && <DropdownMenuItem onClick={onManage}>Gerenciar membros</DropdownMenuItem>}
+            {canChangeCoordinator && (
+              <DropdownMenuItem onClick={onManage}>
+                {coordinator ? 'Trocar coordenador' : 'Definir coordenador'}
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
-      {coordinator && (
+      {coordinator ? (
         <div className="flex items-center gap-2.5">
           <Avatar>
             <AvatarFallback className="bg-brand-bg text-brand">{getInitials(coordinator.name)}</AvatarFallback>
@@ -68,6 +78,18 @@ export function TeamCard({
           <p className="min-w-0 truncate text-sm text-neutral-600">
             Coord: <span className="font-medium text-neutral-900">{coordinator.name}</span>
           </p>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2.5">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
+            <Crown className="h-4 w-4" />
+          </div>
+          <p className="min-w-0 flex-1 truncate text-sm text-neutral-400">Sem coordenador</p>
+          {canChangeCoordinator && (
+            <button type="button" onClick={onManage} className="shrink-0 text-sm font-medium text-brand hover:text-brand-dark">
+              Definir coordenador
+            </button>
+          )}
         </div>
       )}
 
@@ -99,6 +121,17 @@ export function TeamCard({
             <AvatarGroupCount>+{hiddenBrokersCount}</AvatarGroupCount>
           )}
         </AvatarGroup>
+      )}
+
+      {canManageMembers && (
+        <button
+          type="button"
+          onClick={onManage}
+          className="mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] border-[0.5px] border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:border-brand hover:text-brand"
+        >
+          <UsersRound className="h-4 w-4" />
+          Gerenciar membros
+        </button>
       )}
     </div>
   )

@@ -2,18 +2,20 @@
 
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { buildHierarchy, HierarchyTree } from './hierarchy-tree'
-import type { Member } from './types'
+import type { Member, TeamWithMetrics } from './types'
 
 export function HierarchySheet({
   open,
   onOpenChange,
   members,
+  teams,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   members: Member[]
+  teams: TeamWithMetrics[]
 }) {
-  const nodes = buildHierarchy(members)
+  const nodes = buildHierarchy(members, teams)
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>

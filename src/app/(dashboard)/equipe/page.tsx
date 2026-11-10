@@ -5,25 +5,46 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/toast'
-import { mapApiTeamToTeam, mapApiUserToMember, type ApiTeam, type ApiUser } from '@/features/equipe/api'
+import {
+  apiErrorMessage,
+  mapApiTeamToTeam,
+  mapApiUserToMember,
+  type ApiTeam,
+  type ApiUser,
+  type CreatedUser,
+} from '@/features/equipe/api'
+import { ROLES } from '@/features/equipe/constants'
 import { HierarchySheet } from '@/features/equipe/hierarchy-sheet'
 import { MembersSection } from '@/features/equipe/members-section'
 import { NewMemberDialog, type NewMemberFormValues } from '@/features/equipe/new-member-dialog'
 import { NewTeamDialog, type NewTeamFormValues } from '@/features/equipe/new-team-dialog'
+import { NoTeamSection } from '@/features/equipe/no-team-section'
 import { OverviewCards } from '@/features/equipe/overview-cards'
+import { hasRoleAtLeast, manageableRoles } from '@/features/equipe/permissions'
+import { availableCoordinators, canManageTeamMembers, membersWithoutTeam } from '@/features/equipe/structure'
+import { TeamManageSheet } from '@/features/equipe/team-manage-sheet'
 import { TeamsSection } from '@/features/equipe/teams-section'
-import { defaultMemberFilters, type MemberFilters } from '@/features/equipe/types'
+import { defaultMemberFilters, type MemberFilters, type TeamWithMetrics } from '@/features/equipe/types'
+import { invalidateTeamStructure } from '@/features/equipe/use-team-actions'
+import { useHydrated } from '@/lib/use-hydrated'
 import { teamsService } from '@/services/teams.service'
 import { usersService } from '@/services/users.service'
 import { useAuthStore } from '@/store/auth.store'
+import type { Role } from '@/types'
+
+function asRole(value: string | undefined): Role | undefined {
+  return ROLES.find((role) => role === value)
+}
 
 export default function EquipePage() {
   const user = useAuthStore((state) => state.user)
+  const isHydrated = useHydrated()
   const queryClient = useQueryClient()
   const [memberFilters, setMemberFilters] = useState<MemberFilters>(defaultMemberFilters)
   const [isNewMemberOpen, setIsNewMemberOpen] = useState(false)
   const [isNewTeamOpen, setIsNewTeamOpen] = useState(false)
   const [isHierarchyOpen, setIsHierarchyOpen] = useState(false)
+  const [managedTeamId, setManagedTeamId] = useState<string | null>(null)
 
   const { data: usersData, isLoading: loadingUsers } = useQuery<ApiUser[]>({
     queryKey: ['users'],
@@ -39,42 +60,58 @@ export default function EquipePage() {
   const members = (usersData ?? []).map((apiUser) => mapApiUserToMember(apiUser, user?.organizationId ?? ''))
   const teams = (teamsData ?? []).map(mapApiTeamToTeam)
 
-  function invalidateTeam() {
-    queryClient.invalidateQueries({ queryKey: ['users'] })
-    queryClient.invalidateQueries({ queryKey: ['teams'] })
-  }
+  // Permissões só depois da hidratação (o store vem do localStorage)
+  const actorRole = isHydrated ? asRole(user?.role) : undefined
+  // A equipe de quem age vem da lista (o store guarda a do login, que pode ter mudado)
+  const actorTeamId = members.find((member) => member.id === user?.id)?.teamId ?? user?.teamId ?? null
+  const actor = actorRole ? { role: actorRole, teamId: actorTeamId } : null
+  const canCreateMember = manageableRoles(actorRole).length > 0
+  const isManager = hasRoleAtLeast(actorRole, 'gerente')
+  const isCoordinator = actorRole === 'coordenador'
+  const memberTeams = isCoordinator ? teams.filter((team) => team.id === actorTeamId) : teams
+  const withoutTeam = membersWithoutTeam(members)
+  const managedTeam = teams.find((team) => team.id === managedTeamId) ?? null
 
   const createMember = useMutation({
-    mutationFn: (dto: Record<string, unknown>) => usersService.create(dto),
-    onSuccess: () => {
-      invalidateTeam()
+    mutationFn: (dto: Record<string, unknown>): Promise<CreatedUser> => usersService.create(dto),
+    onSuccess: (created) => {
+      invalidateTeamStructure(queryClient, created.teamId ?? undefined)
       toast.add({ title: 'Membro criado com sucesso!', type: 'success' })
     },
-    onError: () => {
-      toast.add({ title: 'Não foi possível criar o membro', type: 'error' })
+    onError: (error) => {
+      toast.add({
+        title: 'Não foi possível criar o membro',
+        description: apiErrorMessage(error, 'Confira os dados e tente de novo.'),
+        type: 'error',
+      })
     },
   })
 
   const createTeam = useMutation({
     mutationFn: async ({ dto, memberIds }: { dto: Record<string, unknown>; memberIds: string[] }) => {
-      const team = await teamsService.create(dto)
-      await Promise.all(memberIds.map((id) => usersService.update(id, { teamId: team.id })))
+      const team: ApiTeam = await teamsService.create(dto)
+      // O coordenador já entra na equipe pelo backend
+      const addUserIds = memberIds.filter((id) => id !== dto.coordinatorId)
+      if (addUserIds.length > 0) await teamsService.updateMembers(team.id, { addUserIds })
       return team
     },
-    onSuccess: () => {
-      invalidateTeam()
-      toast.add({ title: 'Equipe criada com sucesso!', type: 'success' })
+    onSuccess: () => toast.add({ title: 'Equipe criada com sucesso!', type: 'success' }),
+    onError: (error) => {
+      toast.add({
+        title: 'Não foi possível criar a equipe',
+        description: apiErrorMessage(error, 'Tente de novo em instantes.'),
+        type: 'error',
+      })
     },
-    onError: () => {
-      toast.add({ title: 'Não foi possível criar a equipe', type: 'error' })
-    },
+    // Mesmo com erro nos membros a equipe pode ter sido criada
+    onSettled: () => invalidateTeamStructure(queryClient),
   })
 
   function handleCreateMember(data: NewMemberFormValues) {
-    createMember.mutate({
+    return createMember.mutateAsync({
       name: data.name,
       email: data.email,
-      password: data.password,
+      password: data.passwordMode === 'manual' ? data.password : undefined,
       phone: data.phone || undefined,
       creci: data.creci || undefined,
       role: data.role,
@@ -83,10 +120,14 @@ export default function EquipePage() {
   }
 
   function handleCreateTeam(data: NewTeamFormValues) {
-    createTeam.mutate({
-      dto: { name: data.name, coordinatorId: data.coordinatorId },
+    return createTeam.mutateAsync({
+      dto: { name: data.name, coordinatorId: data.coordinatorId || undefined },
       memberIds: data.memberIds,
     })
+  }
+
+  function manageTeam(team: TeamWithMetrics) {
+    setManagedTeamId(team.id)
   }
 
   return (
@@ -109,22 +150,26 @@ export default function EquipePage() {
             <Network className="h-4 w-4" />
             Ver hierarquia
           </button>
-          <button
-            type="button"
-            onClick={() => setIsNewTeamOpen(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-neutral-900 transition-colors hover:border-brand hover:text-brand"
-          >
-            <Plus className="h-4 w-4" />
-            Nova equipe
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsNewMemberOpen(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
-          >
-            <Plus className="h-4 w-4" />
-            Novo membro
-          </button>
+          {isManager && (
+            <button
+              type="button"
+              onClick={() => setIsNewTeamOpen(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-neutral-900 transition-colors hover:border-brand hover:text-brand"
+            >
+              <Plus className="h-4 w-4" />
+              Nova equipe
+            </button>
+          )}
+          {canCreateMember && (
+            <button
+              type="button"
+              onClick={() => setIsNewMemberOpen(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+            >
+              <Plus className="h-4 w-4" />
+              Novo membro
+            </button>
+          )}
         </div>
       </div>
 
@@ -144,7 +189,23 @@ export default function EquipePage() {
       ) : (
         <>
           <OverviewCards members={members} teams={teams} />
-          <TeamsSection teams={teams} members={members} />
+          <TeamsSection
+            teams={teams}
+            members={members}
+            canCreateTeam={isManager}
+            canChangeCoordinator={isManager}
+            canManageMembers={(teamId) => canManageTeamMembers(actor, teamId)}
+            onCreateTeam={() => setIsNewTeamOpen(true)}
+            onManageTeam={manageTeam}
+          />
+          {isManager && (
+            <NoTeamSection
+              members={withoutTeam}
+              teams={teams}
+              actorRole={actorRole}
+              onCreateTeam={() => setIsNewTeamOpen(true)}
+            />
+          )}
           <MembersSection members={members} teams={teams} filters={memberFilters} onFiltersChange={setMemberFilters} />
         </>
       )}
@@ -152,13 +213,29 @@ export default function EquipePage() {
       <NewMemberDialog
         open={isNewMemberOpen}
         onOpenChange={setIsNewMemberOpen}
-        teams={teams}
+        teams={memberTeams}
+        actorRole={actorRole}
+        requiredTeamId={isCoordinator ? actorTeamId : null}
         onCreate={handleCreateMember}
       />
 
-      <NewTeamDialog open={isNewTeamOpen} onOpenChange={setIsNewTeamOpen} members={members} onCreate={handleCreateTeam} />
+      <NewTeamDialog
+        open={isNewTeamOpen}
+        onOpenChange={setIsNewTeamOpen}
+        coordinators={availableCoordinators(members, teams, actorRole)}
+        withoutTeam={withoutTeam}
+        onCreate={handleCreateTeam}
+      />
 
-      <HierarchySheet open={isHierarchyOpen} onOpenChange={setIsHierarchyOpen} members={members} />
+      <TeamManageSheet
+        team={managedTeam}
+        onOpenChange={(open) => !open && setManagedTeamId(null)}
+        members={members}
+        teams={teams}
+        actorRole={actorRole}
+      />
+
+      <HierarchySheet open={isHierarchyOpen} onOpenChange={setIsHierarchyOpen} members={members} teams={teams} />
     </div>
   )
 }

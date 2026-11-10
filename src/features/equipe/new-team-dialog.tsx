@@ -11,13 +11,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { ROLE_META } from './constants'
 import { errorClassName, FormField, inputClassName, labelClassName } from './field'
 import { MemberMultiSelect } from './member-multi-select'
 import type { Member } from './types'
 
 const newTeamSchema = z.object({
   name: z.string().min(1, 'Informe o nome da equipe'),
-  coordinatorId: z.string().min(1, 'Selecione o coordenador'),
+  /** '' = definir depois */
+  coordinatorId: z.string(),
   description: z.string().optional(),
   memberIds: z.array(z.string()),
 })
@@ -31,24 +33,23 @@ const emptyDefaultValues: NewTeamFormValues = {
   memberIds: [],
 }
 
-// Mounted fresh via a `key` every time the dialog opens, so it always starts
-// with clean values without needing an effect to reset state.
+// Montado de novo (key) a cada abertura, então sempre começa limpo
 function NewTeamFormBody({
   coordinators,
-  availableBrokers,
+  withoutTeam,
   onCancel,
   onSubmit,
 }: {
   coordinators: Member[]
-  availableBrokers: Member[]
+  withoutTeam: Member[]
   onCancel: () => void
-  onSubmit: (data: NewTeamFormValues) => void
+  onSubmit: (data: NewTeamFormValues) => Promise<void>
 }) {
   const {
     register,
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<NewTeamFormValues>({
     resolver: zodResolver(newTeamSchema),
     defaultValues: emptyDefaultValues,
@@ -61,22 +62,16 @@ function NewTeamFormBody({
           <input id="new-team-name" className={inputClassName} {...register('name')} />
         </FormField>
 
-        <FormField label="Coordenador" htmlFor="new-team-coordinator" required error={errors.coordinatorId?.message}>
-          <select
-            id="new-team-coordinator"
-            defaultValue=""
-            className={inputClassName}
-            {...register('coordinatorId')}
-          >
-            <option value="" disabled>
-              Selecione o coordenador
-            </option>
+        <FormField label="Coordenador" htmlFor="new-team-coordinator" error={errors.coordinatorId?.message}>
+          <select id="new-team-coordinator" className={inputClassName} {...register('coordinatorId')}>
+            <option value="">Definir depois</option>
             {coordinators.map((coordinator) => (
               <option key={coordinator.id} value={coordinator.id}>
-                {coordinator.name}
+                {coordinator.name} · {ROLE_META[coordinator.role].label}
               </option>
             ))}
           </select>
+          <p className="mt-1.5 text-xs text-neutral-400">Você pode criar a equipe agora e definir o coordenador depois.</p>
         </FormField>
 
         <FormField label="Descrição" htmlFor="new-team-description">
@@ -85,7 +80,12 @@ function NewTeamFormBody({
 
         <div>
           <label className={labelClassName}>Membros iniciais</label>
-          <MemberMultiSelect control={control} name="memberIds" options={availableBrokers} />
+          <MemberMultiSelect
+            control={control}
+            name="memberIds"
+            options={withoutTeam}
+            emptyText="Ninguém sem equipe no momento."
+          />
           {errors.memberIds && <p className={errorClassName}>{errors.memberIds.message}</p>}
         </div>
       </form>
@@ -100,10 +100,11 @@ function NewTeamFormBody({
         </button>
         <button
           type="button"
+          disabled={isSubmitting}
           onClick={handleSubmit(onSubmit)}
-          className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+          className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
         >
-          Criar equipe
+          {isSubmitting ? 'Criando...' : 'Criar equipe'}
         </button>
       </DialogFooter>
     </>
@@ -113,35 +114,43 @@ function NewTeamFormBody({
 export function NewTeamDialog({
   open,
   onOpenChange,
-  members,
+  coordinators,
+  withoutTeam,
   onCreate,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
-  members: Member[]
-  onCreate: (data: NewTeamFormValues) => void
+  /** Coordenador ou superior que ainda não coordena outra equipe (availableCoordinators) */
+  coordinators: Member[]
+  /** Todos os usuários sem equipe */
+  withoutTeam: Member[]
+  /** Rejeita em caso de erro (o toast fica com quem chama) */
+  onCreate: (data: NewTeamFormValues) => Promise<unknown>
 }) {
-  const coordinators = members.filter((member) => member.role === 'coordenador')
-  const availableBrokers = members.filter((member) => member.role === 'corretor' && !member.teamId)
+  async function handleSubmit(data: NewTeamFormValues) {
+    try {
+      await onCreate(data)
+      onOpenChange(false)
+    } catch {
+      // Fica aberto para corrigir
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[90vh] w-[calc(100%-2rem)] max-w-md flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
         <DialogHeader className="shrink-0 gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
           <DialogTitle>Nova equipe</DialogTitle>
-          <DialogDescription>Crie uma nova equipe e defina o coordenador responsável.</DialogDescription>
+          <DialogDescription>Coordenador e membros podem ficar para depois.</DialogDescription>
         </DialogHeader>
 
         {open && (
           <NewTeamFormBody
             key="new-team"
             coordinators={coordinators}
-            availableBrokers={availableBrokers}
+            withoutTeam={withoutTeam}
             onCancel={() => onOpenChange(false)}
-            onSubmit={(data) => {
-              onCreate(data)
-              onOpenChange(false)
-            }}
+            onSubmit={handleSubmit}
           />
         )}
       </DialogContent>

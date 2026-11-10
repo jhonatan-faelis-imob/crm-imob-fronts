@@ -1,3 +1,4 @@
+import { isAxiosError } from 'axios'
 import type { Role } from '@/types'
 import type { Member, TeamWithMetrics } from './types'
 
@@ -50,4 +51,19 @@ export function mapApiTeamToTeam(apiTeam: ApiTeam): TeamWithMetrics {
     createdAt: apiTeam.createdAt,
     metrics: { vgvTarget: 0, vgvRealized: 0 },
   }
+}
+
+/** Resposta do POST /users: a senha gerada vem uma única vez */
+export interface CreatedUser extends ApiUser {
+  temporaryPassword?: string
+}
+
+/** Mensagem do backend (409 de coordenador, 403 de cargo) ou a padrão */
+export function apiErrorMessage(error: unknown, fallback: string): string {
+  if (isAxiosError(error)) {
+    const message: unknown = error.response?.data?.message
+    if (typeof message === 'string') return message
+    if (Array.isArray(message) && typeof message[0] === 'string') return message[0]
+  }
+  return fallback
 }

@@ -959,8 +959,8 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
   segue. **Trocar a INTEGRATIONS_ENC_KEY invalida os segredos guardados** (chave do Google e chaves próprias do Gemini).
   Nenhum segredo volta em resposta (só a máscara `••••a1b2`), nem vai para log ou evento (payload sanitizado: sem `google_key`,
   tokens e senhas, cortado em 8 KB).
-- **Webhook do Google Ads:** `POST /api/v1/public/integrations/google-ads/:publicToken` (`@Public()`, corpo até 100 KB pelo
-  `json({ limit })` do `main.ts`). Token desconhecido ou integração desligada: 404 (mesma resposta). `google_key` comparada em
+- **Webhook do Google Ads:** `POST /api/v1/public/integrations/google-ads/:publicToken` (`@Public()`; todas as rotas têm limite de 100 KB
+  para JSON, no `useBodyParser` global de `configureApp` em `app.setup.ts`. Nunca registrar `json()` num caminho só). Token desconhecido ou integração desligada: 404 (mesma resposta). `google_key` comparada em
   tempo constante (hash + `timingSafeEqual`); errada: 401 e evento erro. Sem `lead_id` ou `user_column_data`: 400. `is_test`:
   evento teste, 200 e nenhum lead. Sucesso, duplicado ou ignorado: 200 `{}`; erro inesperado: 500 (o Google reenvia).
   Colunas por `column_id`, sem diferenciar maiúsculas: `FULL_NAME` (ou `FIRST_NAME` + `LAST_NAME`), `EMAIL`, `PHONE_NUMBER`;
@@ -998,6 +998,55 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
 
 ---
 
+## Equipe e permissões — regras atuais
+
+- **Quem pode criar e editar quem:** uma função só, `canManageUser(actorRole, targetRole)`, no backend
+  (`src/modules/users/user-permissions.ts`) e espelhada no front (`src/features/equipe/permissions.ts`; os testes dos dois
+  lados cobrem as mesmas combinações). Vale no `POST /users`, no `PATCH /users/:id` (é preciso poder gerir o cargo atual e,
+  se o cargo mudar, também o novo) e no `PATCH /teams/:id/members`. Negado: 403 "Seu cargo não permite criar ou editar
+  usuários com cargo X". Editar o próprio nome, telefone ou CRECI não depende de cargo.
+
+  | Quem age | Pode criar e editar |
+  |---|---|
+  | diretor | todos, inclusive outro diretor |
+  | gerente | gerente, coordenador, corretor e administrativo |
+  | coordenador | corretor e administrativo (só na própria equipe) |
+  | corretor, administrativo | ninguém |
+
+- **Equipe é opcional:** `teamId` é opcional no create e no update, e `null` tira a pessoa da equipe. Equipe de outra
+  organização (ou desativada) dá 400. Coordenador só coloca gente na própria equipe (quem ele cria entra nela).
+- **Coordenador é opcional:** `coordinatorId` é opcional no `POST /teams` e no `PATCH /teams/:id` (gerente ou superior;
+  `UpdateTeamDto` é classe, não `Partial<>`), e `null` remove o coordenador. Para coordenar, a pessoa precisa ser da
+  organização e ter cargo coordenador, gerente ou diretor (senão 400 "Só coordenador ou superior pode coordenar uma equipe").
+  **Cada pessoa coordena uma equipe só:** se já coordena outra, 409 com o nome dela. Definir o coordenador também muda o
+  `teamId` dele para a equipe, na mesma transação; remover o coordenador não mexe no `teamId`. Rebaixar alguém para um cargo
+  que não coordena deixa a equipe sem coordenador. Mudar o `teamId` de quem coordena uma equipe dá 409 (troque o
+  coordenador antes). Regras compartilhadas em `src/modules/teams/team-rules.ts`.
+- **Membros:** `PATCH /teams/:id/members` `{ addUserIds?, removeUserIds? }` (coordenador ou superior), numa transação. Um
+  coordenador só mexe na própria equipe e não puxa gente de outra. Remover o coordenador da equipe: 409. Adicionar quem
+  coordena outra equipe: 409.
+- **Listagem:** `GET /users?teamId=<uuid|none>&role=<cargo>`. Coordenador vê só a própria equipe; com `teamId=none`, ninguém;
+  sem equipe, só a si mesmo. Gerente e diretor veem todos. Corretor e administrativo continuam vendo a organização (seletores
+  de responsável).
+- **Senha temporária:** `password` é opcional no `POST /users`. Sem ela, o backend gera uma (`randomBytes(12)` em base64url,
+  16 caracteres) e a devolve uma única vez em `temporaryPassword`. Ela nunca vai para o log. O front mostra a senha num bloco
+  destacado, com "Copiar" e o aviso "Anote agora: esta senha não será exibida de novo".
+- **Front (`/equipe`):**
+  - Nenhum campo depende de existir equipe ou coordenador.
+  - "Novo membro": o cargo traz só o que `manageableRoles` permite. A equipe começa em "Sem equipe (definir depois)"; para
+    coordenador, é fixa na própria equipe. A senha começa em "Gerar senha automaticamente".
+  - "Nova equipe": o coordenador começa em "Definir depois" e a lista vem de `availableCoordinators`. Os membros iniciais
+    são quem está sem equipe.
+  - Sem nenhuma equipe, aparece o EmptyState "Comece criando sua primeira equipe…".
+  - A seção "Sem equipe" é para gerente ou superior, com "Definir equipe" (ou "Criar equipe", se não houver nenhuma).
+  - O painel da equipe (`TeamManageSheet`, query `['team', id]`) define, troca ou remove o coordenador e adiciona ou remove
+    membros.
+  - A hierarquia vai de diretores a gerentes, depois equipes (pelo `coordinatorId`), membros e "Sem equipe".
+  - Depois de cada ação, `invalidateTeamStructure` invalida `['users']`, `['teams']` e `['team', id]`. Os erros
+    mostram a mensagem do backend (`apiErrorMessage`).
+
+---
+
 ## Deploy do backend (Railway) — regras atuais
 
 - **Produção roda sempre o JavaScript compilado: `node dist/main.js` (script `start`). Nunca `nest start`** em produção:
@@ -1021,8 +1070,7 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
 - [x] Setup Next.js — App Router, Tailwind v4, base-ui, RHF+Zod, react-imask (ver seção acima)
 - [ ] Auth (login + JWT + roles) — tela de login existe, mockada (sem JWT real)
 - [ ] Módulo de Organizations (onboarding)
-- [ ] Módulo de Users + Teams — backend pendente; **UI completa e mockada** em `/equipe`: equipes, membros,
-      hierarquia visual (Sheet), cadastro de membro/equipe
+- [x] Módulo de Users + Teams — ver "Equipe e permissões — regras atuais"
 - [ ] Módulo de Leads (CRUD + filtros) — backend pendente; **UI completa e mockada**: kanban, lista, filtros,
       cadastro em 4 abas com preponentes, urgência e tags, página de detalhe (`leads/[id]`) com timeline,
       tarefas e imóveis vinculados
