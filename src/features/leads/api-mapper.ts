@@ -29,6 +29,7 @@ export interface ApiLead {
   spouseIncome: string | number | null
   spouseCpf: string | null
   source: string
+  sourceDetail?: string | null
   intent: string
   propertyType: string | null
   interestValue: string | number | null
@@ -177,6 +178,7 @@ export function mapApiLeadToLead(lead: ApiLead): Lead {
     spouseIncome: toNumber(lead.spouseIncome),
     spouseCpf: lead.spouseCpf ?? undefined,
     source: lead.source as Lead['source'],
+    sourceDetail: lead.sourceDetail ?? undefined,
     intent: lead.intent as Lead['intent'],
     propertyType: (lead.propertyType ?? undefined) as Lead['propertyType'],
     interestValue: toNumber(lead.interestValue),

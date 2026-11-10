@@ -3,9 +3,11 @@
 import { Sparkles } from 'lucide-react'
 import { useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { leadsService } from '@/services/leads.service'
 import { toast } from '@/components/ui/toast'
+import { apiMessage } from '@/features/integracoes/constants'
 
 interface AiAnalysisResult {
   score: number
@@ -18,13 +20,18 @@ interface AiAnalysisResult {
 // and fires a new analysis without needing an effect to imperatively reset state.
 function AiAnalysisBody({ leadId }: { leadId: string }) {
   const queryClient = useQueryClient()
-  const { mutate, data, isPending, isError } = useMutation<AiAnalysisResult>({
+  const { mutate, data, isPending, isError, error } = useMutation<AiAnalysisResult>({
     mutationFn: () => leadsService.analyzeAI(leadId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['lead', leadId] })
     },
-    onError: () => {
-      toast.add({ title: 'Não foi possível analisar o lead com IA', type: 'error' })
+    onError: (mutationError) => {
+      // 403 = recurso desligado pelo gestor em Configurações → Integrações
+      const disabled = isAxiosError(mutationError) && mutationError.response?.status === 403
+      toast.add({
+        title: disabled ? apiMessage(mutationError, 'Recurso de IA desativado pelo gestor') : 'Não foi possível analisar o lead com IA',
+        type: 'error',
+      })
     },
   })
 
@@ -34,11 +41,16 @@ function AiAnalysisBody({ leadId }: { leadId: string }) {
   }, [])
 
   if (isError) {
+    const disabled = isAxiosError(error) && error.response?.status === 403
     return (
       <div className="flex flex-col items-center gap-2 py-8 text-center">
-        <p className="text-sm font-medium text-neutral-900">Não foi possível concluir a análise.</p>
+        <p className="text-sm font-medium text-neutral-900">
+          {disabled ? apiMessage(error, 'Recurso de IA desativado pelo gestor') : 'Não foi possível concluir a análise.'}
+        </p>
         <p className="text-xs text-neutral-400">
-          Verifique se a integração com o Gemini está configurada no backend.
+          {disabled
+            ? 'O gestor pode religar em Configurações → Integrações.'
+            : 'Verifique se a integração com o Gemini está configurada no backend.'}
         </p>
       </div>
     )

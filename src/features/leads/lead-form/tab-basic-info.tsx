@@ -1,9 +1,10 @@
 import { Clock, DollarSign, Mail, Phone } from 'lucide-react'
 import { useFormContext } from 'react-hook-form'
-import type { LeadInterest, LeadSource, MaritalStatus } from '@/types'
+import type { LeadInterest, MaritalStatus } from '@/types'
 import { PROPERTY_TYPE_META, PROPERTY_TYPES } from '@/features/empreendimentos/constants'
 import { ROLE_LABELS } from '@/lib/utils'
-import { INTEREST_META, SOURCE_META } from '../constants'
+import { INTEREST_META } from '../constants'
+import { LEAD_SOURCE_VALUES, leadSourceMeta } from '../sources'
 import { FieldGrid, FormField, IconInputWrapper, inputClassName, inputWithIconClassName } from './field'
 import { MaskedInput } from './masked-input'
 import { cpfMask, currencyMask, phoneMask } from './masks'
@@ -11,7 +12,7 @@ import { LEAD_URGENCIES, LEAD_URGENCY_META, MARITAL_STATUS_META, PERSON_TYPE_MET
 import { TagsInput } from './tags-input'
 import type { LeadFormValues } from './schema'
 
-const SOURCE_VALUES = Object.keys(SOURCE_META) as LeadSource[]
+const SOURCE_VALUES = LEAD_SOURCE_VALUES
 const INTEREST_VALUES = Object.keys(INTEREST_META) as LeadInterest[]
 const MARITAL_STATUS_VALUES = Object.keys(MARITAL_STATUS_META) as MaritalStatus[]
 
@@ -54,7 +55,7 @@ export function TabBasicInfo({ brokers }: { brokers: BrokerOption[] }) {
             </option>
             {SOURCE_VALUES.map((value) => (
               <option key={value} value={value}>
-                {SOURCE_META[value].label}
+                {leadSourceMeta(value).label}
               </option>
             ))}
           </select>

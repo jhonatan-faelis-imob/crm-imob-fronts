@@ -4,14 +4,12 @@ import { PieChart as PieChartIcon } from 'lucide-react'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, type TooltipContentProps } from 'recharts'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { LeadSource } from '@/types'
-import { LEAD_SOURCE_META } from './constants'
+import { leadSourceMeta } from '@/features/leads/sources'
 import type { SourceDistributionEntry } from './types'
 
-const FALLBACK_META = { label: 'Outro', color: '#DDDDDD' }
-
+// Origem nova ou desconhecida aparece com o próprio nome, nunca quebra o gráfico
 function sourceMeta(source: string) {
-  return LEAD_SOURCE_META[source as LeadSource] ?? FALLBACK_META
+  return leadSourceMeta(source)
 }
 
 function SourceTooltip({ active, payload }: TooltipContentProps) {

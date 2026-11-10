@@ -1,6 +1,7 @@
 import { Search, X } from 'lucide-react'
 import type { LeadSource, LeadStatus } from '@/types'
-import { SOURCE_META, STATUS_META, STATUS_ORDER, STATUS_TERMINAL_ORDER } from './constants'
+import { LEAD_SOURCES } from './sources'
+import { STATUS_META, STATUS_ORDER, STATUS_TERMINAL_ORDER } from './constants'
 
 export interface LeadFilters {
   search: string
@@ -72,9 +73,9 @@ export function FiltersBar({
         className={selectClassName}
       >
         <option value="todos">Todas as origens</option>
-        {(Object.keys(SOURCE_META) as LeadSource[]).map((source) => (
+        {LEAD_SOURCES.map(({ value: source, label }) => (
           <option key={source} value={source}>
-            {SOURCE_META[source].label}
+            {label}
           </option>
         ))}
       </select>

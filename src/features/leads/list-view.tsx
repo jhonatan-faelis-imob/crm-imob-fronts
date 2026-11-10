@@ -7,7 +7,7 @@ import { DocsChip } from '@/features/documentos/components/docs-chip'
 import { daysSince, formatCurrency } from '@/lib/utils'
 import type { Lead } from '@/types'
 import { funnelStagesService } from '@/services/funnel-stages.service'
-import { SOURCE_META } from './constants'
+import { leadSourceMeta } from './sources'
 import { resolveLeadStage, type ApiFunnelStage } from './api-mapper'
 import { useMoveLeadToStage } from './use-move-lead-to-stage'
 import { StagePopover } from './components/stage-popover'
@@ -41,7 +41,7 @@ export function LeadsListView({ leads }: { leads: Lead[] }) {
         </thead>
         <tbody>
           {leads.map((lead, index) => {
-            const source = SOURCE_META[lead.source]
+            const source = leadSourceMeta(lead.source)
             const currentStage = resolveLeadStage(lead, stages ?? [])
             return (
               <tr

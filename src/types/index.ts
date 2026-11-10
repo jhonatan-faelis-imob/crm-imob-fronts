@@ -19,6 +19,12 @@ export type LeadSource =
   | 'site'
   | 'plantao'
   | 'portais'
+  | 'google_ads'
+  | 'meta_ads'
+  | 'zap_imoveis'
+  | 'vivareal'
+  | 'olx'
+  | 'chaves_na_mao'
   | 'outro'
 
 export type LeadInterest = 'compra' | 'venda' | 'locacao'
@@ -145,6 +151,8 @@ export interface Lead {
   spouseIncome?: number
   spouseCpf?: string
   source: LeadSource
+  // Detalhe da origem quando o lead veio de uma integração (ex.: campanha e formulário do Google Ads)
+  sourceDetail?: string
   intent: LeadInterest
   propertyType?: PropertyType
   interestValue?: number

@@ -1,14 +1,6 @@
-import {
-  Camera,
-  ThumbsUp,
-  Handshake,
-  Globe,
-  MapPin,
-  LayoutGrid,
-  MoreHorizontal,
-  type LucideIcon,
-} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import type { LeadInterest, LeadSource, LeadStatus } from '@/types'
+import { LEAD_SOURCES } from './sources'
 
 export const STATUS_ORDER: LeadStatus[] = [
   'novo',
@@ -32,15 +24,10 @@ export const STATUS_META: Record<LeadStatus, { label: string; bg: string; text: 
   perdido: { label: 'Perdido', bg: '#FFEBEE', text: '#D93B30' },
 }
 
-export const SOURCE_META: Record<LeadSource, { label: string; icon: LucideIcon }> = {
-  instagram: { label: 'Instagram', icon: Camera },
-  facebook: { label: 'Facebook', icon: ThumbsUp },
-  indicacao: { label: 'Indicação', icon: Handshake },
-  site: { label: 'Site', icon: Globe },
-  plantao: { label: 'Plantão', icon: MapPin },
-  portais: { label: 'Portais', icon: LayoutGrid },
-  outro: { label: 'Outro', icon: MoreHorizontal },
-}
+// Derivado da lista única de origens (sources.ts)
+export const SOURCE_META = Object.fromEntries(
+  LEAD_SOURCES.map(({ value, label, icon }) => [value, { label, icon }]),
+) as Record<LeadSource, { label: string; icon: LucideIcon }>
 
 export const INTEREST_META: Record<LeadInterest, string> = {
   compra: 'Compra',

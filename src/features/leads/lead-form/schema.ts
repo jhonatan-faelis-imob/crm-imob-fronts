@@ -1,8 +1,9 @@
 import { z } from 'zod'
 import type { DefaultValues } from 'react-hook-form'
-import type { LeadInterest, LeadSource, MaritalStatus } from '@/types'
+import type { LeadInterest, MaritalStatus } from '@/types'
 import { PROPERTY_TYPES } from '@/features/empreendimentos/constants'
-import { SOURCE_META, INTEREST_META } from '../constants'
+import { INTEREST_META } from '../constants'
+import { LEAD_SOURCE_VALUES } from '../sources'
 import {
   EDUCATION_LEVELS,
   GENDERS,
@@ -12,7 +13,7 @@ import {
   PREPONENT_RELATIONS,
 } from './options'
 
-const SOURCE_VALUES = Object.keys(SOURCE_META) as [LeadSource, ...LeadSource[]]
+const SOURCE_VALUES = LEAD_SOURCE_VALUES
 const INTEREST_VALUES = Object.keys(INTEREST_META) as [LeadInterest, ...LeadInterest[]]
 const MARITAL_STATUS_VALUES = Object.keys(MARITAL_STATUS_META) as [MaritalStatus, ...MaritalStatus[]]
 

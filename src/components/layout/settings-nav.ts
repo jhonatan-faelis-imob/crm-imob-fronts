@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { FileCheck, MessageSquareText, UsersRound, Workflow, type LucideIcon } from 'lucide-react'
+import { FileCheck, MessageSquareText, Plug, UsersRound, Workflow, type LucideIcon } from 'lucide-react'
 import { canManageCadences } from '@/features/cadencias/constants'
 import { canManageDocuments } from '@/features/documentos/constants'
+import { canManageIntegrations } from '@/features/integracoes/constants'
 
 export interface SettingsNavItem {
   href: string
@@ -18,6 +19,7 @@ export const SETTINGS_NAV_ITEMS: SettingsNavItem[] = [
   { href: '/equipe', label: 'Equipe', icon: UsersRound },
   { href: '/cadencias', label: 'Cadências', icon: Workflow, canSee: (role) => canManageCadences({ role }) },
   { href: '/documentos', label: 'Documentos', icon: FileCheck, canSee: (role) => canManageDocuments({ role }) },
+  { href: '/integracoes', label: 'Integrações', icon: Plug, canSee: (role) => canManageIntegrations({ role }) },
 ]
 
 export function isNavItemActive(pathname: string, href: string) {

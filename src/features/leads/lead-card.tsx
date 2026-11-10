@@ -15,7 +15,7 @@ import { daysSince, formatCurrency, getInitials } from '@/lib/utils'
 import type { Lead } from '@/types'
 import { WhatsAppPickerDialog } from '@/features/mensagens/components/whatsapp-button'
 import { funnelStagesService } from '@/services/funnel-stages.service'
-import { SOURCE_META } from './constants'
+import { leadSourceMeta } from './sources'
 import { LEAD_URGENCY_META } from './lead-form/options'
 import { resolveLeadStage, type ApiFunnelStage } from './api-mapper'
 import { DocsChip } from '@/features/documentos/components/docs-chip'
@@ -35,7 +35,7 @@ export function LeadCard({ lead }: { lead: Lead }) {
     queryFn: funnelStagesService.findAll,
   })
 
-  const source = SOURCE_META[lead.source]
+  const source = leadSourceMeta(lead.source)
   const SourceIcon = source.icon
   const days = daysSince(lead.lastContactAt ?? lead.createdAt)
   const isStale = days > 2

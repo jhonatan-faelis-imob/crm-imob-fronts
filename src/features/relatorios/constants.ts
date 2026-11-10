@@ -1,3 +1,4 @@
+import { LEAD_SOURCES } from '@/features/leads/sources'
 import type { LeadSource, SaleStatus } from '@/types'
 
 export const SALE_STATUS_META: Record<SaleStatus, { label: string; bg: string; text: string }> = {
@@ -8,16 +9,9 @@ export const SALE_STATUS_META: Record<SaleStatus, { label: string; bg: string; t
   cancelado: { label: 'Cancelado', bg: '#FFEBEE', text: '#D93B30' },
 }
 
-export const REPORT_LEAD_SOURCES: LeadSource[] = ['instagram', 'facebook', 'indicacao', 'site', 'plantao', 'portais']
-
-export const LEAD_SOURCE_META: Record<LeadSource, { label: string; color: string }> = {
-  instagram: { label: 'Instagram', color: '#E1306C' },
-  facebook: { label: 'Facebook', color: '#0070F3' },
-  indicacao: { label: 'Indicação', color: '#008A05' },
-  site: { label: 'Site', color: '#7C3AED' },
-  plantao: { label: 'Plantão', color: '#C45800' },
-  portais: { label: 'Portais', color: '#767676' },
-  outro: { label: 'Outro', color: '#DDDDDD' },
-}
+// Rótulos e cores vêm da lista única de origens (features/leads/sources.ts)
+export const LEAD_SOURCE_META = Object.fromEntries(
+  LEAD_SOURCES.map(({ value, label, color }) => [value, { label, color }]),
+) as Record<LeadSource, { label: string; color: string }>
 
 export const TEAM_CHART_COLORS = ['#FF385C', '#0070F3', '#008A05', '#7C3AED', '#C45800']

@@ -406,7 +406,10 @@ DATABASE_URL=              # Neon PostgreSQL
 REDIS_URL=                 # Upstash Redis
 JWT_SECRET=
 FRONTEND_URL=              # Origem do frontend em produção, liberada no CORS
-GEMINI_API_KEY=
+GEMINI_API_KEY=            # Chave do sistema (vale quando a organização não usa chave própria)
+GEMINI_MODEL=              # Opcional. Padrão do código: gemini-1.5-flash (descontinuado pelo Google: definir um atual)
+INTEGRATIONS_ENC_KEY=      # 32 bytes em base64: node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+API_PUBLIC_URL=            # Endereço público do backend, com https:// e sem barra no final (URL do webhook do Google Ads)
 RESEND_API_KEY=
 ONESIGNAL_APP_ID=
 ONESIGNAL_API_KEY=
@@ -492,9 +495,10 @@ src/
   | Equipe | `/equipe` | todos (mesma regra de antes) |
   | Cadências | `/cadencias` | gerente ou superior (`canManageCadences`) |
   | Documentos | `/documentos` | gerente ou superior (`canManageDocuments`) |
+  | Integrações | `/integracoes` | gerente ou superior (`canManageIntegrations`, ícone Plug) |
 
 - Sem nenhum subitem visível, o grupo some. O grupo fica destacado e abre sozinho em `/mensagens`, `/equipe` e `/cadencias`
-  (`useSettingsGroup`), e também em `/documentos`; fora delas começa recolhido. As três páginas mostram "Configurações" em muted acima do título.
+  (`useSettingsGroup`), e também em `/documentos` e `/integracoes`; fora delas começa recolhido. As três páginas mostram "Configurações" em muted acima do título.
 - **Hidratação:** a primeira renderização usa a lista completa e estática; o filtro por cargo (e o nome do usuário no rodapé
   do Sidebar) só entra depois de `useHydrated()`. O lint (react-hooks 7) não aceita `setState` em `useEffect`, por isso o
   "mounted" é o `useHydrated`.
@@ -918,6 +922,65 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
   e com hash no nome. O precache do build não tem HTML. O `start_url` do manifesto (`/?source=pwa`) não mudou.
 - **Atenção:** os `urlPattern` em regex começando com `^\/` (rotas protegidas e `auth-pages`) nunca casam, porque o
   Workbox compara com a URL completa. Elas ficam sem efeito; quem garante que HTML não entra em cache é a regra de navegação.
+
+---
+
+## Integrações — regras atuais
+
+- **Tela:** `/integracoes` (Configurações → Integrações), só gerente ou superior (front e API: `@Roles('gerente')`; corretor
+  recebe 403). Cartões em três grupos (Portais imobiliários, Redes sociais e anúncios, Inteligência artificial), ícones do
+  lucide-react (nunca logotipos de marcas), selo de status: Desativada (cinza), Aguardando (âmbar), Ativa (verde), Erro
+  (vermelho), Em breve (azul). Painéis em Sheet lateral no desktop e tela cheia no celular. A query `['integrations']` é
+  invalidada depois de qualquer ação; quando chega lead novo na atividade, também leads, Meu dia e tarefas.
+- **Backend:** `src/modules/integrations/` (`IntegrationsModule`). `core/` (`IntegrationsCoreModule`: `SecretsService` e
+  `IntegrationEventsService`) fica separado para o `AiModule` usar sem dependência circular. Tabelas `integrations` (uma linha
+  por organização e provedor: `google_ads | ai | grupo_olx | chaves_na_mao | meta`) e `integration_events`.
+- **Status calculado:** desativada; aguardando (ligada, sem nenhum evento); erro (`lastError` preenchido: um evento `erro` grava,
+  um `ok`/`teste` depois limpa); ativa. A IA ligada é sempre ativa (não recebe nada de fora). Eventos de auditoria (ativação,
+  chave consultada, chave nova) são gravados com `touch: false` e não mexem no status. Eventos com mais de 45 dias são apagados
+  (no máximo 1x por hora por organização). `GET /integrations/:provider/events` devolve só o resumo, sem o payload.
+- **Cofre de segredos (`SecretsService`):** AES-256-GCM com `INTEGRATIONS_ENC_KEY` (32 bytes em base64), formato
+  `v1:<iv>:<tag>:<texto>` em base64. Os segredos de uma integração ficam num JSON cifrado só (`secretsEnc`). Sem a variável
+  (ou com tamanho errado), só a operação que usa o cofre falha, com "INTEGRATIONS_ENC_KEY não configurada"; o resto do sistema
+  segue. **Trocar a INTEGRATIONS_ENC_KEY invalida os segredos guardados** (chave do Google e chaves próprias do Gemini).
+  Nenhum segredo volta em resposta (só a máscara `••••a1b2`), nem vai para log ou evento (payload sanitizado: sem `google_key`,
+  tokens e senhas, cortado em 8 KB).
+- **Webhook do Google Ads:** `POST /api/v1/public/integrations/google-ads/:publicToken` (`@Public()`, corpo até 100 KB pelo
+  `json({ limit })` do `main.ts`). Token desconhecido ou integração desligada: 404 (mesma resposta). `google_key` comparada em
+  tempo constante (hash + `timingSafeEqual`); errada: 401 e evento erro. Sem `lead_id` ou `user_column_data`: 400. `is_test`:
+  evento teste, 200 e nenhum lead. Sucesso, duplicado ou ignorado: 200 `{}`; erro inesperado: 500 (o Google reenvia).
+  Colunas por `column_id`, sem diferenciar maiúsculas: `FULL_NAME` (ou `FIRST_NAME` + `LAST_NAME`), `EMAIL`, `PHONE_NUMBER`;
+  as outras (inclusive perguntas personalizadas) viram "Pergunta: resposta" nas observações. `sourceDetail` =
+  "Google Ads · campanha X · formulário Y". O `publicToken` (base64url) e a chave (hex, no cofre) nascem só na primeira
+  ativação; desativar mantém os dois; "Gerar nova chave" invalida a anterior na hora. `GET .../secret` é a única rota que devolve
+  a chave completa e grava "Chave consultada por [usuário]". Sem `API_PUBLIC_URL`, a ativação devolve erro claro.
+- **Entrada de leads (`LeadIntakeService.ingest`)**, reaproveitável por portais e Meta: o mesmo `externalLeadId` não cria nada
+  (evento ignorado; quando o primeiro envio caiu num lead já existente, o reenvio é reconhecido pelo `payload.externalLeadId`
+  do evento). Sem telefone válido e sem e-mail: evento ignorado e 200. Lead novo: primeira etapa do funil (menor `orderIndex`),
+  status novo, histórico de etapa e cadência como no cadastro manual, tarefa "Primeiro contato: [nome] ([fonte])" (alta, em
+  `firstContactMinutes`, padrão 15, se `createFirstContactTask`, padrão ligado). Distribuição: `assignment.userIds` (usuários
+  ativos da organização); recebe quem ganhou menos leads de integração (`externalLeadId` preenchido) nas últimas 24 h, empate
+  para quem recebeu há mais tempo; sem lista, o `createdBy` da integração, depois um gestor ativo.
+- **Lead de integração não atualiza o `lastContactAt`:** se o telefone já existe, não cria lead: grava uma Interaction do tipo
+  `outro` ("Novo contato recebido via [fonte]: ...", direto no Prisma, sem o `InteractionsService`) e a tarefa "Responder novo
+  contato de [nome] ([fonte])" para o responsável, alta, em 15 minutos. Quem fez contato foi o cliente, não o corretor.
+- **Telefone (função compartilhada, `src/common/utils/phone.ts`):** `normalizePhone` (só dígitos, tira o 55 quando sobram 12 ou
+  13, aceita 10 ou 11), `formatPhone` ((DD) 9XXXX-XXXX) e `findLeadByPhone(db, organizationId, digits)` (candidatos por
+  `contains` nos 8 últimos dígitos, também com o hífen da máscara no meio, em `phone` e `phone2`; confere em memória pelos
+  dígitos completos). O cadastro manual de lead usa a mesma função: acha telefone salvo com ou sem máscara.
+- **Origens de lead:** lista única `LEAD_SOURCES` no backend (`src/modules/leads/lead-sources.ts`, usada no `@IsIn` do DTO) e
+  espelho no front (`src/features/leads/sources.ts`, com ícone e cor), lido por formulário, filtros, cartão, lista, detalhe e
+  gráfico de Relatórios. Novas: google_ads, meta_ads, zap_imoveis, vivareal, olx, chaves_na_mao. Origem desconhecida aparece com
+  o próprio nome (`leadSourceMeta`), nunca quebra a tela. O detalhe do lead mostra o `sourceDetail` abaixo da origem.
+- **IA (provider `ai`):** config `{ enabled, useOwnKey, features: { leadScore, propertyCopy } }` e a chave própria do Gemini no
+  cofre. Sem registro: tudo ligado com a chave do sistema. O `AiService` lê a configuração antes de analisar lead ou gerar texto
+  de imóvel: recurso desligado = 403 "Recurso de IA desativado pelo gestor". Modelo em `GEMINI_MODEL` (padrão do código:
+  gemini-1.5-flash). `POST /integrations/ai/test` faz uma chamada mínima e devolve o erro do provedor resumido, sem a chave.
+- **Em breve (sem lógica):** ZAP Imóveis, VivaReal e OLX (`grupo_olx`), Chaves na Mão e Facebook e Instagram (`meta`): o painel só
+  mostra a descrição e os requisitos.
+- **Decisão para a etapa dos feeds (`portalListingId`):** cada imóvel recebe o id do anúncio nos portais na primeira publicação,
+  e ele **nunca muda** depois (trocar o id faz o portal tratar como anúncio novo e perder o histórico). Em caso de colisão,
+  acrescenta-se um sufixo. A coluna ainda não existe: entra na migration dos feeds.
 
 ---
 

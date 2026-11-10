@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { formatCurrency, getInitials } from '@/lib/utils'
 import { whatsappUrl } from '@/lib/whatsapp'
 import type { Lead, Task, TaskType } from '@/types'
-import { SOURCE_META } from '../../constants'
+import { leadSourceMeta } from '../../sources'
 import { formatDateBR, formatDateTimeBR } from './format'
 
 const PROFILE_LABEL: Record<Lead['profile'], string> = {
@@ -54,7 +54,7 @@ function ScoreRing({ score }: { score: number }) {
 }
 
 export function SummaryCard({ lead, onAnalyze }: { lead: Lead; onAnalyze: () => void }) {
-  const source = SOURCE_META[lead.source]
+  const source = leadSourceMeta(lead.source)
   const SourceIcon = source.icon
   const whatsappHref = whatsappUrl(lead.phone)
 
@@ -110,9 +110,14 @@ export function SummaryCard({ lead, onAnalyze }: { lead: Lead; onAnalyze: () => 
             <span className="truncate">{lead.email}</span>
           </div>
         )}
-        <div className="flex items-center gap-2 text-neutral-600">
-          <SourceIcon className="h-4 w-4 shrink-0 text-neutral-400" />
-          {source.label}
+        <div className="flex items-start gap-2 text-neutral-600">
+          <SourceIcon className="mt-0.5 h-4 w-4 shrink-0 text-neutral-400" />
+          <span className="min-w-0">
+            {source.label}
+            {lead.sourceDetail && (
+              <span className="block break-words text-xs text-neutral-400">{lead.sourceDetail}</span>
+            )}
+          </span>
         </div>
         <div className="flex items-center gap-2 text-neutral-600">
           <Calendar className="h-4 w-4 shrink-0 text-neutral-400" />
