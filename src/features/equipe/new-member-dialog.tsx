@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dialog'
 import { toast } from '@/components/ui/toast'
 import type { Role } from '@/types'
-import type { CreatedUser } from './api'
+import { apiErrorMessage, memberErrorField, type CreatedUser } from './api'
 import { ROLE_META, ROLES } from './constants'
 import { FieldGrid, FormField, inputClassName, labelClassName } from './field'
 import { MaskedInput } from './masked-input'
@@ -28,7 +28,7 @@ const ROLE_VALUES = ROLES as [Role, ...Role[]]
 const newMemberSchema = z
   .object({
     name: z.string().min(1, 'Informe o nome completo'),
-    email: z.string().min(1, 'Informe o email').email('Email inválido'),
+    email: z.string().trim().min(1, 'Informe o email').email('Email inválido'),
     phone: z.string().optional(),
     cpf: z.string().optional(),
     creci: z.string().optional(),
@@ -38,8 +38,8 @@ const newMemberSchema = z
     password: z.string(),
     confirmPassword: z.string(),
   })
-  .refine((data) => data.passwordMode === 'auto' || data.password.length >= 6, {
-    message: 'Mínimo de 6 caracteres',
+  .refine((data) => data.passwordMode === 'auto' || data.password.length >= 8, {
+    message: 'Mínimo de 8 caracteres',
     path: ['password'],
   })
   .refine((data) => data.passwordMode === 'auto' || data.password === data.confirmPassword, {
@@ -133,6 +133,7 @@ function NewMemberFormBody({
     register,
     control,
     setValue,
+    setError,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<NewMemberFormValues>({
@@ -152,9 +153,19 @@ function NewMemberFormBody({
   })
   const passwordMode = useWatch({ control, name: 'passwordMode' })
 
+  // Erro da API: mantém o modal aberto e mostra a mensagem no campo a que ela se refere
+  async function submit(data: NewMemberFormValues) {
+    try {
+      await onSubmit(data)
+    } catch (error) {
+      const message = apiErrorMessage(error, 'Não foi possível criar o membro. Tente de novo.')
+      setError(memberErrorField(message), { message })
+    }
+  }
+
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
+      <form onSubmit={handleSubmit(submit)} noValidate className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
         <PhotoPicker />
 
         <FormField label="Nome completo" htmlFor="new-member-name" required error={errors.name?.message}>
@@ -241,13 +252,19 @@ function NewMemberFormBody({
             </FormField>
           </FieldGrid>
         )}
+
+        {errors.root?.message && (
+          <p role="alert" className="rounded-[12px] bg-danger/10 px-3 py-2 text-sm text-danger">
+            {errors.root.message}
+          </p>
+        )}
       </form>
 
       <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
         <button type="button" onClick={onCancel} className={secondaryButton}>
           Cancelar
         </button>
-        <button type="button" disabled={isSubmitting} onClick={handleSubmit(onSubmit)} className={primaryButton}>
+        <button type="button" disabled={isSubmitting} onClick={handleSubmit(submit)} className={primaryButton}>
           {isSubmitting ? 'Criando...' : 'Criar membro'}
         </button>
       </DialogFooter>
@@ -320,7 +337,7 @@ export function NewMemberDialog({
   actorRole: Role | undefined
   /** Coordenador: a pessoa entra obrigatoriamente na equipe dele */
   requiredTeamId: string | null
-  /** Rejeita em caso de erro (o toast fica com quem chama) */
+  /** Rejeita em caso de erro: o formulário mostra a mensagem no campo certo */
   onCreate: (data: NewMemberFormValues) => Promise<CreatedUser>
 }) {
   const [created, setCreated] = useState<(CreatedUser & { temporaryPassword: string }) | null>(null)
@@ -331,13 +348,10 @@ export function NewMemberDialog({
   }
 
   async function handleSubmit(data: NewMemberFormValues) {
-    try {
-      const user = await onCreate(data)
-      if (user.temporaryPassword) setCreated({ ...user, temporaryPassword: user.temporaryPassword })
-      else handleOpenChange(false)
-    } catch {
-      // Fica aberto para corrigir; o erro já apareceu no toast
-    }
+    // Só fecha (ou mostra a senha) com 2xx; o erro sobe para o formulário
+    const user = await onCreate(data)
+    if (user.temporaryPassword) setCreated({ ...user, temporaryPassword: user.temporaryPassword })
+    else handleOpenChange(false)
   }
 
   return (

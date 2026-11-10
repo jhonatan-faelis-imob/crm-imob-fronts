@@ -78,13 +78,7 @@ export default function EquipePage() {
       invalidateTeamStructure(queryClient, created.teamId ?? undefined)
       toast.add({ title: 'Membro criado com sucesso!', type: 'success' })
     },
-    onError: (error) => {
-      toast.add({
-        title: 'Não foi possível criar o membro',
-        description: apiErrorMessage(error, 'Confira os dados e tente de novo.'),
-        type: 'error',
-      })
-    },
+    // Erro: o modal fica aberto e mostra a mensagem no campo certo
   })
 
   const createTeam = useMutation({

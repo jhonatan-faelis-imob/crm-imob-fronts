@@ -57,7 +57,7 @@ const withPWAConfig = withPWA({
     },
     // Rotas protegidas e o link público /i/ — NUNCA cachear páginas HTML
     {
-      urlPattern: /^\/(dashboard|leads|tarefas|metas|equipe|empreendimentos|relatorios|cadencias|documentos|integracoes|simulador|i)(\/.*)?$/i,
+      urlPattern: /^\/(dashboard|meu-dia|leads|tarefas|metas|equipe|empreendimentos|relatorios|cadencias|documentos|integracoes|mensagens|simulador|perfil|i)(\/.*)?$/i,
       handler: 'NetworkOnly',
     },
     // Rota raiz e login — NetworkFirst com fallback

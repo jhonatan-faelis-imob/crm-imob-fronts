@@ -67,3 +67,17 @@ export function apiErrorMessage(error: unknown, fallback: string): string {
   }
   return fallback
 }
+
+export type MemberErrorField = 'email' | 'password' | 'role' | 'teamId' | 'phone' | 'name' | 'root'
+
+/** Em qual campo do "Novo membro" mostrar a mensagem do backend */
+export function memberErrorField(message: string): MemberErrorField {
+  const text = message.toLowerCase()
+  if (text.includes('email') || text.includes('e-mail')) return 'email'
+  if (text.includes('senha') || text.includes('password')) return 'password'
+  if (text.includes('cargo') || text.includes('role')) return 'role'
+  if (text.includes('equipe') || text.includes('team')) return 'teamId'
+  if (text.includes('telefone') || text.includes('phone')) return 'phone'
+  if (text.includes('nome') || text.includes('name')) return 'name'
+  return 'root'
+}

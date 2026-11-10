@@ -140,6 +140,7 @@ app/
       │   ├── page.tsx
       │   └── [id]/page.tsx
       ├── equipe/page.tsx           → Gestão da equipe
+      ├── perfil/page.tsx           → Meu perfil (dados e troca de senha)
       ├── metas/
       │   ├── page.tsx              → Visão geral das metas
       │   └── [id]/page.tsx         → Detalhe + funil diário
@@ -1030,7 +1031,14 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
   de responsável).
 - **Senha temporária:** `password` é opcional no `POST /users`. Sem ela, o backend gera uma (`randomBytes(12)` em base64url,
   16 caracteres) e a devolve uma única vez em `temporaryPassword`. Ela nunca vai para o log. O front mostra a senha num bloco
-  destacado, com "Copiar" e o aviso "Anote agora: esta senha não será exibida de novo".
+  destacado, com "Copiar" e o aviso "Anote agora: esta senha não será exibida de novo". Senha informada: mínimo de 8
+  caracteres (criar e `PATCH /users/:id/reset-password`).
+- **Redefinir senha de outra pessoa:** `PATCH /users/:id/reset-password` `{ password }` (DTO, gerente ou superior, e
+  `canManageUser` sobre o cargo da pessoa: gerente não redefine a senha de diretor). Encerra as sessões dessa pessoa.
+- **Mudar de equipe não encerra sessões:** definir coordenador e `PATCH /teams/:id/members` usam
+  `setTeamKeepingSessions` (`team-rules.ts`), que grava o `teamId` mantendo o `updatedAt` (uma atualização por pessoa,
+  transação com timeout de 20 s). Já o `PATCH /users/:id` (cargo, ativo, equipe pelo gestor) muda o `updatedAt` e derruba
+  as sessões da pessoa, de propósito.
 - **Front (`/equipe`):**
   - Nenhum campo depende de existir equipe ou coordenador.
   - "Novo membro": o cargo traz só o que `manageableRoles` permite. A equipe começa em "Sem equipe (definir depois)"; para
@@ -1042,8 +1050,49 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
   - O painel da equipe (`TeamManageSheet`, query `['team', id]`) define, troca ou remove o coordenador e adiciona ou remove
     membros.
   - A hierarquia vai de diretores a gerentes, depois equipes (pelo `coordinatorId`), membros e "Sem equipe".
-  - Depois de cada ação, `invalidateTeamStructure` invalida `['users']`, `['teams']` e `['team', id]`. Os erros
-    mostram a mensagem do backend (`apiErrorMessage`).
+  - Depois de cada ação, `invalidateTeamStructure` invalida `['users']`, `['teams']`, `['me']` e `['team', id]`. Os
+    erros mostram a mensagem do backend (`apiErrorMessage`). No "Novo membro", o erro da API aparece no campo a que se
+    refere (`memberErrorField`) e o modal só fecha com 2xx.
+
+---
+
+## Perfil, senha e sessão — regras atuais
+
+- **E-mail normalizado:** minúsculas e sem espaços nas pontas no cadastro (`POST /users` e criação da organização) e no
+  login (`@Transform(trimLowerEmail)` no DTO e `normalizeEmail` no serviço, `src/common/utils/email.ts`). O login e o
+  teste de duplicidade buscam com `mode: 'insensitive'`, então contas antigas gravadas com maiúsculas continuam entrando. A
+  senha nunca passa por trim.
+- **Log do login:** em falha, só `motivo=usuario_nao_encontrado|inativo|senha_incorreta` e o e-mail normalizado. Nunca a
+  senha. A resposta é sempre "Credenciais inválidas".
+- **Perfil próprio (qualquer cargo):** `GET /auth/profile` devolve id, name, email, phone, creci, avatarUrl, role, teamId,
+  teamName, organizationName e createdAt. `PATCH /auth/profile` aceita **só** `name`, `phone` e `creci`
+  (`UpdateProfileDto`); role, email, teamId, active ou organizationId no corpo dão 400 (forbidNonWhitelisted global).
+  Telefone: vazio limpa; preenchido precisa de 10 ou 11 dígitos e é gravado como `(DD) 9XXXX-XXXX` (`formatPhone`). CRECI
+  vazio limpa. A resposta é `{ user, accessToken, refreshToken }`.
+- **Troca de senha:** `POST /auth/change-password` `{ currentPassword, newPassword }`. Senha atual errada: 400 "Senha atual
+  incorreta". Nova com menos de 8 caracteres ou igual à atual: 400. Limite de 5 tentativas por hora por usuário
+  (`PasswordAttempts`, contador **em memória, vale por réplica**), 429 acima disso. Devolve `{ accessToken, refreshToken }`.
+- **Carimbo da sessão (`pwd` no JWT):** o token leva `pwd` = `updatedAt` do usuário em ms na emissão
+  (`src/modules/auth/session-stamp.ts`). O `JwtStrategy.validate` e o `refresh` recusam (401) se não bater com o
+  `updatedAt` atual. Sem migration: usa o campo que já existia.
+  - Qualquer alteração no usuário muda o `updatedAt`: trocar a senha, editar o próprio perfil, o gestor mudar cargo, ativo
+    ou redefinir a senha. **Editar o próprio perfil também desconecta as outras sessões**, o que é aceitável e seguro; quem
+    editou recebe tokens novos na resposta e não cai.
+  - O login grava `lastLogin` passando o `updatedAt` atual de volta, senão cada login derrubaria os outros aparelhos.
+  - Trocar de equipe pela gestão de equipes não muda o `updatedAt` (`setTeamKeepingSessions`).
+  - Tokens emitidos antes desta regra não têm `pwd` e deixaram de valer no deploy: todos entraram de novo uma vez.
+- **Front:**
+  - `/perfil` (todos os cargos), pelo rodapé do menu lateral (clicar no nome abre "Meu perfil" e "Sair") e pelo sheet
+    "Menu" do celular. Está na lista NetworkOnly do PWA (ver a ressalva da seção PWA sobre esses padrões).
+  - "Meus dados" (nome, telefone com máscara, CRECI; e-mail e cargo só leitura, "Para alterar, fale com um gestor") e
+    "Segurança" (senha atual, nova, confirmar, indicador de força, aviso de desconexão nos outros aparelhos).
+  - Sem telefone: aviso "Seu telefone aparece na página dos imóveis que você compartilha…".
+  - O perfil manda só os campos que mudaram (salvar sem mudança derrubaria as outras sessões à toa).
+  - Depois de salvar, `useApplySession` troca os tokens pela store (`setTokens`, sem limpar o cache), atualiza o nome
+    (`patchUser`) e invalida `['me']`, `['users']` e `['profile']`.
+  - **Sessão expirada:** o interceptor de 401 tenta o refresh (e grava os tokens novos pela store, com o cookie). Se falhar,
+    limpa a store e o cookie, marca `session-expired` no sessionStorage e vai para `/login`, que mostra o toast "Sua sessão
+    expirou. Entre novamente". 401 de `/auth/login` e `/auth/refresh` não passa por isso (senha errada não é sessão vencida).
 
 ---
 

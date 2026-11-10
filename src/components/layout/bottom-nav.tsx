@@ -19,6 +19,7 @@ import {
   ChevronDown,
   LogOut,
   Settings,
+  UserRound,
   X as XIcon,
   type LucideIcon,
 } from 'lucide-react'
@@ -56,7 +57,9 @@ export function BottomNav() {
   const settingsItems = visibleSettingsItems(isHydrated, role)
 
   const isMenuActive =
-    settings.isActive || menuNavItems.some(({ href }) => isNavItemActive(pathname, href))
+    settings.isActive ||
+    isNavItemActive(pathname, '/perfil') ||
+    menuNavItems.some(({ href }) => isNavItemActive(pathname, href))
 
   function closeSheet() {
     setActiveSheet(null)
@@ -188,6 +191,17 @@ export function BottomNav() {
             )}
           </div>
         )}
+        <button
+          type="button"
+          onClick={() => handleNavigate('/perfil')}
+          className={cn(
+            'flex min-h-11 w-full items-center gap-3.5 border-b-[0.5px] border-[#F0F0F0] py-3.5 text-left text-[15px] font-medium',
+            isNavItemActive(pathname, '/perfil') ? 'text-brand' : 'text-neutral-900',
+          )}
+        >
+          <UserRound size={20} strokeWidth={2} />
+          Meu perfil
+        </button>
         <button
           type="button"
           onClick={handleLogout}

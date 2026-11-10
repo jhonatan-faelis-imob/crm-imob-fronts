@@ -1,17 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { toast } from '@/components/ui/toast'
+import { consumeSessionExpired, SESSION_EXPIRED_MESSAGE } from '@/lib/session-expired'
 import { authService } from '@/services/auth.service'
 import { useAuthStore } from '@/store/auth.store'
 
 const loginSchema = z.object({
-  email: z.string().min(1, 'Informe seu email').email('Digite um email válido'),
+  email: z.string().trim().min(1, 'Informe seu email').email('Digite um email válido'),
   password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
 })
 
@@ -21,6 +23,11 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [authError, setAuthError] = useState<string | null>(null)
   const router = useRouter()
+
+  // Veio do interceptor (401 sem refresh possível): avisa uma vez
+  useEffect(() => {
+    if (consumeSessionExpired()) toast.add({ title: SESSION_EXPIRED_MESSAGE, type: 'warning' })
+  }, [])
 
   const {
     register,

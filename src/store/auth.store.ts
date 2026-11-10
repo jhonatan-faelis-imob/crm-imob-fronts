@@ -18,6 +18,10 @@ interface AuthStore {
   accessToken: string | null
   refreshToken: string | null
   setAuth: (user: AuthUser, accessToken: string, refreshToken: string) => void
+  /** Troca os tokens sem limpar o cache (perfil, troca de senha, refresh) */
+  setTokens: (accessToken: string, refreshToken: string) => void
+  /** Atualiza dados do usuário logado (ex.: nome depois de editar o perfil) */
+  patchUser: (change: Partial<Pick<AuthUser, 'name' | 'avatarUrl'>>) => void
   clearAuth: () => void
   isAuthenticated: () => boolean
 }
@@ -45,6 +49,16 @@ export const useAuthStore = create<AuthStore>()(
         // Sem isso, quem entrar depois na mesma aba veria o badge e a fila do usuário anterior
         queryClient.clear()
         set({ user, accessToken, refreshToken })
+      },
+      setTokens: (accessToken, refreshToken) => {
+        localStorage.setItem('accessToken', accessToken)
+        localStorage.setItem('refreshToken', refreshToken)
+        setAuthCookie(accessToken)
+        set({ accessToken, refreshToken })
+      },
+      patchUser: (change) => {
+        const user = get().user
+        if (user) set({ user: { ...user, ...change } })
       },
       clearAuth: () => {
         localStorage.removeItem('accessToken')

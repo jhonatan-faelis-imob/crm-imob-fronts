@@ -13,11 +13,20 @@ import {
   Target,
   BarChart2,
   ChevronDown,
+  ChevronsUpDown,
   LogOut,
   Settings,
+  UserRound,
   type LucideIcon,
 } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { MyDayBadge } from '@/features/meu-dia/components/my-day-badge'
 import { useHydrated } from '@/lib/use-hydrated'
 import { cn, getInitials } from '@/lib/utils'
@@ -127,26 +136,43 @@ export function Sidebar() {
         <SettingsGroup pathname={pathname} role={user?.role} isHydrated={isHydrated} />
       </nav>
 
-      <div className="flex items-center gap-2 border-t-[0.5px] border-neutral-200 px-4 py-4">
-        <Avatar>
-          <AvatarFallback className="bg-brand-bg text-brand">
-            {getInitials(user?.name ?? '')}
-          </AvatarFallback>
-        </Avatar>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-neutral-900">{user?.name}</p>
-          <p className="truncate text-xs text-neutral-400">
-            {user ? (roleLabels[user.role] ?? user.role) : ''}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={handleLogout}
-          aria-label="Sair"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] text-neutral-400 transition-colors hover:bg-danger-bg hover:text-danger"
-        >
-          <LogOut className="h-4 w-4" />
-        </button>
+      <div className="border-t-[0.5px] border-neutral-200 p-3">
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <button
+                type="button"
+                aria-label="Menu da conta"
+                className={cn(
+                  'flex w-full items-center gap-2 rounded-[8px] px-2 py-2 text-left transition-colors hover:bg-neutral-100',
+                  isNavItemActive(pathname, '/perfil') && 'bg-brand-bg',
+                )}
+              />
+            }
+          >
+            <Avatar>
+              <AvatarFallback className="bg-brand-bg text-brand">{getInitials(user?.name ?? '')}</AvatarFallback>
+            </Avatar>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-medium text-neutral-900">{user?.name}</span>
+              <span className="block truncate text-xs text-neutral-400">
+                {user ? (roleLabels[user.role] ?? user.role) : ''}
+              </span>
+            </span>
+            <ChevronsUpDown className="h-4 w-4 shrink-0 text-neutral-400" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="top" align="start" className="bg-white">
+            <DropdownMenuItem className="min-h-9" onClick={() => router.push('/perfil')}>
+              <UserRound className="h-4 w-4" />
+              Meu perfil
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="min-h-9 text-danger" onClick={handleLogout}>
+              <LogOut className="h-4 w-4" />
+              Sair
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </aside>
   )

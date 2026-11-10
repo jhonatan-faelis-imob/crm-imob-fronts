@@ -9,6 +9,7 @@ import { apiErrorMessage } from './api'
 export function invalidateTeamStructure(queryClient: QueryClient, teamId?: string) {
   queryClient.invalidateQueries({ queryKey: ['users'] })
   queryClient.invalidateQueries({ queryKey: ['teams'] })
+  queryClient.invalidateQueries({ queryKey: ['me'] })
   if (teamId) queryClient.invalidateQueries({ queryKey: ['team', teamId] })
   else queryClient.invalidateQueries({ queryKey: ['team'] })
 }
