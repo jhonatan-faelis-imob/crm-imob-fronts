@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Camera, Check, Copy, KeyRound } from 'lucide-react'
+import { Camera } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { toast } from '@/components/ui/toast'
+import { TemporaryPasswordBox } from '@/components/temporary-password-box'
 import type { Role } from '@/types'
 import { apiErrorMessage, memberErrorField, type CreatedUser } from './api'
 import { ROLE_META, ROLES } from './constants'
@@ -273,17 +273,6 @@ function NewMemberFormBody({
 }
 
 function TemporaryPasswordView({ user, onClose }: { user: CreatedUser & { temporaryPassword: string }; onClose: () => void }) {
-  const [copied, setCopied] = useState(false)
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(user.temporaryPassword)
-      setCopied(true)
-    } catch {
-      toast.add({ title: 'Não consegui copiar. Selecione a senha e copie à mão', type: 'error' })
-    }
-  }
-
   return (
     <>
       <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
@@ -291,26 +280,7 @@ function TemporaryPasswordView({ user, onClose }: { user: CreatedUser & { tempor
           <span className="font-medium text-neutral-900">{user.name}</span> foi criado. Repasse o email e a senha
           temporária abaixo.
         </p>
-        <div className="rounded-[16px] border-[1.5px] border-[#F5C46B] bg-[#FFF7E0] p-4">
-          <p className="flex items-center gap-1.5 text-xs font-medium text-[#B45309]">
-            <KeyRound className="h-3.5 w-3.5" />
-            Senha temporária
-          </p>
-          <div className="mt-2 flex items-center gap-2">
-            <code className="min-w-0 flex-1 select-all break-all rounded-[8px] bg-white px-3 py-2 font-mono text-[15px] text-neutral-900">
-              {user.temporaryPassword}
-            </code>
-            <button
-              type="button"
-              onClick={copy}
-              className="flex shrink-0 items-center gap-1.5 rounded-[8px] border-[1.5px] border-neutral-200 bg-white px-3 py-2 text-sm font-medium text-neutral-900 transition-colors hover:border-brand hover:text-brand"
-            >
-              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              {copied ? 'Copiada' : 'Copiar'}
-            </button>
-          </div>
-          <p className="mt-2 text-xs font-medium text-[#B45309]">Anote agora: esta senha não será exibida de novo.</p>
-        </div>
+        <TemporaryPasswordBox password={user.temporaryPassword} />
         <p className="text-xs text-neutral-400">Login: {user.email}</p>
       </div>
       <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">

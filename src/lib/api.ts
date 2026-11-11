@@ -1,6 +1,8 @@
 import axios from 'axios'
 import { useAuthStore } from '@/store/auth.store'
+import { paywallFromResponse, usePaywallStore } from '@/store/paywall.store'
 import { API_BASE_URL } from './api-base-url'
+import { queryClient } from './query-client'
 import { isAuthEndpoint, markSessionExpired } from './session-expired'
 
 // Fallback explícito para produção caso variável não seja injetada (ver api-base-url.ts)
@@ -23,6 +25,14 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config
+    // 402: assinatura bloqueada ou limite de usuários. Não desloga: mostra o aviso e deixa quem chamou tratar o erro
+    if (error.response?.status === 402) {
+      const { code, message } = paywallFromResponse(error.response.data)
+      usePaywallStore.getState().show(code, message)
+      // A situação pode ter mudado agora: a faixa do topo se atualiza
+      queryClient.invalidateQueries({ queryKey: ['billing-me'] })
+      return Promise.reject(error)
+    }
     // 401 no login é senha errada, não sessão vencida: quem chamou trata
     if (error.response?.status === 401 && original && !original._retry && !isAuthEndpoint(original.url)) {
       original._retry = true

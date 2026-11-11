@@ -27,6 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useIsSuperAdmin } from '@/features/assinatura/use-billing-me'
 import { MyDayBadge } from '@/features/meu-dia/components/my-day-badge'
 import { useHydrated } from '@/lib/use-hydrated'
 import { cn, getInitials } from '@/lib/utils'
@@ -47,7 +48,8 @@ export const navItems: { href: string; label: string; icon: LucideIcon }[] = [
 
 function SettingsGroup({ pathname, role, isHydrated }: { pathname: string; role?: string; isHydrated: boolean }) {
   const { isActive, isOpen, toggle } = useSettingsGroup(pathname)
-  const items = visibleSettingsItems(isHydrated, role)
+  const isSuperAdmin = useIsSuperAdmin(isHydrated, role !== undefined)
+  const items = visibleSettingsItems(isHydrated, role, isSuperAdmin)
   if (items.length === 0) return null
 
   return (

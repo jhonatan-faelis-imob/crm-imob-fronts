@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FileCheck, MessageSquareText, Plug, UsersRound, Workflow, type LucideIcon } from 'lucide-react'
+import { CreditCard, FileCheck, MessageSquareText, Plug, ShieldCheck, UsersRound, Workflow, type LucideIcon } from 'lucide-react'
 import { canManageCadences } from '@/features/cadencias/constants'
 import { canManageDocuments } from '@/features/documentos/constants'
 import { canManageIntegrations } from '@/features/integracoes/constants'
@@ -10,6 +10,8 @@ export interface SettingsNavItem {
   icon: LucideIcon
   // Sem regra = visível para todos
   canSee?: (role: string) => boolean
+  /** Só para quem o backend diz ser superadministrador (GET /billing/me isSuperAdmin) */
+  superAdminOnly?: boolean
 }
 
 // Lista estática: é ela que vai para a primeira renderização (servidor e cliente iguais)
@@ -20,6 +22,8 @@ export const SETTINGS_NAV_ITEMS: SettingsNavItem[] = [
   { href: '/cadencias', label: 'Cadências', icon: Workflow, canSee: (role) => canManageCadences({ role }) },
   { href: '/documentos', label: 'Documentos', icon: FileCheck, canSee: (role) => canManageDocuments({ role }) },
   { href: '/integracoes', label: 'Integrações', icon: Plug, canSee: (role) => canManageIntegrations({ role }) },
+  { href: '/assinatura', label: 'Assinatura', icon: CreditCard, canSee: (role) => role === 'diretor' },
+  { href: '/admin', label: 'Administração', icon: ShieldCheck, superAdminOnly: true },
 ]
 
 export function isNavItemActive(pathname: string, href: string) {
@@ -30,10 +34,14 @@ export function isSettingsPath(pathname: string) {
   return SETTINGS_NAV_ITEMS.some(({ href }) => isNavItemActive(pathname, href))
 }
 
-// Antes da montagem não há cargo confiável (vem do localStorage): mostra a lista completa
-export function visibleSettingsItems(isMounted: boolean, role: string | undefined) {
-  if (!isMounted) return SETTINGS_NAV_ITEMS
-  return SETTINGS_NAV_ITEMS.filter((item) => !item.canSee || (role !== undefined && item.canSee(role)))
+// Antes da montagem não há cargo confiável (vem do localStorage): mostra a lista completa, menos o /admin,
+// que só aparece depois que o backend confirma (nunca decidido pelo front)
+export function visibleSettingsItems(isMounted: boolean, role: string | undefined, isSuperAdmin = false) {
+  if (!isMounted) return SETTINGS_NAV_ITEMS.filter((item) => !item.superAdminOnly)
+  return SETTINGS_NAV_ITEMS.filter((item) => {
+    if (item.superAdminOnly) return isSuperAdmin
+    return !item.canSee || (role !== undefined && item.canSee(role))
+  })
 }
 
 // Aberto/fechado só vale para o pathname em que foi escolhido: ao entrar numa rota de

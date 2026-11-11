@@ -141,6 +141,8 @@ app/
       │   └── [id]/page.tsx
       ├── equipe/page.tsx           → Gestão da equipe
       ├── perfil/page.tsx           → Meu perfil (dados e troca de senha)
+      ├── assinatura/page.tsx       → Assinatura (diretor): plano, usuários, vencimento, dados de cobrança
+      ├── admin/page.tsx            → Painel do superadministrador (imobiliárias e assinaturas)
       ├── metas/
       │   ├── page.tsx              → Visão geral das metas
       │   └── [id]/page.tsx         → Detalhe + funil diário
@@ -411,6 +413,8 @@ GEMINI_API_KEY=            # Chave do sistema (vale quando a organização não 
 GEMINI_MODEL=              # Opcional. Padrão do código: gemini-1.5-flash (descontinuado pelo Google: definir um atual)
 INTEGRATIONS_ENC_KEY=      # 32 bytes em base64: node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 API_PUBLIC_URL=            # Endereço público do backend, com https:// e sem barra no final (URL do webhook do Google Ads)
+SUPER_ADMIN_EMAILS=        # E-mails do painel /admin, separados por vírgula (comparados em minúsculas)
+PUBLIC_SIGNUP_ENABLED=     # true liga o cadastro público (POST /organizations/onboarding). Padrão: desligado (403)
 RESEND_API_KEY=
 ONESIGNAL_APP_ID=
 ONESIGNAL_API_KEY=
@@ -419,6 +423,7 @@ STRIPE_WEBHOOK_SECRET=
 
 # Frontend
 NEXT_PUBLIC_API_URL=
+NEXT_PUBLIC_SUPPORT_PHONE= # WhatsApp do suporte com DDD (botão "Falar com o suporte"); sem ele o botão some
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
@@ -1093,6 +1098,86 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
   - **Sessão expirada:** o interceptor de 401 tenta o refresh (e grava os tokens novos pela store, com o cookie). Se falhar,
     limpa a store e o cookie, marca `session-expired` no sessionStorage e vai para `/login`, que mostra o toast "Sua sessão
     expirou. Entre novamente". 401 de `/auth/login` e `/auth/refresh` não passa por isso (senha errada não é sessão vencida).
+
+---
+
+## Assinatura, planos e painel /admin — regras atuais
+
+Sem gateway de pagamento: cobrança combinada por fora, registrada à mão no painel.
+
+- **Planos** (fonte única: `src/modules/billing/plans.config.ts` no backend; o front lê de `GET /billing/plans`):
+
+  | Plano | Preço | Usuários incluídos | Usuário extra |
+  |---|---|---|---|
+  | Corretor (`corretor`) | R$ 89,90 | 1 | não vende |
+  | Equipe (`equipe`) | R$ 247 | 5 | R$ 30 |
+  | Imobiliária (`imobiliaria`) | R$ 699 | 20 | R$ 30 |
+
+  `priceFor(plano, seats)` = base + extra × assentos acima do incluído (preço de tabela). O `monthlyPrice` da organização é o
+  valor combinado e pode ser outro. Planos antigos (`free`, `starter`, `pro`) não estão no catálogo: o nome aparece como
+  está e valem 20 assentos no backfill. `TRIAL_DAYS = 14`, `GRACE_DAYS = 5`.
+- **Banco** (migration `20261111090000_assinaturas`, só aditiva): em `organizations`, `seats` (padrão 1),
+  `subscription_status` (padrão `ativa`), `trial_ends_at`, `current_period_end`, `billing_name`, `billing_document` (só
+  dígitos), `billing_email`, `billing_phone`, `monthly_price` e `notes` (internas). Tabela `billing_events` (histórico; `created_by`
+  guarda o e-mail de quem fez ou "sistema", sem FK).
+- **Situações:** `teste`, `ativa`, `atrasada`, `bloqueada`, `cancelada`. Transições da tarefa diária
+  (`recalculateSubscriptionStatuses`; regras puras em `subscription-state.ts`):
+  - teste com `trialEndsAt` vencido → atrasada;
+  - ativa com `currentPeriodEnd` vencido → atrasada;
+  - atrasada há mais de `GRACE_DAYS` (contando de `currentPeriodEnd` ou, sem ele, de `trialEndsAt`) → bloqueada. Sem
+    nenhuma das datas (marcada à mão), não bloqueia sozinha.
+  - Cada mudança grava um BillingEvent. **O projeto não tem `@nestjs/schedule`**, então não há agendamento: a tarefa roda pelo
+    `POST /admin/recalculate` (botão "Recalcular" no painel). Para rodar todo dia às 6h, agendar uma chamada externa (cron do
+    Railway, por exemplo) ou instalar o `@nestjs/schedule` numa etapa futura.
+- **Somente leitura:** `SubscriptionGuard` global, depois do JWT e dos cargos. Bloqueada ou cancelada: GET passa; POST, PATCH,
+  PUT e DELETE dão **402** `{ code: 'SUBSCRIPTION_BLOCKED', message: 'Assinatura bloqueada. Fale com o suporte para reativar.' }`.
+  Teste vencido e atrasada gravam normalmente (só aviso). Leitura nunca é bloqueada.
+  - Sempre liberado (`@AllowWhenBlocked()` ou `@Public()`): `/auth`, `/health`, `/billing`, `/admin`, rotas públicas e os POSTs
+    que só leem (`/simulations/calculate`, renderizar mensagem, `/properties/portal-readiness`). Um POST novo que só lê
+    precisa do decorator.
+  - A situação fica em cache de 60 s por organização (`SubscriptionCache`, em memória, por réplica); o painel limpa o cache ao
+    alterar.
+- **Limite de usuários:** `assertSeatAvailable` no `POST /users` e ao reativar (`active: true` em quem estava inativo). Ativos ≥
+  `seats`: 402 `{ code: 'SEAT_LIMIT', message: 'Limite de X usuários do plano Y atingido. Fale com o suporte para ampliar.' }`.
+  Inativos não contam.
+- **`GET /billing/me`** (qualquer logado): plano, nome do plano, seats, seatsUsed, situação, datas, daysLeft, valor, `warning`
+  (texto pronto), `warningLevel` (`aviso` ou `bloqueio`), `isSuperAdmin` e `billing` (dados de cobrança, só para diretor).
+  **`PATCH /billing/me`** (diretor) altera só billingName, billingDocument (CPF ou CNPJ validado pelo dígito verificador),
+  billingEmail e billingPhone.
+- **Organização:** `PATCH /organizations/me` agora só aceita `name` (antes aceitava qualquer campo sem validar). O
+  `POST /organizations` (qualquer diretor criava organização) foi removido. `GET /organizations/me` não devolve as anotações
+  nem os dados de cobrança.
+- **Superadministrador:** variável `SUPER_ADMIN_EMAILS` (vírgula, minúsculas), sem cargo no banco. O `SuperAdminGuard` compara
+  o e-mail do usuário autenticado. Rotas `/admin`:
+  - `GET /admin/summary`: contagem por situação, receita mensal das ativas e quantas estão em teste;
+  - `GET /admin/organizations?search=&status=`: com usuários ativos, leads e último acesso (max(lastLogin));
+  - `GET /admin/organizations/:id`: usuários sem senha e os últimos 50 eventos;
+  - `POST /admin/organizations`: imobiliária e diretor numa transação; semeia o funil; a senha gerada volta uma única vez em
+    `temporaryPassword`. Sem situação, vira teste de 14 dias; sem valor, usa o preço de tabela;
+  - `PATCH /admin/organizations/:id`: plano, seats, situação, valor, datas, cobrança e notas. Seats abaixo dos ativos dá 400;
+  - `POST .../block` e `.../unblock` `{ reason }` (desbloquear volta para ativa);
+  - `POST .../register-payment` `{ amount, paidAt, method, note }`: vencimento = um mês a partir do maior entre o vencimento
+    atual e hoje; situação ativa;
+  - `POST /admin/recalculate`.
+  - Toda alteração grava um BillingEvent com o e-mail de quem fez.
+- **Cadastro público:** `POST /organizations/onboarding` só com `PUBLIC_SIGNUP_ENABLED=true` (senão 403 "Cadastro disponível
+  apenas por contato com o suporte"). Ligado: plano Corretor, 1 assento, teste de 14 dias; 5 cadastros por hora por IP (em
+  memória, por réplica; IP = último item do X-Forwarded-For). O corpo agora passa por DTO.
+- **Retrocompatibilidade:** `npm run db:backfill-subscriptions` (`prisma/backfill-subscriptions.ts`), simulação por padrão e
+  `--apply` para gravar. Para cada organização: ativa, seats conforme o plano (20 se fora do catálogo) e vencimento em 30
+  dias, com um BillingEvent. Imprime a tabela antes. Rodar depois da migration.
+- **Front:**
+  - `SubscriptionBanner` no layout do painel, fora da área que rola: lê `['billing-me']` (5 min) e mostra o `warning` em âmbar
+    (teste, atrasada) ou vermelho (bloqueada).
+  - **402:** o interceptor do `api.ts` não desloga. Abre o `PaymentRequiredDialog` (store `paywall.store.ts`) com a mensagem
+    do servidor, título próprio para `SEAT_LIMIT` e o botão "Falar com o suporte" (`NEXT_PUBLIC_SUPPORT_PHONE`), e invalida
+    `['billing-me']`. O erro continua indo para quem chamou.
+  - `/assinatura` (Configurações, só diretor) e `/admin` (Configurações, só quando o `/billing/me` diz `isSuperAdmin`; antes da
+    hidratação o item não aparece). As duas estão na lista NetworkOnly do PWA.
+  - Painel: cartões de resumo, busca e filtro, cartões no celular e tabela no desktop (atrasadas e bloqueadas destacadas),
+    "Nova imobiliária" com senha temporária (`TemporaryPasswordBox`), painel lateral com edição (só os campos alterados),
+    pagamento, bloquear e desbloquear com motivo, usuários e histórico. Depois de cada ação, `invalidateAdmin` invalida
+    `['admin-organizations']`, `['admin-summary']`, `['admin-organization']`, `['billing-me']` e `['users']`.
 
 ---
 

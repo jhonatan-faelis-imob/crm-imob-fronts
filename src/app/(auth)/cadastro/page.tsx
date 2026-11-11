@@ -13,6 +13,7 @@ import { organizationsService } from '@/services/organizations.service'
 import { useAuthStore } from '@/store/auth.store'
 import { MaskedInput } from '@/features/leads/lead-form/masked-input'
 import { phoneMask } from '@/features/leads/lead-form/masks'
+import { slugify, SLUG_PATTERN } from '@/lib/slugify'
 
 const cadastroSchema = z.object({
   org: z.object({
@@ -20,14 +21,14 @@ const cadastroSchema = z.object({
     slug: z
       .string()
       .min(1, 'Informe o slug')
-      .regex(/^[a-z0-9-]+$/, 'Use apenas letras minúsculas, números e hífens'),
+      .regex(SLUG_PATTERN, 'Use apenas letras minúsculas, números e hífens'),
   }),
   director: z
     .object({
       name: z.string().min(1, 'Informe seu nome completo'),
       email: z.string().min(1, 'Informe seu email').email('Digite um email válido'),
       phone: z.string().optional(),
-      password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
+      password: z.string().min(8, 'A senha deve ter no mínimo 8 caracteres'),
       confirmPassword: z.string().min(1, 'Confirme sua senha'),
     })
     .refine((data) => data.password === data.confirmPassword, {
@@ -37,13 +38,6 @@ const cadastroSchema = z.object({
 })
 
 type CadastroFormValues = z.infer<typeof cadastroSchema>
-
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '')
-}
 
 const STEPS = [
   { label: 'Imobiliária' },

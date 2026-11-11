@@ -23,6 +23,7 @@ import {
   X as XIcon,
   type LucideIcon,
 } from 'lucide-react'
+import { useIsSuperAdmin } from '@/features/assinatura/use-billing-me'
 import { MyDayBadge } from '@/features/meu-dia/components/my-day-badge'
 import { useHydrated } from '@/lib/use-hydrated'
 import { cn } from '@/lib/utils'
@@ -54,7 +55,8 @@ export function BottomNav() {
   const [activeSheet, setActiveSheet] = useState<ActiveSheet>(null)
   const settings = useSettingsGroup(pathname)
   // Filtro por cargo só depois da montagem, como no Sidebar
-  const settingsItems = visibleSettingsItems(isHydrated, role)
+  const isSuperAdmin = useIsSuperAdmin(isHydrated, role !== undefined)
+  const settingsItems = visibleSettingsItems(isHydrated, role, isSuperAdmin)
 
   const isMenuActive =
     settings.isActive ||
