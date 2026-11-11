@@ -18,6 +18,7 @@ import { FormField, inputClassName, labelClassName } from '@/features/equipe/fie
 import { cn } from '@/lib/utils'
 import { adminService, type AdminOrganizationDetail, type OrganizationChange } from '@/services/admin.service'
 import type { SubscriptionStatus } from '@/services/billing.service'
+import { AsaasSection } from './asaas-section'
 import { PaymentDialog, ReasonDialog } from './organization-actions'
 import { isValidSeats, moneyInput, parseMoney, suggestedPrice } from './rules'
 import { invalidateAdmin, useAdminOrganization, usePlans } from './use-admin'
@@ -278,6 +279,10 @@ export function OrganizationSheet({ organizationId, onClose }: { organizationId:
             <Section title="Assinatura e cobrança">
               {/* key: recomeça com os dados novos depois de salvar ou de outra ação */}
               <EditForm key={`${organization.id}-${organization.billingEvents[0]?.id ?? ''}`} organization={organization} />
+            </Section>
+
+            <Section title="Asaas">
+              <AsaasSection organization={organization} />
             </Section>
 
             <Section title={`Usuários (${organization.users.length})`}>

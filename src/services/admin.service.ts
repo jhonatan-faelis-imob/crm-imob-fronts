@@ -1,5 +1,5 @@
 import api from '@/lib/api'
-import type { BillingInfo, SubscriptionStatus } from './billing.service'
+import type { BillingInfo, PaymentRow, SubscriptionStatus } from './billing.service'
 
 export interface AdminOrganizationRow {
   id: string
@@ -55,6 +55,32 @@ export interface AdminOrganizationDetail extends BillingInfo {
   suggestedPrice: number | null
   users: AdminUser[]
   billingEvents: BillingEvent[]
+  asaasCustomerId: string | null
+  asaasSubscriptionId: string | null
+  billingType: string | null
+  canceledAt: string | null
+  cancelReason: string | null
+  payments: PaymentRow[]
+}
+
+export interface WebhookDelivery {
+  id: string
+  provider: string
+  eventId: string
+  event: string
+  organizationId: string | null
+  status: 'ok' | 'ignorado' | 'erro'
+  message: string | null
+  payload: unknown
+  createdAt: string
+}
+
+export interface SyncResult {
+  payments: number
+  subscriptionStatus: string
+  paidUntil: string | null
+  statusBefore: string
+  statusAfter: string
 }
 
 export interface AdminSummary {
@@ -130,5 +156,8 @@ export const adminService = {
   unblock: async (id: string, reason: string) => (await api.post(`/admin/organizations/${id}/unblock`, { reason })).data,
   registerPayment: async (id: string, input: PaymentInput) =>
     (await api.post(`/admin/organizations/${id}/register-payment`, input)).data,
+  syncAsaas: async (id: string): Promise<SyncResult> =>
+    (await api.post<SyncResult>(`/admin/organizations/${id}/sync-asaas`)).data,
+  webhooks: async (): Promise<WebhookDelivery[]> => (await api.get<WebhookDelivery[]>('/admin/webhooks')).data,
   recalculate: async (): Promise<RecalculateResult> => (await api.post<RecalculateResult>('/admin/recalculate')).data,
 }

@@ -142,7 +142,9 @@ app/
       ├── equipe/page.tsx           → Gestão da equipe
       ├── perfil/page.tsx           → Meu perfil (dados e troca de senha)
       ├── assinatura/page.tsx       → Assinatura (diretor): plano, usuários, vencimento, dados de cobrança
+      ├── assinatura/retorno/page.tsx → Volta do pagamento no Asaas (espera o webhook confirmar)
       ├── admin/page.tsx            → Painel do superadministrador (imobiliárias e assinaturas)
+      ├── admin/webhooks/page.tsx   → Últimas 100 entregas de webhook (depuração)
       ├── metas/
       │   ├── page.tsx              → Visão geral das metas
       │   └── [id]/page.tsx         → Detalhe + funil diário
@@ -415,6 +417,10 @@ INTEGRATIONS_ENC_KEY=      # 32 bytes em base64: node -e "console.log(require('c
 API_PUBLIC_URL=            # Endereço público do backend, com https:// e sem barra no final (URL do webhook do Google Ads)
 SUPER_ADMIN_EMAILS=        # E-mails do painel /admin, separados por vírgula (comparados em minúsculas)
 PUBLIC_SIGNUP_ENABLED=     # true liga o cadastro público (POST /organizations/onboarding). Padrão: desligado (403)
+ASAAS_API_KEY=             # Chave da API do Asaas (cabeçalho access_token). Nunca vai para log
+ASAAS_ENV=                 # production usa api.asaas.com; qualquer outro valor (padrão), o sandbox
+ASAAS_WEBHOOK_TOKEN=       # authToken do webhook no Asaas (cabeçalho asaas-access-token). Sem ele, todo webhook dá 401
+APP_PUBLIC_URL=            # Endereço do front, sem barra no final (retorno do pagamento: /assinatura/retorno)
 RESEND_API_KEY=
 ONESIGNAL_APP_ID=
 ONESIGNAL_API_KEY=
@@ -1103,17 +1109,20 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
 
 ## Assinatura, planos e painel /admin — regras atuais
 
-Sem gateway de pagamento: cobrança combinada por fora, registrada à mão no painel.
+Pagamento self-service pelo Asaas (seção "Assinatura self-service com Asaas" abaixo). O painel /admin continua podendo
+registrar pagamento à mão (cobrança combinada por fora).
 
 - **Planos** (fonte única: `src/modules/billing/plans.config.ts` no backend; o front lê de `GET /billing/plans`):
 
   | Plano | Preço | Usuários incluídos | Usuário extra |
   |---|---|---|---|
-  | Corretor (`corretor`) | R$ 89,90 | 1 | não vende |
+  | Corretor (`corretor`) | R$ 89,90 | 1 (fixo, `maxSeats: 1`) | não vende |
   | Equipe (`equipe`) | R$ 247 | 5 | R$ 30 |
   | Imobiliária (`imobiliaria`) | R$ 699 | 20 | R$ 30 |
 
-  `priceFor(plano, seats)` = base + extra × assentos acima do incluído (preço de tabela). O `monthlyPrice` da organização é o
+  **Os planos diferem só na quantidade de usuários: nenhuma funcionalidade é travada por plano.** Só ciclo mensal.
+  `priceFor(plano, seats)` = base + extra × assentos acima do incluído (preço de tabela); lança 400 (`PlanSeatsError`) para
+  Corretor com mais de 1 usuário (`assertPlanSeats` vale também no painel /admin). O `monthlyPrice` da organização é o
   valor combinado e pode ser outro. Planos antigos (`free`, `starter`, `pro`) não estão no catálogo: o nome aparece como
   está e valem 20 assentos no backfill. `TRIAL_DAYS = 14`, `GRACE_DAYS = 5`.
 - **Banco** (migration `20261111090000_assinaturas`, só aditiva): em `organizations`, `seats` (padrão 1),
@@ -1161,8 +1170,11 @@ Sem gateway de pagamento: cobrança combinada por fora, registrada à mão no pa
   - `POST /admin/recalculate`.
   - Toda alteração grava um BillingEvent com o e-mail de quem fez.
 - **Cadastro público:** `POST /organizations/onboarding` só com `PUBLIC_SIGNUP_ENABLED=true` (senão 403 "Cadastro disponível
-  apenas por contato com o suporte"). Ligado: plano Corretor, 1 assento, teste de 14 dias; 5 cadastros por hora por IP (em
-  memória, por réplica; IP = último item do X-Forwarded-For). O corpo agora passa por DTO.
+  apenas por contato com o suporte", checado num guard antes da validação do corpo). Ligado: plano Corretor, 1 assento,
+  teste de 14 dias; 5 cadastros por hora por IP (em memória, por réplica; IP = último item do X-Forwarded-For). Exige
+  `document` (CPF ou CNPJ, dígito verificador) e `phone`; documento já usado por outra organização dá 409 "Já existe uma
+  conta com este documento". Grava os dados de cobrança (nome da imobiliária, documento, e-mail e telefone do diretor).
+  Nada é criado no Asaas no cadastro.
 - **Retrocompatibilidade:** `npm run db:backfill-subscriptions` (`prisma/backfill-subscriptions.ts`), simulação por padrão e
   `--apply` para gravar. Para cada organização: ativa, seats conforme o plano (20 se fora do catálogo) e vencimento em 30
   dias, com um BillingEvent. Imprime a tabela antes. Rodar depois da migration.
@@ -1178,6 +1190,65 @@ Sem gateway de pagamento: cobrança combinada por fora, registrada à mão no pa
     "Nova imobiliária" com senha temporária (`TemporaryPasswordBox`), painel lateral com edição (só os campos alterados),
     pagamento, bloquear e desbloquear com motivo, usuários e histórico. Depois de cada ação, `invalidateAdmin` invalida
     `['admin-organizations']`, `['admin-summary']`, `['admin-organization']`, `['billing-me']` e `['users']`.
+
+## Assinatura self-service com Asaas — regras atuais
+
+Contratos conferidos na documentação oficial (docs.asaas.com). Cliente em `src/modules/billing/asaas/`.
+
+- **Endpoints usados:** `POST /v3/customers`, `PUT /v3/customers/{id}`, `POST /v3/subscriptions`,
+  `GET /v3/subscriptions/{id}`, `PUT /v3/subscriptions/{id}`, `DELETE /v3/subscriptions/{id}` e
+  `GET /v3/subscriptions/{id}/payments`. Base `https://api.asaas.com/v3` (`ASAAS_ENV=production`) ou
+  `https://api-sandbox.asaas.com/v3` (padrão). Chave no cabeçalho `access_token`.
+- **Cliente HTTP** (`asaas.client.ts`): timeout de 15 s; 2 novas tentativas (0,5 s e 1,5 s) só em erro de rede ou 5xx, nunca
+  em 4xx. 4xx vira 400 "Asaas: <descrição deles>"; 401 do Asaas vira 503 (chave errada, logada sem a chave). A chave nunca
+  vai para log nem para mensagem de erro (há teste).
+- **Cartão nunca passa pelo nosso servidor:** a assinatura é criada no Asaas e o cliente paga na fatura da primeira cobrança
+  (`invoiceUrl`, página do Asaas), com `callback.successUrl = APP_PUBLIC_URL/assinatura/retorno`. Não usamos o Checkout do
+  Asaas (exige imagem em base64 e não aceita um cliente já cadastrado). **Conferir no sandbox** que o cartão pago pela
+  fatura fica salvo para as renovações seguintes.
+- **Fluxo:**
+  - `POST /billing/subscribe` (diretor) `{ planId, seats?, billingType: CREDIT_CARD | PIX | BOLETO }`: confere a regra do
+    plano e se os usuários cobrem os ativos; 409 "Já existe uma assinatura ativa"; `ensureAsaasCustomer` cria ou atualiza o
+    cliente (400 dizendo o que falta dos dados de cobrança; celular em `mobilePhone`, fixo em `phone`); cria a assinatura
+    (valor de `priceFor`, `cycle: MONTHLY`, `nextDueDate` = hoje ou o fim do teste ou do período já pago, o que for maior;
+    descrição "Smart CRM — plano X (N usuários)"; `externalReference` = id da organização) e devolve
+    `{ redirectUrl, subscriptionId }`. Grava plano, usuários, valor e ids, mas **não muda a situação**.
+  - `PATCH /billing/subscription` (diretor) `{ planId?, seats? }`: `PUT` com `value`, `description` e
+    `updatePendingPayments: true`. Vale a partir da próxima cobrança, sem proporcional. **Atenção:** o schema da referência
+    do PUT não lista `value`, mas a página fala em alterar o valor; conferir no sandbox. Usuários abaixo dos ativos: 400.
+  - `POST /billing/subscription/cancel` (diretor) `{ reason }`: `DELETE` no Asaas, grava `canceledAt` e `cancelReason`. Segue
+    ativa (ou em teste) até o fim do período; a tarefa diária passa para **cancelada** (sem passar por atrasada).
+  - `GET /billing/payments`: últimas 24 cobranças. `GET /billing/me` passou a devolver `billingType`, `hasSubscription`,
+    `canceledAt`, `cancelReason` e `openPayment` (cobrança em aberto com fatura).
+- **Só o webhook libera acesso.** Voltar do pagamento não muda nada: `/assinatura/retorno` consulta a cada 5 s por até
+  2 minutos e só mostra "confirmado" com situação ativa e uma cobrança paga.
+- **Webhook** `POST /public/webhooks/asaas` (`@Public`): token do cabeçalho `asaas-access-token` contra `ASAAS_WEBHOOK_TOKEN`,
+  comparado em tempo constante (a documentação não prevê assinatura da requisição). Inválido: 401 sem detalhes.
+  - **Idempotência:** tabela `webhook_deliveries`, única por `(provider, eventId)`. Evento já gravado como ok ou ignorado:
+    200 sem reprocessar. Gravado como erro: processa de novo (o Asaas repete depois de um 500). A entrega é gravada na
+    mesma transação do processamento; duas entregas simultâneas esbarram na chave única.
+  - Organização por `externalReference` e, sem ela, pela assinatura (`asaasSubscriptionId`) ou pelo cliente
+    (`asaasCustomerId`). Não achou: grava ignorado e responde 200.
+  - **Eventos tratados:** `PAYMENT_CONFIRMED` e `PAYMENT_RECEIVED` (ativa; `currentPeriodEnd` = vencimento da cobrança + 1 mês,
+    nunca para trás; um BillingEvent de pagamento por cobrança); `PAYMENT_OVERDUE`, `PAYMENT_REFUNDED` e
+    `PAYMENT_CHARGEBACK_REQUESTED` (ativa ou teste vira atrasada; a tarefa diária bloqueia depois de `GRACE_DAYS`);
+    `PAYMENT_CREATED`, `PAYMENT_UPDATED`, `PAYMENT_DELETED` e `PAYMENT_RESTORED` (só o espelho da cobrança);
+    `SUBSCRIPTION_CREATED` e `SUBSCRIPTION_UPDATED` (id e forma de cobrança); `SUBSCRIPTION_INACTIVATED` e
+    `SUBSCRIPTION_DELETED` (registra o cancelamento se não foi pelo sistema). O resto fica como ignorado.
+  - Erro inesperado: grava erro e responde 500. Payload gravado sem dados de cartão nem tokens (`safePayload`).
+- **Tabelas:** `payments` (espelho das cobranças, único por `asaasPaymentId`; `DELETED` é marcador local) e
+  `webhook_deliveries`. Em `organizations`: `asaas_customer_id`, `asaas_subscription_id`, `billing_type`, `canceled_at`,
+  `cancel_reason` (migration `20261112090000_asaas`, só aditiva).
+- **Painel /admin:** o detalhe mostra ids do Asaas, forma de cobrança e as últimas 12 cobranças, com "Sincronizar com Asaas"
+  (`POST /admin/organizations/:id/sync-asaas`: relê assinatura e cobranças, corrige vencimento e situação). `/admin/webhooks`
+  (`GET /admin/webhooks`) lista as últimas 100 entregas.
+- **Front:** `/assinatura` tem três estados: sem assinatura (teste ou cancelada: planos, usuários só em Equipe e
+  Imobiliária, valor na hora, cartão ou PIX/boleto, formulário de cobrança se faltar dado, "Assinar"); com assinatura (plano,
+  valor, próxima cobrança, forma, mudar plano, alterar usuários, cancelar com motivo, "Alterações valem a partir da próxima
+  cobrança"); atrasada (aviso com a fatura em aberto). O seletor explica quantos usuários desativar se o plano não comporta.
+  A faixa mostra "Teste termina em N dias — Assinar agora". Depois de cada ação, `invalidateBilling` invalida
+  `['billing-me']`, `['billing-payments']` e `['admin-organizations']`. A página pública de planos mostra os mesmos
+  recursos nos três cartões e "Começar teste" em todos.
 
 ---
 

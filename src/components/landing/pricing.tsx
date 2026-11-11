@@ -1,6 +1,6 @@
 import { Check } from 'lucide-react'
 import { LINKS } from '@/lib/landing/links'
-import { PLANS, formatPlanPrice, type Plan } from '@/lib/landing/plans'
+import { PLAN_CTA, PLAN_FEATURES, PLANS, formatPlanPrice, type Plan } from '@/lib/landing/plans'
 import { motionVars } from './motion-vars'
 import { PricingCalculator } from './pricing-calculator'
 import { ButtonLink, Container, Eyebrow, SectionTitle } from './ui'
@@ -40,7 +40,7 @@ function PlanCard({ plan }: { plan: Plan }) {
         {plan.extraLabel ?? <span className="sr-only">Sem usuários adicionais</span>}
       </p>
       <ul className={`mt-6 space-y-3 border-t pt-6 ${dark ? 'border-white/15' : 'border-[#E6E2DD]'}`}>
-        {plan.features.map((feature) => (
+        {[...PLAN_FEATURES, ...plan.extras].map((feature) => (
           <li key={feature} className="flex gap-2.5 text-[15px]">
             <Check
               className={`mt-0.5 h-4 w-4 shrink-0 ${dark ? 'text-[#FF385C]' : 'text-[#C8104A]'}`}
@@ -52,12 +52,8 @@ function PlanCard({ plan }: { plan: Plan }) {
         ))}
       </ul>
       <div className="mt-auto pt-8">
-        <ButtonLink
-          href={plan.cta.href === 'signup' ? LINKS.signup : LINKS.sales}
-          variant={dark ? 'primary' : 'outline-light-bg'}
-          className="w-full"
-        >
-          {plan.cta.label}
+        <ButtonLink href={LINKS.signup} variant={dark ? 'primary' : 'outline-light-bg'} className="w-full">
+          {PLAN_CTA.label}
         </ButtonLink>
       </div>
     </li>
@@ -71,12 +67,21 @@ export function Pricing() {
         <div data-reveal className="mx-auto max-w-[760px] text-center">
           <Eyebrow>Planos e preços</Eyebrow>
           <SectionTitle>Escolha o tamanho da sua operação.</SectionTitle>
+          <p className="mt-4 text-[17px] text-[#57534E]">
+            Todos os recursos em todos os planos. O que muda é a quantidade de usuários. 14 dias grátis, sem cartão.
+          </p>
         </div>
         <ul data-reveal-stagger={STAGGER} className="mt-12 grid gap-5 lg:grid-cols-3">
           {PLANS.map((plan) => (
             <PlanCard key={plan.id} plan={plan} />
           ))}
         </ul>
+        <p className="mt-6 text-center text-[15px] text-[#57534E]">
+          Dúvidas sobre o plano certo?{' '}
+          <a href={LINKS.contact} target="_blank" rel="noopener noreferrer" className="font-semibold text-[#1C1B1A] underline underline-offset-4">
+            Fale com a gente
+          </a>
+        </p>
         <PricingCalculator />
       </Container>
     </section>

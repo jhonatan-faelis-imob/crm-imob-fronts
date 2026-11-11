@@ -20,7 +20,16 @@ export function billingInfoValues(info: BillingInfo | null): BillingInfoValues {
 }
 
 /** Dados de cobrança da própria imobiliária (diretor) */
-export function BillingInfoForm({ info }: { info: BillingInfo | null }) {
+export function BillingInfoForm({
+  info,
+  onSaved,
+  submitLabel = 'Salvar dados de cobrança',
+}: {
+  info: BillingInfo | null
+  /** Depois de salvar (ex.: seguir para a assinatura) */
+  onSaved?: (saved: BillingInfo) => void
+  submitLabel?: string
+}) {
   const queryClient = useQueryClient()
   const {
     register,
@@ -37,6 +46,7 @@ export function BillingInfoForm({ info }: { info: BillingInfo | null }) {
       reset(billingInfoValues(saved))
       queryClient.invalidateQueries({ queryKey: BILLING_ME_KEY })
       toast.add({ title: 'Dados de cobrança salvos', type: 'success' })
+      onSaved?.(saved)
     },
     onError: (error) => setError('root', { message: apiErrorMessage(error, 'Não foi possível salvar. Tente de novo.') }),
   })
@@ -52,10 +62,10 @@ export function BillingInfoForm({ info }: { info: BillingInfo | null }) {
       <div className="flex justify-end">
         <button
           type="submit"
-          disabled={!isDirty || save.isPending}
+          disabled={(!isDirty && !onSaved) || save.isPending}
           className="min-h-11 w-full rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-60 sm:w-auto"
         >
-          {save.isPending ? 'Salvando...' : 'Salvar dados de cobrança'}
+          {save.isPending ? 'Salvando...' : submitLabel}
         </button>
       </div>
     </form>

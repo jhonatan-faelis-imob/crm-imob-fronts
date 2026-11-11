@@ -1,9 +1,12 @@
 'use client'
 
 import { Skeleton } from '@/components/ui/skeleton'
+import { ActiveSubscription, OverdueNotice } from '@/features/assinatura/active-subscription'
 import { BillingInfoForm } from '@/features/assinatura/billing-info-form'
-import { formatDay, formatMoney, STATUS_META } from '@/features/assinatura/constants'
-import { SupportButton } from '@/features/assinatura/support-button'
+import { formatDay } from '@/features/assinatura/constants'
+import { PaymentsList } from '@/features/assinatura/payments-list'
+import { SubscribePanel } from '@/features/assinatura/subscribe-panel'
+import { useBillingPayments } from '@/features/assinatura/use-billing-actions'
 import { useBillingMe } from '@/features/assinatura/use-billing-me'
 import { useHydrated } from '@/lib/use-hydrated'
 import { cn } from '@/lib/utils'
@@ -16,6 +19,7 @@ export default function AssinaturaPage() {
   const role = useAuthStore((state) => state.user?.role)
   const isDirector = isHydrated && role === 'diretor'
   const { data, isLoading, isError, refetch } = useBillingMe(isDirector)
+  const payments = useBillingPayments(isDirector)
 
   if (isHydrated && !isDirector) {
     return (
@@ -25,24 +29,14 @@ export default function AssinaturaPage() {
     )
   }
 
-  const usage = data ? Math.min(100, Math.round((data.seatsUsed / Math.max(1, data.seats)) * 100)) : 0
-  const full = data ? data.seatsUsed >= data.seats : false
-  const inTrial = data?.status === 'teste'
-  const statusMeta = data ? STATUS_META[data.status] : undefined
-
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6">
       <div>
         <p className="text-xs font-medium text-neutral-400">Configurações</p>
         <h1 className="text-[28px] font-semibold text-neutral-900">Assinatura</h1>
       </div>
 
-      {(!isHydrated || isLoading) && (
-        <div className="space-y-6">
-          <Skeleton className="h-64 rounded-[16px]" />
-          <Skeleton className="h-80 rounded-[16px]" />
-        </div>
-      )}
+      {(!isHydrated || isLoading) && <Skeleton className="h-96 rounded-[16px]" />}
 
       {isError && (
         <div className={cn(cardClassName, 'text-center')}>
@@ -59,65 +53,38 @@ export default function AssinaturaPage() {
 
       {data && (
         <>
-          <section className={cn(cardClassName, 'space-y-5')}>
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="text-sm text-neutral-400">Plano atual</p>
-                <p className="text-[22px] font-semibold text-neutral-900">{data.planName}</p>
-              </div>
-              <span className={cn('rounded-full px-3 py-1 text-xs font-semibold', statusMeta?.className)}>
-                {statusMeta?.label ?? data.status}
-              </span>
-            </div>
+          {data.status === 'atrasada' && <OverdueNotice billing={data} />}
 
-            <div>
-              <div className="mb-1.5 flex items-baseline justify-between text-sm">
-                <span className="text-neutral-600">Usuários ativos</span>
-                <span className="font-semibold text-neutral-900">
-                  {data.seatsUsed} de {data.seats}
-                </span>
-              </div>
-              <div
-                className="h-2 overflow-hidden rounded-full bg-neutral-100"
-                role="progressbar"
-                aria-valuemin={0}
-                aria-valuemax={data.seats}
-                aria-valuenow={data.seatsUsed}
-                aria-label="Usuários ativos sobre contratados"
-              >
-                <div
-                  className={cn('h-full rounded-full', full ? 'bg-warning' : 'bg-brand')}
-                  style={{ width: `${usage}%` }}
-                />
-              </div>
-              {full && <p className="mt-1.5 text-xs text-warning">Todos os usuários contratados estão em uso.</p>}
-            </div>
+          <section className={cn(cardClassName, 'space-y-4')}>
+            {data.hasSubscription ? (
+              <ActiveSubscription billing={data} />
+            ) : (
+              <>
+                <div>
+                  <h2 className="text-[18px] font-semibold text-neutral-900">
+                    {data.status === 'teste' && data.daysLeft !== null && data.daysLeft > 0
+                      ? `Seu teste termina em ${data.daysLeft} ${data.daysLeft === 1 ? 'dia' : 'dias'}`
+                      : 'Escolha seu plano'}
+                  </h2>
+                  <p className="text-sm text-neutral-400">
+                    Todos os planos têm os mesmos recursos; muda só a quantidade de usuários.
+                    {data.canceledAt ? ` Assinatura cancelada; acesso até ${formatDay(data.currentPeriodEnd ?? data.trialEndsAt)}.` : ''}
+                  </p>
+                </div>
+                <SubscribePanel billing={data} />
+              </>
+            )}
+          </section>
 
-            <dl className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <dt className="text-neutral-400">{inTrial ? 'Fim do teste' : 'Próximo vencimento'}</dt>
-                <dd className="font-medium text-neutral-900">
-                  {formatDay(inTrial ? data.trialEndsAt : data.currentPeriodEnd)}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-neutral-400">Valor mensal</dt>
-                <dd className="font-medium text-neutral-900">{formatMoney(data.monthlyPrice)}</dd>
-              </div>
-            </dl>
-
-            <div className="flex flex-col gap-3 rounded-[12px] bg-neutral-100 p-3 sm:flex-row sm:items-center">
-              <p className="flex-1 text-sm text-neutral-600">
-                Para mudar de plano ou ampliar usuários, fale com o suporte.
-              </p>
-              <SupportButton text="Olá! Quero mudar o plano ou ampliar os usuários do CRM Imob." />
-            </div>
+          <section className={cn(cardClassName, 'space-y-2')}>
+            <h2 className="text-[18px] font-semibold text-neutral-900">Cobranças</h2>
+            <PaymentsList payments={payments.data} isLoading={payments.isLoading} />
           </section>
 
           <section className={cn(cardClassName, 'space-y-4')}>
             <div>
               <h2 className="text-[18px] font-semibold text-neutral-900">Dados de cobrança</h2>
-              <p className="text-sm text-neutral-400">Usados para emitir a cobrança.</p>
+              <p className="text-sm text-neutral-400">Usados pelo Asaas para emitir a cobrança.</p>
             </div>
             <BillingInfoForm info={data.billing} />
           </section>

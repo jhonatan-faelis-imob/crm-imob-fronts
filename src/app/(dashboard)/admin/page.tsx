@@ -1,7 +1,8 @@
 'use client'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, RefreshCw, Search, ShieldCheck } from 'lucide-react'
+import { Plus, RefreshCw, Search, ShieldCheck, Webhook } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/toast'
@@ -77,6 +78,13 @@ export default function AdminPage() {
           </p>
         </div>
         <div className="grid grid-cols-2 gap-2 sm:flex">
+          <Link
+            href="/admin/webhooks"
+            className="col-span-2 inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-900 hover:border-brand hover:text-brand sm:col-span-1"
+          >
+            <Webhook className="h-4 w-4" />
+            Webhooks
+          </Link>
           <button
             type="button"
             onClick={() => recalculate.mutate()}

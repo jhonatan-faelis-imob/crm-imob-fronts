@@ -6,7 +6,9 @@ export const organizationsService = {
     slug: string
     name: string
     email: string
-    phone?: string
+    phone: string
+    /** CPF ou CNPJ */
+    document: string
     password: string
   }) => {
     const { data } = await api.post('/organizations/onboarding', dto)

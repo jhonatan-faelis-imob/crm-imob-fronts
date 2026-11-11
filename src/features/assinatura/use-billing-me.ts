@@ -4,12 +4,13 @@ import { billingService } from '@/services/billing.service'
 export const BILLING_ME_KEY = ['billing-me'] as const
 
 /** Situação da assinatura (faixa do topo, /assinatura, menu do /admin). 5 minutos de cache */
-export function useBillingMe(enabled = true) {
+export function useBillingMe(enabled = true, refetchInterval: number | false = false) {
   return useQuery({
     queryKey: BILLING_ME_KEY,
     queryFn: billingService.me,
     staleTime: 5 * 60_000,
     enabled,
+    refetchInterval,
     meta: { silent: true },
   })
 }

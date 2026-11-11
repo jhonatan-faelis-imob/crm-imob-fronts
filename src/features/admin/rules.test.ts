@@ -3,8 +3,8 @@ import { slugify, SLUG_PATTERN } from '@/lib/slugify'
 import { moneyInput, parseMoney, suggestedPrice } from './rules'
 
 const plans = [
-  { id: 'corretor', name: 'Corretor', price: 89.9, seats: 1, extraSeatPrice: null },
-  { id: 'equipe', name: 'Equipe', price: 247, seats: 5, extraSeatPrice: 30 },
+  { id: 'corretor', name: 'Corretor', price: 89.9, seats: 1, extraSeatPrice: null, maxSeats: 1 },
+  { id: 'equipe', name: 'Equipe', price: 247, seats: 5, extraSeatPrice: 30, maxSeats: null },
 ]
 
 describe('suggestedPrice', () => {

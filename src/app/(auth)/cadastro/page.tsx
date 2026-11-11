@@ -13,6 +13,8 @@ import { organizationsService } from '@/services/organizations.service'
 import { useAuthStore } from '@/store/auth.store'
 import { MaskedInput } from '@/features/leads/lead-form/masked-input'
 import { phoneMask } from '@/features/leads/lead-form/masks'
+import { documentMask } from '@/features/assinatura/billing-info-fields'
+import { isValidDocumentOrEmpty } from '@/features/assinatura/constants'
 import { slugify, SLUG_PATTERN } from '@/lib/slugify'
 
 const cadastroSchema = z.object({
@@ -22,12 +24,18 @@ const cadastroSchema = z.object({
       .string()
       .min(1, 'Informe o slug')
       .regex(SLUG_PATTERN, 'Use apenas letras minúsculas, números e hífens'),
+    document: z
+      .string()
+      .min(1, 'Informe o CPF ou CNPJ')
+      .refine(isValidDocumentOrEmpty, 'CPF ou CNPJ inválido'),
   }),
   director: z
     .object({
       name: z.string().min(1, 'Informe seu nome completo'),
       email: z.string().min(1, 'Informe seu email').email('Digite um email válido'),
-      phone: z.string().optional(),
+      phone: z
+        .string()
+        .refine((value) => [10, 11].includes(value.replace(/\D/g, '').length), 'Informe o telefone com DDD'),
       password: z.string().min(8, 'A senha deve ter no mínimo 8 caracteres'),
       confirmPassword: z.string().min(1, 'Confirme sua senha'),
     })
@@ -58,12 +66,13 @@ export default function CadastroPage() {
     trigger,
     watch,
     setValue,
+    setError,
     control,
     formState: { errors, isSubmitting },
   } = useForm<CadastroFormValues>({
     resolver: zodResolver(cadastroSchema),
     defaultValues: {
-      org: { orgName: '', slug: '' },
+      org: { orgName: '', slug: '', document: '' },
       director: { name: '', email: '', phone: '', password: '', confirmPassword: '' },
     },
   })
@@ -77,7 +86,7 @@ export default function CadastroPage() {
   }, [orgName, slugTouched, setValue])
 
   async function goToStep2() {
-    const isValid = await trigger(['org.orgName', 'org.slug'])
+    const isValid = await trigger(['org.orgName', 'org.slug', 'org.document'])
     if (isValid) setStep(1)
   }
 
@@ -89,7 +98,8 @@ export default function CadastroPage() {
         slug: data.org.slug,
         name: data.director.name,
         email: data.director.email,
-        phone: data.director.phone || undefined,
+        phone: data.director.phone,
+        document: data.org.document,
         password: data.director.password,
       })
 
@@ -97,8 +107,13 @@ export default function CadastroPage() {
       useAuthStore.getState().setAuth(auth.user, auth.accessToken, auth.refreshToken)
       router.push('/dashboard')
     } catch (error) {
-      if (axios.isAxiosError(error) && typeof error.response?.data?.message === 'string') {
-        setSubmitError(error.response.data.message)
+      const message: unknown = axios.isAxiosError(error) ? error.response?.data?.message : null
+      if (axios.isAxiosError(error) && error.response?.status === 409 && typeof message === 'string' && /documento/i.test(message)) {
+        // Documento já usado: volta para o passo da imobiliária com a mensagem no campo
+        setStep(0)
+        setError('org.document', { message: 'Já existe uma conta com este CPF ou CNPJ. Entre com ela ou fale com o suporte.' })
+      } else if (typeof message === 'string') {
+        setSubmitError(message)
       } else {
         setSubmitError('Não foi possível criar a conta. Tente novamente.')
       }
@@ -112,7 +127,7 @@ export default function CadastroPage() {
 
         <div className="flex flex-1 flex-col items-start justify-center">
           <h1 className="max-w-md text-[32px] font-semibold leading-tight">
-            Comece agora gratuitamente
+            14 dias grátis, sem cartão de crédito
           </h1>
           <p className="mt-3 max-w-sm text-base text-white/80">
             Cadastre sua imobiliária, monte sua equipe e centralize todo o funil de vendas em um só
@@ -218,14 +233,25 @@ export default function CadastroPage() {
                 </div>
 
                 <div>
-                  <span className="mb-1.5 block text-[13px] font-medium text-neutral-900">Plano</span>
-                  <div className="flex items-center justify-between rounded-[12px] border-[1.5px] border-neutral-200 bg-neutral-100 px-3 py-2.5">
-                    <span className="text-[15px] font-medium text-neutral-900">Gratuito</span>
-                    <span className="rounded-full bg-brand-bg px-2.5 py-1 text-[11px] font-medium text-brand">
-                      Free
-                    </span>
-                  </div>
+                  <label htmlFor="document" className="mb-1.5 block text-[13px] font-medium text-neutral-900">
+                    CPF ou CNPJ
+                  </label>
+                  <MaskedInput
+                    control={control}
+                    name="org.document"
+                    mask={documentMask}
+                    id="document"
+                    placeholder="000.000.000-00"
+                    className="w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-[15px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand"
+                  />
+                  {errors.org?.document && (
+                    <p className="mt-1 text-[12px] text-danger">{errors.org.document.message}</p>
+                  )}
                 </div>
+
+                <p className="rounded-[12px] bg-brand-bg px-3 py-2.5 text-center text-[13px] font-medium text-brand">
+                  14 dias grátis, sem cartão de crédito
+                </p>
 
                 <button
                   type="button"
@@ -294,6 +320,9 @@ export default function CadastroPage() {
                       className="w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white py-2.5 pl-10 pr-3 text-[15px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand"
                     />
                   </div>
+                  {errors.director?.phone && (
+                    <p className="mt-1 text-[12px] text-danger">{errors.director.phone.message}</p>
+                  )}
                 </div>
 
                 <div>

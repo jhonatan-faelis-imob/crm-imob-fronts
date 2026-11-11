@@ -9,12 +9,24 @@ export type Plan = {
   extraUserPrice: number | null
   usersLabel: string
   extraLabel: string | null
-  features: string[]
-  cta: { label: string; href: 'signup' | 'sales' }
+  /** Só o que é exclusivo do plano; os recursos são iguais em todos (PLAN_FEATURES) */
+  extras: string[]
   featured: boolean
 }
 
 export const EXTRA_USER_PRICE = 30
+
+/** Os planos diferem só na quantidade de usuários: nenhum recurso é travado por plano */
+export const PLAN_FEATURES = [
+  'Funil, leads e tarefas',
+  'Metas e funil diário',
+  'Score de IA nos leads',
+  'Catálogo de imóveis',
+  'Relatórios',
+  'Hierarquia completa',
+]
+
+export const PLAN_CTA = { label: 'Começar teste', href: 'signup' } as const
 
 export const PLANS: Plan[] = [
   {
@@ -26,8 +38,7 @@ export const PLANS: Plan[] = [
     extraUserPrice: null,
     usersLabel: '1 usuário',
     extraLabel: null,
-    features: ['Funil, leads e tarefas', 'Score de IA nos leads', 'Metas individuais'],
-    cta: { label: 'Começar teste', href: 'signup' },
+    extras: [],
     featured: false,
   },
   {
@@ -38,14 +49,8 @@ export const PLANS: Plan[] = [
     includedUsers: 5,
     extraUserPrice: EXTRA_USER_PRICE,
     usersLabel: '5 usuários inclusos',
-    extraLabel: '+ R$ 30 por usuário adicional',
-    features: [
-      'Tudo do plano Corretor',
-      'Metas por equipe e funil diário',
-      'Coordenador vê o time',
-      'Relatórios de desempenho',
-    ],
-    cta: { label: 'Começar teste', href: 'signup' },
+    extraLabel: 'R$ 30 por usuário adicional',
+    extras: [],
     featured: true,
   },
   {
@@ -56,14 +61,8 @@ export const PLANS: Plan[] = [
     includedUsers: 20,
     extraUserPrice: EXTRA_USER_PRICE,
     usersLabel: '20 usuários inclusos',
-    extraLabel: '+ R$ 30 por usuário adicional',
-    features: [
-      'Tudo do plano Equipe',
-      '5 níveis de hierarquia',
-      'Catálogo de imóveis e vendas',
-      'Implantação acompanhada',
-    ],
-    cta: { label: 'Falar com vendas', href: 'sales' },
+    extraLabel: 'R$ 30 por usuário adicional',
+    extras: ['Implantação acompanhada'],
     featured: false,
   },
 ]
