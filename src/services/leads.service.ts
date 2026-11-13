@@ -16,6 +16,13 @@ export interface StageChangeResponse {
   cadence?: CadenceResult
 }
 
+// POST /leads devolve o lead mais `cadence` (tarefas da etapa inicial)
+export interface CreateLeadResponse {
+  id: string
+  funnelStageId: string | null
+  cadence?: CadenceResult
+}
+
 export const leadsService = {
   findAll: async (params?: Record<string, string>) => {
     const { data } = await api.get('/leads', { params })
@@ -25,8 +32,9 @@ export const leadsService = {
     const { data } = await api.get(`/leads/${id}`)
     return data
   },
-  create: async (dto: Record<string, unknown>) => {
-    const { data } = await api.post('/leads', dto)
+  // Sem funnelStageId, o backend põe o lead na primeira etapa do funil e aplica a cadência dela
+  create: async (dto: Record<string, unknown>): Promise<CreateLeadResponse> => {
+    const { data } = await api.post<CreateLeadResponse>('/leads', dto)
     return data
   },
   update: async (id: string, dto: Record<string, unknown>) => {

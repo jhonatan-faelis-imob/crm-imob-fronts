@@ -14,6 +14,7 @@ import { formatVgv, KanbanBoard } from '@/features/leads/components/kanban-board
 import { PendingSalesBanner } from '@/features/leads/components/pending-sales-banner'
 import { LeadsListView } from '@/features/leads/list-view'
 import { NewLeadDialog, type LeadFormInitialValues } from '@/features/leads/new-lead-dialog'
+import { createdLeadToastTitle } from '@/features/leads/created-lead-toast'
 import { toCurrencyMaskValue } from '@/features/leads/lead-form/from-lead'
 import { useSimulationDraftStore } from '@/features/simulador/simulation-draft-store'
 import {
@@ -85,11 +86,11 @@ export default function LeadsPage() {
 
   const createLead = useMutation({
     mutationFn: (dto: Record<string, unknown>) => leadsService.create(dto),
-    onSuccess: () => {
+    onSuccess: (lead) => {
       queryClient.invalidateQueries({ queryKey: ['leads'] })
-      // Lead criado com etapa recebe as tarefas da cadência
+      // Todo lead novo entra numa etapa e ganha as tarefas da cadência: invalida tasks, my-day e my-day-summary
       invalidateMyDayQueries(queryClient)
-      toast.add({ title: 'Lead criado com sucesso!', type: 'success' })
+      toast.add({ title: createdLeadToastTitle(lead.cadence), type: 'success' })
     },
     onError: (error: unknown) => {
       if (isAxiosError(error) && error.response?.status === 409) {
