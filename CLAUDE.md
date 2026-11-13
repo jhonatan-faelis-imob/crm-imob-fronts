@@ -413,7 +413,7 @@ background: var(--page-bg)  →  #F7F5F3 (warm gray em todas as páginas)
 DATABASE_URL=              # Neon PostgreSQL
 REDIS_URL=                 # Upstash Redis
 JWT_SECRET=
-FRONTEND_URL=              # Origem do frontend em produção, liberada no CORS
+FRONTEND_URL=              # Origens do frontend liberadas no CORS: uma ou várias separadas por vírgula (ver "CORS")
 GEMINI_API_KEY=            # Chave do sistema (vale quando a organização não usa chave própria)
 GEMINI_MODEL=              # Opcional. Padrão do código: gemini-1.5-flash (descontinuado pelo Google: definir um atual)
 INTEGRATIONS_ENC_KEY=      # 32 bytes em base64: node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
@@ -873,7 +873,7 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
 - **Módulo:** `property-shares` no backend (tabela `property_shares`), `features/empreendimentos/components/property-viewer.tsx`,
   `features/empreendimentos/share/` e `features/vitrine/` no front. Vale para revenda e empreendimento.
 - **Token:** `randomBytes(24).toString('base64url')` (32 caracteres, imprevisível, `@unique`). O link é
-  `${FRONTEND_URL}/i/${token}`. **`FRONTEND_URL` precisa estar definido na API** (também é a origem do CORS); sem ele, o link
+  `${FRONTEND_URL}/i/${token}` (com lista, o primeiro endereço). **`FRONTEND_URL` precisa estar definido na API** (também é a origem do CORS); sem ele, o link
   sai com `http://localhost:3000` e a API registra um aviso.
 - **Endpoints autenticados (`/property-shares`, qualquer perfil, sempre pela organização):**
 
@@ -1272,6 +1272,12 @@ Contratos conferidos na documentação oficial (docs.asaas.com). Cliente em `src
 - `@nestjs/cli`, `prisma` e `typescript` ficam em devDependencies: o build precisa instalar tudo, compilar e só depois
   podar as dependências de desenvolvimento (se um Dockerfile for criado, o `CMD` é `node dist/main.js`).
 - `GET /api/v1/health` é público (`@Public()`), não consulta o banco e devolve `{ status: 'ok' }` (healthcheck).
+- **CORS** (`configureApp` em `src/app.setup.ts`, regras em `src/common/utils/cors.ts`): `FRONTEND_URL` aceita uma lista
+  separada por vírgula. Cada item e a origem recebida são normalizados (trim, sem aspas, sem barra no final, minúsculas) e
+  comparados por igualdade. `http://localhost:3000` é sempre permitido. Curingas (`*.vercel.app`) e itens vazios são
+  descartados, nunca liberados. Origem recusada: `callback(null, false)` (resposta sem os cabeçalhos de CORS, nunca 500) e
+  aviso no log "Origem recusada: X. Permitidas: …". Sem `Origin` (apps, webhooks, Postman) passa. O link de
+  compartilhamento de imóvel usa o **primeiro** endereço da lista (`primaryFrontendUrl`).
 - Depois do `listen`, o `main.ts` loga o RSS em MB ("Memória em repouso"), para acompanhar o consumo no log do Railway.
 
 ---
