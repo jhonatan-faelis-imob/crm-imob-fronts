@@ -10,7 +10,7 @@ const jakarta = Plus_Jakarta_Sans({
   display: 'swap',
 })
 
-const title = 'CRM Imob — CRM imobiliário com IA para lançamento e revenda'
+const title = 'Smart CRM — CRM imobiliário com IA para lançamento e revenda'
 const description =
   'Funil, follow-up, tarefas e metas num só lugar, com uma IA que pontua cada lead e mostra em quem investir seu tempo hoje. Feito para corretores e equipes de lançamento e revenda.'
 
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
-    siteName: 'CRM Imob',
+    siteName: 'Smart CRM',
     title,
     description,
   },

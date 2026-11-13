@@ -47,10 +47,10 @@ export function InstallPWA() {
           gap: '12px',
         }}
       >
-        <img src="/icons/icon-72x72.png" alt="CRM Imob" style={{ width: 40, height: 40, borderRadius: 8 }} />
+        <img src="/icons/icon-72x72.png" alt="Smart CRM" style={{ width: 40, height: 40, borderRadius: 8 }} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontSize: 13, fontWeight: 700, color: '#222222', marginBottom: 2 }}>
-            Instalar CRM Imob
+            Instalar Smart CRM
           </p>
           <p style={{ fontSize: 12, color: '#767676' }}>
             Adicione à tela inicial para acesso rápido

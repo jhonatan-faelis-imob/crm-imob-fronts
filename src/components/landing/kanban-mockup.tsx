@@ -49,7 +49,7 @@ export function KanbanMockup() {
   return (
     <figure className="overflow-hidden rounded-[20px] bg-white text-left shadow-[0_50px_100px_-20px_rgba(0,0,0,0.7)]">
       <figcaption className="sr-only">
-        Exemplo da tela de funil de vendas do CRM Imob em Kanban, com o VGV de cada etapa e o score de IA de cada lead.
+        Exemplo da tela de funil de vendas do Smart CRM em Kanban, com o VGV de cada etapa e o score de IA de cada lead.
       </figcaption>
       <div className="flex items-center gap-3 bg-[#EAE7E3] px-4 py-3">
         <div className="flex gap-1.5" aria-hidden="true">

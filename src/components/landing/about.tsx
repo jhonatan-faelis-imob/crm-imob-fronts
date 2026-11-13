@@ -29,10 +29,10 @@ export function About() {
     <section id="produto" className="scroll-mt-[72px] bg-white py-20 md:py-28">
       <Container className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
         <div data-reveal>
-          <Eyebrow>O que é o CRM Imob?</Eyebrow>
+          <Eyebrow>O que é o Smart CRM?</Eyebrow>
           <SectionTitle>Menos tempo atualizando cliente. Mais tempo vendendo.</SectionTitle>
           <p className="mt-6 text-[17px] leading-relaxed text-[#57534E]">
-            O CRM Imob é uma plataforma feita para a rotina do corretor. Cada lead entra no funil, recebe um score de
+            O Smart CRM é uma plataforma feita para a rotina do corretor. Cada lead entra no funil, recebe um score de
             IA, ganha tarefas de follow-up encadeadas e alimenta as metas da equipe — sem planilha, sem caderno, sem
             cliente esquecido no WhatsApp.
           </p>

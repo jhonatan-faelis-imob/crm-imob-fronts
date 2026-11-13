@@ -49,7 +49,7 @@ export function toDateInput(value: string | null | undefined) {
 export const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_PHONE ?? ''
 
 /** WhatsApp do suporte; null se NEXT_PUBLIC_SUPPORT_PHONE não estiver configurado */
-export function supportWhatsappUrl(text = 'Olá! Preciso de ajuda com a assinatura do CRM Imob.') {
+export function supportWhatsappUrl(text = 'Olá! Preciso de ajuda com a assinatura do Smart CRM.') {
   return SUPPORT_PHONE ? whatsappUrl(SUPPORT_PHONE, text) : null
 }
 

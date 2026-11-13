@@ -1,4 +1,4 @@
-const SALES_MESSAGE = 'Quero conhecer o CRM Imob'
+const SALES_MESSAGE = 'Quero conhecer o Smart CRM'
 
 function salesWhatsapp() {
   const phone = (process.env.NEXT_PUBLIC_SALES_WHATSAPP ?? '').replace(/\D/g, '')

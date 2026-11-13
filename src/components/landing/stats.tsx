@@ -12,7 +12,7 @@ const STAGGER = 100
 
 export function Stats() {
   return (
-    <section className="bg-[#121212] py-16 text-white md:py-20" aria-label="O CRM Imob em números">
+    <section className="bg-[#121212] py-16 text-white md:py-20" aria-label="O Smart CRM em números">
       <Container>
         <ul data-reveal-stagger={STAGGER} className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {STATS.map((stat, index) => (

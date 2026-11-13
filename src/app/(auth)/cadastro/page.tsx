@@ -123,7 +123,7 @@ export default function CadastroPage() {
   return (
     <main className="flex min-h-screen flex-col bg-page lg:flex-row">
       <div className="hidden bg-brand p-12 text-white lg:flex lg:w-1/2 lg:flex-col">
-        <span className="text-xl font-semibold">CRM Imob</span>
+        <span className="text-xl font-semibold">Smart CRM</span>
 
         <div className="flex flex-1 flex-col items-start justify-center">
           <h1 className="max-w-md text-[32px] font-semibold leading-tight">

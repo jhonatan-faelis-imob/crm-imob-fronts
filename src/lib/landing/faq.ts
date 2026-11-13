@@ -6,7 +6,7 @@ export type FaqItem = {
 
 export const FAQ: FaqItem[] = [
   {
-    question: 'O que é o CRM Imob?',
+    question: 'O que é o Smart CRM?',
     answer:
       'Um CRM imobiliário para corretores e imobiliárias que trabalham com lançamento e revenda. Reúne funil de leads, follow-up, tarefas, metas, imóveis, vendas e relatórios, com IA para priorizar os atendimentos.',
   },
@@ -38,7 +38,7 @@ export const FAQ: FaqItem[] = [
   {
     question: 'Funciona no celular?',
     answer:
-      'Sim. O CRM Imob roda no navegador e pode ser instalado na tela inicial do celular, com atalho rápido para criar leads e tarefas.',
+      'Sim. O Smart CRM roda no navegador e pode ser instalado na tela inicial do celular, com atalho rápido para criar leads e tarefas.',
   },
   {
     question: 'Quanto custa?',

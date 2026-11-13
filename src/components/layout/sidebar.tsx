@@ -115,7 +115,7 @@ export function Sidebar() {
     <aside className="hidden h-screen w-[240px] shrink-0 flex-col border-r-[0.5px] border-neutral-200 bg-white lg:flex">
       <div className="flex h-16 items-center gap-2 px-6">
         <Home className="h-5 w-5 text-brand" strokeWidth={2.5} />
-        <span className="text-[20px] font-semibold text-neutral-900">CRM Imob</span>
+        <span className="text-[20px] font-semibold text-neutral-900">Smart CRM</span>
       </div>
 
       <nav className="flex-1 space-y-1 px-3 py-2">

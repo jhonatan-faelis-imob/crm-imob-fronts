@@ -93,7 +93,7 @@ export function Goals() {
           <Eyebrow>Metas e tarefas</Eyebrow>
           <SectionTitle>Meta batida é rotina, não sorte.</SectionTitle>
           <p className="mt-6 text-[17px] leading-relaxed text-[#57534E]">
-            Defina metas para a imobiliária, para cada equipe e para cada corretor. O CRM Imob quebra a meta do mês em
+            Defina metas para a imobiliária, para cada equipe e para cada corretor. O Smart CRM quebra a meta do mês em
             números do dia — leads, visitas, propostas — e mostra quem está no ritmo.
           </p>
         </div>

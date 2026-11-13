@@ -33,7 +33,7 @@ export function PaymentRequiredDialog() {
             Fechar
           </button>
           <SupportButton
-            text={isSeatLimit ? 'Olá! Quero ampliar o número de usuários do CRM Imob.' : 'Olá! Quero reativar a assinatura do CRM Imob.'}
+            text={isSeatLimit ? 'Olá! Quero ampliar o número de usuários do Smart CRM.' : 'Olá! Quero reativar a assinatura do Smart CRM.'}
           />
         </DialogFooter>
       </DialogContent>

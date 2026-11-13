@@ -15,6 +15,9 @@ description: >
 
 ## O Produto
 
+**Nome:** Smart CRM (S e C maiúsculos, com espaço). Era "CRM Imob": o nome antigo continua só em identificadores
+(pacote `crm-imob-front`, repositórios, URL da API no Railway, store `crm-auth`), que não mudam sem decisão à parte.
+
 SaaS multi-tenant para imobiliárias gerenciarem leads, follow-up, metas e equipes.
 Focado em corretores de **lançamento e revenda** que perdem clientes por falta de follow-up
 e precisam de controle de metas de VGV.

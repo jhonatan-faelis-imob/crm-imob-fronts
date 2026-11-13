@@ -21,13 +21,13 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'CRM Imob',
+  title: 'Smart CRM',
   description: 'CRM para imobiliárias',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'CRM Imob',
+    title: 'Smart CRM',
   },
   formatDetection: {
     telephone: false,
@@ -49,7 +49,7 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="CRM Imob" />
+        <meta name="apple-mobile-web-app-title" content="Smart CRM" />
       </head>
       <body className={jakarta.variable} suppressHydrationWarning>
         <RegisterServiceWorker />

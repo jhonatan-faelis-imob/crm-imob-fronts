@@ -62,7 +62,7 @@ export function Footer() {
         </div>
         <div className="mt-14 flex flex-col gap-2 border-t border-[#E6E2DD] pt-6 text-[14px] text-[#6B6762] sm:flex-row sm:justify-between">
           <p>
-            © 2026 CRM Imob · {COMPANY.legalName} · CNPJ {COMPANY.cnpj}
+            © 2026 Smart CRM · {COMPANY.legalName} · CNPJ {COMPANY.cnpj}
           </p>
           <p>
             {COMPANY.city} – {COMPANY.state}
