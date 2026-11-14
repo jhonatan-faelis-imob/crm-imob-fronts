@@ -7,11 +7,16 @@ import { Controller, useForm, useWatch, type Control } from 'react-hook-form'
 import { z } from 'zod'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import type { Task, TaskPriority, TaskType } from '@/types'
+import { leadMatchesSearch } from '@/features/leads/lead-search'
 import { PRIORITY_META, TASK_PRIORITIES, TASK_TYPE_META, TASK_TYPES } from './constants'
 
+// Telefones e e-mail opcionais: entram na busca do seletor (mesma regra da tela de Leads)
 export interface TaskLeadOption {
   id: string
   name: string
+  email?: string | null
+  phone?: string | null
+  phone2?: string | null
 }
 
 const TASK_TYPE_VALUES = TASK_TYPES as [TaskType, ...TaskType[]]
@@ -138,10 +143,7 @@ function LeadSearchSelect({ control, leads }: { control: Control<NewTaskFormValu
       name="leadId"
       render={({ field }) => {
         const selectedLead = leads.find((lead) => lead.id === field.value)
-        const normalized = query.trim().toLowerCase()
-        const results = normalized
-          ? leads.filter((lead) => lead.name.toLowerCase().includes(normalized))
-          : leads
+        const results = query.trim() ? leads.filter((lead) => leadMatchesSearch(lead, query)) : leads
 
         return (
           <div className="relative">

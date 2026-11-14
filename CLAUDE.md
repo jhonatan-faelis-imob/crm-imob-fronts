@@ -1004,6 +1004,14 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
   13, aceita 10 ou 11), `formatPhone` ((DD) 9XXXX-XXXX) e `findLeadByPhone(db, organizationId, digits)` (candidatos por
   `contains` nos 8 últimos dígitos, também com o hífen da máscara no meio, em `phone` e `phone2`; confere em memória pelos
   dígitos completos). O cadastro manual de lead usa a mesma função: acha telefone salvo com ou sem máscara.
+- **Busca de leads por telefone** (`GET /leads?search=`): nome e e-mail por `contains` sem diferenciar maiúsculas, mais o
+  telefone quando o texto só tem dígitos, parênteses, espaços, traços, ponto e + e soma 4 ou mais dígitos
+  (`phoneSearchDigits`; "+55 19 99546-1826" vira "19995461826"). Candidatos por `phoneCandidateWhere` (últimos até 8
+  dígitos, puros ou com um separador `-`, espaço ou `) ` em qualquer posição, em `phone` e `phone2`), dentro dos mesmos
+  filtros, no máximo 500, conferidos em memória por `phoneContainsDigits`; os ids entram no mesmo OR do nome e e-mail.
+  Visibilidade, etapa, origem, responsável, equipe, urgência e a busca vão cada um num item do `AND` (um filtro não
+  sobrescreve a visibilidade do corretor ou do coordenador). Seletor de proprietário e painel de compartilhar usam essa
+  busca; o seletor de lead da nova tarefa filtra os leads carregados com o espelho `features/leads/lead-search.ts`.
 - **Origens de lead:** lista única `LEAD_SOURCES` no backend (`src/modules/leads/lead-sources.ts`, usada no `@IsIn` do DTO) e
   espelho no front (`src/features/leads/sources.ts`, com ícone e cor), lido por formulário, filtros, cartão, lista, detalhe e
   gráfico de Relatórios. Novas: google_ads, meta_ads, zap_imoveis, vivareal, olx, chaves_na_mao. Origem desconhecida aparece com
