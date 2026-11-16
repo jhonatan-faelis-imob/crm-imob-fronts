@@ -60,12 +60,10 @@ export function Footer() {
             </nav>
           ))}
         </div>
-        <div className="mt-14 flex flex-col gap-2 border-t border-[#E6E2DD] pt-6 text-[14px] text-[#6B6762] sm:flex-row sm:justify-between">
-          <p>
-            © 2026 Smart CRM · {COMPANY.legalName} · CNPJ {COMPANY.cnpj}
-          </p>
-          <p>
-            {COMPANY.city} – {COMPANY.state}
+        <div className="mt-14 space-y-1 border-t border-[#E6E2DD] pt-6">
+          <p className="text-[14px] text-[#6B6762]">© 2026 Smart CRM</p>
+          <p className="text-[13px] leading-relaxed text-[#767676]">
+            {COMPANY.legalName} <span aria-hidden="true">·</span> CNPJ {COMPANY.cnpj}
           </p>
         </div>
       </Container>

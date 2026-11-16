@@ -1,7 +1,4 @@
-// Preencher antes de publicar
 export const COMPANY = {
-  legalName: '[RAZÃO SOCIAL]',
-  cnpj: '[CNPJ]',
-  city: '[CIDADE]',
-  state: 'SP',
+  legalName: 'Smart Consultoria Integrada LTDA',
+  cnpj: '60.222.268/0001-08',
 } as const
