@@ -13,6 +13,9 @@ export interface ApiUser {
   teamId: string | null
   active: boolean
   createdAt: string
+  deactivatedAt?: string | null
+  deactivatedByName?: string | null
+  deactivationReason?: string | null
 }
 
 export interface ApiTeam {
@@ -37,6 +40,9 @@ export function mapApiUserToMember(apiUser: ApiUser, organizationId: string): Me
     creci: apiUser.creci ?? undefined,
     active: apiUser.active,
     createdAt: apiUser.createdAt,
+    deactivatedAt: apiUser.deactivatedAt ?? undefined,
+    deactivatedByName: apiUser.deactivatedByName ?? undefined,
+    deactivationReason: apiUser.deactivationReason ?? undefined,
     metrics: { leadsCount: 0, salesCount: 0, vgv: 0, goalTarget: 0 },
   }
 }
@@ -80,4 +86,34 @@ export function memberErrorField(message: string): MemberErrorField {
   if (text.includes('telefone') || text.includes('phone')) return 'phone'
   if (text.includes('nome') || text.includes('name')) return 'name'
   return 'root'
+}
+
+/** 409 de exclusão: o que impede (leads, tarefas...) vem em `blockers` */
+export interface DeleteBlocker {
+  kind: string
+  label: string
+  count: number
+}
+
+export function deleteBlockers(error: unknown): DeleteBlocker[] {
+  if (!isAxiosError(error) || error.response?.status !== 409) return []
+  const blockers: unknown = error.response.data?.blockers
+  if (!Array.isArray(blockers)) return []
+  return blockers.filter(
+    (item): item is DeleteBlocker =>
+      typeof item === 'object' && item !== null && typeof item.label === 'string' && typeof item.count === 'number',
+  )
+}
+
+/** 402 SEAT_LIMIT: plano cheio ao reativar */
+export function isSeatLimitError(error: unknown): boolean {
+  return isAxiosError(error) && error.response?.status === 402 && error.response.data?.code === 'SEAT_LIMIT'
+}
+
+/** Campos do modal de edição a que uma mensagem do backend se refere */
+export type EditErrorField = 'email' | 'role' | 'teamId' | 'phone' | 'name' | 'root'
+
+export function editErrorField(message: string): EditErrorField {
+  const field = memberErrorField(message)
+  return field === 'password' ? 'root' : field
 }

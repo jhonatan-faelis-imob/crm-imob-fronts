@@ -16,8 +16,10 @@ import { phoneMask } from '@/features/leads/lead-form/masks'
 import { documentMask } from '@/features/assinatura/billing-info-fields'
 import { isValidDocumentOrEmpty } from '@/features/assinatura/constants'
 import { slugify, SLUG_PATTERN } from '@/lib/slugify'
+import { LINKS } from '@/lib/landing/links'
 
 const cadastroSchema = z.object({
+  acceptedTerms: z.boolean().refine((value) => value, 'Aceite os Termos de Uso e a Política de Privacidade'),
   org: z.object({
     orgName: z.string().min(1, 'Informe o nome da imobiliária'),
     slug: z
@@ -72,12 +74,14 @@ export default function CadastroPage() {
   } = useForm<CadastroFormValues>({
     resolver: zodResolver(cadastroSchema),
     defaultValues: {
+      acceptedTerms: false,
       org: { orgName: '', slug: '', document: '' },
       director: { name: '', email: '', phone: '', password: '', confirmPassword: '' },
     },
   })
 
   const orgName = watch('org.orgName')
+  const acceptedTerms = watch('acceptedTerms')
 
   useEffect(() => {
     if (!slugTouched) {
@@ -101,6 +105,7 @@ export default function CadastroPage() {
         phone: data.director.phone,
         document: data.org.document,
         password: data.director.password,
+        acceptedTerms: data.acceptedTerms,
       })
 
       const auth = await authService.login(data.director.email, data.director.password)
@@ -392,6 +397,28 @@ export default function CadastroPage() {
                   )}
                 </div>
 
+                <div>
+                  <label htmlFor="acceptedTerms" className="flex min-h-11 items-start gap-3 text-[13px] text-neutral-600">
+                    <input
+                      id="acceptedTerms"
+                      type="checkbox"
+                      className="mt-0.5 size-5 shrink-0 accent-[#FF385C]"
+                      {...register('acceptedTerms')}
+                    />
+                    <span>
+                      Li e aceito os{' '}
+                      <a href={LINKS.terms} target="_blank" rel="noopener noreferrer" className="font-medium text-brand hover:text-brand-dark">
+                        Termos de Uso
+                      </a>{' '}
+                      e a{' '}
+                      <a href={LINKS.privacy} target="_blank" rel="noopener noreferrer" className="font-medium text-brand hover:text-brand-dark">
+                        Política de Privacidade
+                      </a>
+                    </span>
+                  </label>
+                  {errors.acceptedTerms && <p className="mt-1 text-[12px] text-danger">{errors.acceptedTerms.message}</p>}
+                </div>
+
                 <div className="flex gap-2">
                   <button
                     type="button"
@@ -402,7 +429,7 @@ export default function CadastroPage() {
                   </button>
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !acceptedTerms}
                     className="flex flex-1 items-center justify-center gap-2 rounded-[8px] bg-brand py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}

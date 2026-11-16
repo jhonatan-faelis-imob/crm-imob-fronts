@@ -420,6 +420,7 @@ INTEGRATIONS_ENC_KEY=      # 32 bytes em base64: node -e "console.log(require('c
 API_PUBLIC_URL=            # Endereço público do backend, com https:// e sem barra no final (URL do webhook do Google Ads)
 SUPER_ADMIN_EMAILS=        # E-mails do painel /admin, separados por vírgula (comparados em minúsculas)
 PUBLIC_SIGNUP_ENABLED=     # true liga o cadastro público (POST /organizations/onboarding). Padrão: desligado (403)
+TERMS_VERSION=             # Versão dos termos gravada no aceite do cadastro público. Padrão: 1.0
 ASAAS_API_KEY=             # Chave da API do Asaas (cabeçalho access_token). Nunca vai para log
 ASAAS_ENV=                 # production usa api.asaas.com; qualquer outro valor (padrão), o sandbox
 ASAAS_WEBHOOK_TOKEN=       # authToken do webhook no Asaas (cabeçalho asaas-access-token). Sem ele, todo webhook dá 401
@@ -1066,8 +1067,8 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
   `canManageUser` sobre o cargo da pessoa: gerente não redefine a senha de diretor). Encerra as sessões dessa pessoa.
 - **Mudar de equipe não encerra sessões:** definir coordenador e `PATCH /teams/:id/members` usam
   `setTeamKeepingSessions` (`team-rules.ts`), que grava o `teamId` mantendo o `updatedAt` (uma atualização por pessoa,
-  transação com timeout de 20 s). Já o `PATCH /users/:id` (cargo, ativo, equipe pelo gestor) muda o `updatedAt` e derruba
-  as sessões da pessoa, de propósito.
+  transação com timeout de 20 s). Já o `PATCH /users/:id` (cargo, e-mail, equipe pelo gestor) e o desativar mudam o `updatedAt` e derrubam
+  as sessões da pessoa, de propósito. Ver "Gestão de usuários" abaixo.
 - **Front (`/equipe`):**
   - Nenhum campo depende de existir equipe ou coordenador.
   - "Novo membro": o cargo traz só o que `manageableRoles` permite. A equipe começa em "Sem equipe (definir depois)"; para
@@ -1082,6 +1083,63 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
   - Depois de cada ação, `invalidateTeamStructure` invalida `['users']`, `['teams']`, `['me']` e `['team', id]`. Os
     erros mostram a mensagem do backend (`apiErrorMessage`). No "Novo membro", o erro da API aparece no campo a que se
     refere (`memberErrorField`) e o modal só fecha com 2xx.
+
+---
+
+## Gestão de usuários: editar, desativar, transferir e excluir — regras atuais
+
+- **Desativar x excluir.** *Desativar* (`PATCH /users/:id/deactivate { reason? }`) só marca `active = false` e grava
+  `deactivatedAt`, `deactivatedBy` (id, sem FK) e `deactivationReason`: leads, tarefas, imóveis, metas e vendas continuam no
+  nome da pessoa, o histórico fica inteiro, o assento é liberado (a contagem de assentos só conta ativos) e a sessão cai na
+  hora (o `JwtStrategy` recusa inativo e o `updatedAt` muda). Reversível: `PATCH /users/:id/activate`. *Excluir*
+  (`DELETE /users/:id`, **só diretor**) apaga a linha para sempre e só vale para quem não tem nada vinculado.
+- **Travas (valem no backend; o front só esconde o botão):**
+  - ninguém altera o **próprio cargo** (403 "Você não pode alterar o próprio cargo"), se desativa (403) ou se exclui (403);
+  - **último diretor:** não dá para desativar nem excluir o último diretor ativo (409 "A imobiliária precisa de ao menos um
+    diretor ativo");
+  - **coordenador de equipe:** quem coordena uma equipe ativa não é desativado nem tem a equipe trocada (409 pedindo para trocar o
+    coordenador antes); na exclusão também impede;
+  - `canManageUser` vale no editar (cargo atual e novo), desativar, reativar, transferir (nos dois lados) e excluir; coordenador
+    só age sobre a própria equipe (403);
+  - e-mail: só gerente ou superior altera (403), sem duplicar na base, ignorando maiúsculas (409). Mudar e-mail, cargo ou
+    equipe pelo `PATCH /users/:id` derruba a sessão da pessoa (muda o `updatedAt`).
+- **`PATCH /users/:id` não aceita mais `active`:** desativar e reativar têm rotas próprias (para passar pelas travas).
+  Reativar confere o limite do plano (402 `SEAT_LIMIT`) e limpa os campos de desativação.
+- **Resumo da carteira:** `GET /users/:id/portfolio` e a resposta do deactivate (`{ user, summary }`) trazem
+  `{ leadsAtivos, tarefasPendentes, imoveis, metasAtivas }`. Lead ativo = `active` e fora de ganho e perdido; tarefa pendente
+  = `status pendente`; imóveis ativos.
+- **Transferir carteira:** `POST /users/:id/transfer { toUserId, what: ('leads'|'tasks'|'properties')[] }` (coordenador ou
+  superior). Quem recebe precisa estar ativo e ser de outra pessoa; os dois são checados com `canManageUser`. Numa transação
+  move `ownerId` dos leads ativos (o `teamId` do lead acompanha a equipe de quem recebe, que é o que decide a visibilidade do
+  coordenador), `assignedTo` das tarefas pendentes e `ownerId` dos imóveis ativos. **Não move metas nem vendas**. Devolve
+  `{ leads, tasks, properties }` e grava um registro no histórico. Funciona também a partir de um usuário inativo.
+- **Excluir:** impedem leads, tarefas (atribuídas ou criadas por ela), imóveis, metas (e registros diários), vendas,
+  interações, links de imóvel compartilhados, registros de atividade diária e equipe que coordena. Havendo qualquer um: 409 com
+  `code: 'USER_HAS_LINKS'`, `message` com a contagem e `blockers: [{ kind, label, count }]`. Sem vínculos, grava o registro e
+  apaga na mesma transação.
+- **Histórico da organização** = `billing_events` (mesma tabela do painel /admin), com `kind` `usuario_desativado`,
+  `usuario_reativado`, `carteira_transferida` e `usuario_excluido`; `created_by` = e-mail de quem fez.
+- **Listagem:** `GET /users?active=true|false|all` (padrão `true`). `false` e `all` só para coordenador ou superior (403). Os
+  inativos trazem `deactivatedAt`, `deactivatedBy`, `deactivatedByName` e `deactivationReason`. Efeito: seletores de
+  responsável deixaram de listar inativos.
+- **Migration `20261116134112_usuarios_gestao` (só ADD COLUMN):** `users.deactivated_at/by/reason` e
+  `organizations.terms_accepted_at/by/terms_version`.
+- **Aceite dos termos:** o `POST /organizations/onboarding` exige `acceptedTerms: true` (400 sem ele) e grava
+  `termsAcceptedAt`, `termsAcceptedBy` (id do diretor criado) e `termsVersion` (variável `TERMS_VERSION`, padrão `1.0`).
+  `GET /billing/me` devolve `termsAcceptedAt`, `termsAcceptedBy` e `termsVersion`. Contas criadas pelo /admin ficam sem aceite.
+  No front, o cadastro tem a caixa "Li e aceito os Termos de Uso e a Política de Privacidade" (desmarcada, botão desabilitado
+  até marcar). **Os links vêm de `LINKS.terms` e `LINKS.privacy` (`src/lib/landing/links.ts`), hoje `#`: as páginas ainda
+  precisam existir.**
+- **Front (`/equipe`, `src/features/equipe`):** menu de ações por cartão (`MemberActionsMenu`, regra em `memberActions`, espelho
+  do backend) com Editar, Transferir carteira, Resetar senha, Desativar/Reativar e Excluir. Editar a si mesmo leva ao
+  `/perfil` (editar por aqui derrubaria a própria sessão). O modal de edição manda só os campos alterados e mostra 403/409 no
+  campo certo. Desativar (`DeactivateMemberDialog`): mostra a carteira, motivo opcional e, havendo carteira, "Transferir para"
+  com caixas marcadas por padrão; **desativa primeiro e transfere depois** (se o backend recusar, nada foi movido; se a
+  transferência falhar, avisa e a pessoa continua transferível pela seção Inativos). Seção "Inativos" recolhida, com quem
+  desativou, data, motivo e Reativar (402 de plano cheio abre o aviso global de limite). Excluir pede para digitar `excluir`;
+  no 409 lista o que impede e oferece "Desativar em vez de excluir". Depois de cada ação, `invalidateMemberChanges` invalida
+  `['users']`, `['teams']`, `['team']`, `['leads']`, `['tasks']`, `['my-day']` e `['billing-me']`. O filtro de status saiu da
+  barra de membros (inativos têm a própria seção).
 
 ---
 
@@ -1164,7 +1222,7 @@ registrar pagamento à mão (cobrança combinada por fora).
     precisa do decorator.
   - A situação fica em cache de 60 s por organização (`SubscriptionCache`, em memória, por réplica); o painel limpa o cache ao
     alterar.
-- **Limite de usuários:** `assertSeatAvailable` no `POST /users` e ao reativar (`active: true` em quem estava inativo). Ativos ≥
+- **Limite de usuários:** `assertSeatAvailable` no `POST /users` e no `PATCH /users/:id/activate`. Ativos ≥
   `seats`: 402 `{ code: 'SEAT_LIMIT', message: 'Limite de X usuários do plano Y atingido. Fale com o suporte para ampliar.' }`.
   Inativos não contam.
 - **`GET /billing/me`** (qualquer logado): plano, nome do plano, seats, seatsUsed, situação, datas, daysLeft, valor, `warning`

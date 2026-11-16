@@ -38,3 +38,57 @@ const LEVEL: Record<Role, number> = { diretor: 5, gerente: 4, coordenador: 3, co
 export function hasRoleAtLeast(role: string | undefined, minimum: Role): boolean {
   return !!role && isRole(role) && LEVEL[role] >= LEVEL[minimum]
 }
+
+export interface MemberActor {
+  id: string
+  role: Role
+  teamId: string | null
+}
+
+export interface MemberActions {
+  edit: boolean
+  /** Cargo só muda por outra pessoa: nunca no próprio cadastro */
+  editRole: boolean
+  editEmail: boolean
+  transfer: boolean
+  resetPassword: boolean
+  deactivate: boolean
+  activate: boolean
+  remove: boolean
+}
+
+export const NO_MEMBER_ACTIONS: MemberActions = {
+  edit: false, editRole: false, editEmail: false, transfer: false,
+  resetPassword: false, deactivate: false, activate: false, remove: false,
+}
+
+/**
+ * O que quem está logado pode fazer com um membro (espelha o backend; ele é quem decide de verdade).
+ * Coordenador só age sobre a própria equipe
+ */
+export function memberActions(
+  actor: MemberActor | null | undefined,
+  member: { id: string; role: Role; teamId: string | null; active: boolean },
+): MemberActions {
+  if (!actor) return NO_MEMBER_ACTIONS
+  const isSelf = actor.id === member.id
+  const manages = canManageUser(actor.role, member.role)
+  const inScope = actor.role !== 'coordenador' || (!!actor.teamId && member.teamId === actor.teamId)
+  const canAct = manages && inScope
+  const isManagerOrAbove = hasRoleAtLeast(actor.role, 'gerente')
+  return {
+    edit: isSelf || canAct,
+    editRole: !isSelf && canAct,
+    // O próprio e-mail muda pelo perfil, nunca por aqui (editar a si mesmo derrubaria a própria sessão)
+    editEmail: isManagerOrAbove && !isSelf && canAct,
+    transfer: hasRoleAtLeast(actor.role, 'coordenador') && canAct && !isSelf,
+    resetPassword: isManagerOrAbove && canAct && !isSelf && member.active,
+    deactivate: canAct && !isSelf && member.active,
+    activate: canAct && !member.active,
+    remove: actor.role === 'diretor' && !isSelf,
+  }
+}
+
+export function hasAnyMemberAction(actions: MemberActions): boolean {
+  return Object.values(actions).some(Boolean)
+}

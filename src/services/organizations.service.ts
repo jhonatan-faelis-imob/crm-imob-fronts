@@ -10,6 +10,8 @@ export const organizationsService = {
     /** CPF ou CNPJ */
     document: string
     password: string
+    /** Termos de Uso e Política de Privacidade: o backend recusa sem true */
+    acceptedTerms: boolean
   }) => {
     const { data } = await api.post('/organizations/onboarding', dto)
     return data

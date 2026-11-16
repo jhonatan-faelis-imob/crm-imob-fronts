@@ -22,18 +22,15 @@ export interface TeamWithMetrics extends Team {
 }
 
 export type RoleFilter = Role | 'todos'
-export type StatusFilter = 'ativos' | 'inativos' | 'todos'
 
 export interface MemberFilters {
   search: string
   teamId: string
   role: RoleFilter
-  status: StatusFilter
 }
 
 export const defaultMemberFilters: MemberFilters = {
   search: '',
   teamId: 'todas',
   role: 'todos',
-  status: 'ativos',
 }

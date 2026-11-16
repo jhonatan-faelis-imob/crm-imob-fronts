@@ -4,6 +4,14 @@ import { Network, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
+import { DeactivateMemberDialog } from '@/features/equipe/deactivate-member-dialog'
+import { DeleteMemberDialog } from '@/features/equipe/delete-member-dialog'
+import { EditMemberDialog } from '@/features/equipe/edit-member-dialog'
+import { InactiveSection } from '@/features/equipe/inactive-section'
+import type { MemberActionKind } from '@/features/equipe/member-actions-menu'
+import { ResetPasswordDialog } from '@/features/equipe/reset-password-dialog'
+import { TransferPortfolioDialog } from '@/features/equipe/transfer-portfolio-dialog'
+import { useMemberActions } from '@/features/equipe/use-member-actions'
 import { toast } from '@/components/ui/toast'
 import {
   apiErrorMessage,
@@ -20,11 +28,11 @@ import { NewMemberDialog, type NewMemberFormValues } from '@/features/equipe/new
 import { NewTeamDialog, type NewTeamFormValues } from '@/features/equipe/new-team-dialog'
 import { NoTeamSection } from '@/features/equipe/no-team-section'
 import { OverviewCards } from '@/features/equipe/overview-cards'
-import { hasRoleAtLeast, manageableRoles } from '@/features/equipe/permissions'
+import { hasRoleAtLeast, manageableRoles, memberActions, NO_MEMBER_ACTIONS } from '@/features/equipe/permissions'
 import { availableCoordinators, canManageTeamMembers, membersWithoutTeam } from '@/features/equipe/structure'
 import { TeamManageSheet } from '@/features/equipe/team-manage-sheet'
 import { TeamsSection } from '@/features/equipe/teams-section'
-import { defaultMemberFilters, type MemberFilters, type TeamWithMetrics } from '@/features/equipe/types'
+import { defaultMemberFilters, type Member, type MemberFilters, type TeamWithMetrics } from '@/features/equipe/types'
 import { invalidateTeamStructure } from '@/features/equipe/use-team-actions'
 import { useHydrated } from '@/lib/use-hydrated'
 import { teamsService } from '@/services/teams.service'
@@ -45,10 +53,19 @@ export default function EquipePage() {
   const [isNewTeamOpen, setIsNewTeamOpen] = useState(false)
   const [isHierarchyOpen, setIsHierarchyOpen] = useState(false)
   const [managedTeamId, setManagedTeamId] = useState<string | null>(null)
+  const [dialog, setDialog] = useState<{ kind: MemberActionKind; member: Member } | null>(null)
+  const { activate } = useMemberActions()
 
   const { data: usersData, isLoading: loadingUsers } = useQuery<ApiUser[]>({
     queryKey: ['users'],
     queryFn: () => usersService.findAll(),
+  })
+
+  const canSeeInactive = isHydrated && hasRoleAtLeast(asRole(user?.role), 'coordenador')
+  const { data: inactiveData } = useQuery<ApiUser[]>({
+    queryKey: ['users', { active: 'false' }],
+    queryFn: () => usersService.findAll({ active: 'false' }),
+    enabled: canSeeInactive,
   })
 
   const { data: teamsData, isLoading: loadingTeams } = useQuery<ApiTeam[]>({
@@ -59,12 +76,14 @@ export default function EquipePage() {
   const isLoading = loadingUsers || loadingTeams
   const members = (usersData ?? []).map((apiUser) => mapApiUserToMember(apiUser, user?.organizationId ?? ''))
   const teams = (teamsData ?? []).map(mapApiTeamToTeam)
+  const inactiveMembers = (inactiveData ?? []).map((apiUser) => mapApiUserToMember(apiUser, user?.organizationId ?? ''))
 
   // Permissões só depois da hidratação (o store vem do localStorage)
   const actorRole = isHydrated ? asRole(user?.role) : undefined
   // A equipe de quem age vem da lista (o store guarda a do login, que pode ter mudado)
   const actorTeamId = members.find((member) => member.id === user?.id)?.teamId ?? user?.teamId ?? null
   const actor = actorRole ? { role: actorRole, teamId: actorTeamId } : null
+  const memberActor = actorRole && user ? { id: user.id, role: actorRole, teamId: actorTeamId } : null
   const canCreateMember = manageableRoles(actorRole).length > 0
   const isManager = hasRoleAtLeast(actorRole, 'gerente')
   const isCoordinator = actorRole === 'coordenador'
@@ -119,6 +138,15 @@ export default function EquipePage() {
       memberIds: data.memberIds,
     })
   }
+
+  function handleMemberAction(kind: MemberActionKind, member: Member) {
+    if (kind === 'activate') activate.mutate({ id: member.id, name: member.name })
+    else setDialog({ kind, member })
+  }
+
+  const closeDialog = () => setDialog(null)
+  const dialogMember = (kind: MemberActionKind): Member | null => (dialog?.kind === kind ? dialog.member : null)
+  const editingMember = dialogMember('edit')
 
   function manageTeam(team: TeamWithMetrics) {
     setManagedTeamId(team.id)
@@ -200,7 +228,20 @@ export default function EquipePage() {
               onCreateTeam={() => setIsNewTeamOpen(true)}
             />
           )}
-          <MembersSection members={members} teams={teams} filters={memberFilters} onFiltersChange={setMemberFilters} />
+          <MembersSection
+            members={members}
+            teams={teams}
+            filters={memberFilters}
+            onFiltersChange={setMemberFilters}
+            actor={memberActor}
+            onAction={handleMemberAction}
+          />
+          <InactiveSection
+            members={inactiveMembers}
+            actor={memberActor}
+            isReactivating={activate.isPending}
+            onAction={handleMemberAction}
+          />
         </>
       )}
 
@@ -227,6 +268,40 @@ export default function EquipePage() {
         members={members}
         teams={teams}
         actorRole={actorRole}
+      />
+
+      <EditMemberDialog
+        member={editingMember}
+        teams={memberTeams}
+        actorRole={actorRole}
+        actions={editingMember ? memberActions(memberActor, editingMember) : NO_MEMBER_ACTIONS}
+        canEditTeam={!isCoordinator}
+        onClose={closeDialog}
+      />
+      <DeactivateMemberDialog
+        key={`deactivate-${dialogMember('deactivate')?.id ?? 'none'}`}
+        member={dialogMember('deactivate')}
+        members={members}
+        actor={memberActor}
+        onClose={closeDialog}
+      />
+      <TransferPortfolioDialog
+        key={`transfer-${dialogMember('transfer')?.id ?? 'none'}`}
+        member={dialogMember('transfer')}
+        members={members}
+        actor={memberActor}
+        onClose={closeDialog}
+      />
+      <DeleteMemberDialog
+        key={`delete-${dialogMember('remove')?.id ?? 'none'}`}
+        member={dialogMember('remove')}
+        onClose={closeDialog}
+        onSuggestDeactivate={(member) => setDialog({ kind: 'deactivate', member })}
+      />
+      <ResetPasswordDialog
+        key={`reset-${dialogMember('resetPassword')?.id ?? 'none'}`}
+        member={dialogMember('resetPassword')}
+        onClose={closeDialog}
       />
 
       <HierarchySheet open={isHierarchyOpen} onOpenChange={setIsHierarchyOpen} members={members} teams={teams} />

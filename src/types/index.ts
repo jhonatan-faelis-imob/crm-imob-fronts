@@ -113,6 +113,10 @@ export interface User {
   creci?: string
   active: boolean
   createdAt: string
+  /** Só de quem foi desativado */
+  deactivatedAt?: string
+  deactivatedByName?: string
+  deactivationReason?: string
 }
 
 export interface FunnelStage {

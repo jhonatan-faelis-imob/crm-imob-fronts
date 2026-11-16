@@ -1,10 +1,11 @@
 import { MemberCard } from './member-card'
+import type { MemberActionKind } from './member-actions-menu'
+import { memberActions, type MemberActor } from './permissions'
 import { MembersFiltersBar } from './members-filters-bar'
 import type { Member, MemberFilters, TeamWithMetrics } from './types'
 
 function matchesFilters(member: Member, filters: MemberFilters) {
-  if (filters.status === 'ativos' && !member.active) return false
-  if (filters.status === 'inativos' && member.active) return false
+  if (!member.active) return false
   if (filters.teamId !== 'todas' && member.teamId !== filters.teamId) return false
   if (filters.role !== 'todos' && member.role !== filters.role) return false
 
@@ -19,11 +20,15 @@ export function MembersSection({
   teams,
   filters,
   onFiltersChange,
+  actor,
+  onAction,
 }: {
   members: Member[]
   teams: TeamWithMetrics[]
   filters: MemberFilters
   onFiltersChange: (filters: MemberFilters) => void
+  actor: MemberActor | null
+  onAction: (kind: MemberActionKind, member: Member) => void
 }) {
   const filteredMembers = members.filter((member) => matchesFilters(member, filters))
   const teamNameById = new Map(teams.map((team) => [team.id, team.name]))
@@ -45,6 +50,9 @@ export function MembersSection({
               key={member.id}
               member={member}
               teamName={member.teamId ? teamNameById.get(member.teamId) : undefined}
+              actions={memberActions(actor, member)}
+              isSelf={member.id === actor?.id}
+              onAction={onAction}
             />
           ))}
         </div>

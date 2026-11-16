@@ -1,17 +1,11 @@
 import { Search } from 'lucide-react'
 import type { Role } from '@/types'
 import { ROLE_META, ROLES } from './constants'
-import type { MemberFilters, RoleFilter, StatusFilter } from './types'
+import type { MemberFilters, RoleFilter } from './types'
 import type { TeamWithMetrics } from './types'
 
 const selectClassName =
   'rounded-[8px] border-[1.5px] border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-brand'
-
-const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
-  { value: 'ativos', label: 'Ativos' },
-  { value: 'inativos', label: 'Inativos' },
-  { value: 'todos', label: 'Todos' },
-]
 
 export function MembersFiltersBar({
   filters,
@@ -57,18 +51,6 @@ export function MembersFiltersBar({
         {ROLES.map((role: Role) => (
           <option key={role} value={role}>
             {ROLE_META[role].label}
-          </option>
-        ))}
-      </select>
-
-      <select
-        value={filters.status}
-        onChange={(event) => onChange({ ...filters, status: event.target.value as StatusFilter })}
-        className={selectClassName}
-      >
-        {STATUS_OPTIONS.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
           </option>
         ))}
       </select>

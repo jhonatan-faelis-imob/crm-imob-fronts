@@ -1,17 +1,25 @@
-import { Mail, MessageCircle, MoreVertical } from 'lucide-react'
+import { Mail, MessageCircle } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { formatCurrency, getInitials } from '@/lib/utils'
 import { whatsappUrl } from '@/lib/whatsapp'
 import { ROLE_META } from './constants'
+import { MemberActionsMenu, type MemberActionKind } from './member-actions-menu'
+import type { MemberActions } from './permissions'
 import type { Member } from './types'
 
-export function MemberCard({ member, teamName }: { member: Member; teamName: string | undefined }) {
+export function MemberCard({
+  member,
+  teamName,
+  actions,
+  isSelf,
+  onAction,
+}: {
+  member: Member
+  teamName: string | undefined
+  actions: MemberActions
+  isSelf: boolean
+  onAction: (kind: MemberActionKind, member: Member) => void
+}) {
   const roleMeta = ROLE_META[member.role]
   const goalPct =
     member.metrics.goalTarget > 0 ? Math.round((member.metrics.vgv / member.metrics.goalTarget) * 100) : 0
@@ -95,26 +103,7 @@ export function MemberCard({ member, teamName }: { member: Member; teamName: str
           </a>
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <button
-                type="button"
-                aria-label="Mais opções"
-                className="shrink-0 rounded-[8px] p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
-              />
-            }
-          >
-            <MoreVertical className="h-4 w-4" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>Editar</DropdownMenuItem>
-            <DropdownMenuItem>Ver leads</DropdownMenuItem>
-            <DropdownMenuItem>Transferir leads</DropdownMenuItem>
-            <DropdownMenuItem>Resetar senha</DropdownMenuItem>
-            <DropdownMenuItem variant="destructive">Desativar</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <MemberActionsMenu actions={actions} isSelf={isSelf} onAction={(kind) => onAction(kind, member)} />
       </div>
     </div>
   )

@@ -40,6 +40,9 @@ export interface BillingMe {
   cancelReason: string | null
   /** Cobrança em aberto com fatura (link do aviso de atraso) */
   openPayment: { invoiceUrl: string; dueDate: string | null; value: number; status: string } | null
+  /** Aceite dos termos no cadastro público (null em contas criadas pelo suporte) */
+  termsAcceptedAt?: string | null
+  termsVersion?: string | null
   /** Decidido pelo backend (SUPER_ADMIN_EMAILS) */
   isSuperAdmin: boolean
   /** Só para diretor */
