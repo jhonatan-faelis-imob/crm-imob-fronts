@@ -97,6 +97,13 @@ export function SubscribePanel({ billing }: { billing: BillingMe }) {
         <CreditCard className="h-4 w-4" />
         {subscribe.isPending ? 'Abrindo o pagamento...' : 'Assinar'}
       </button>
+      <p className="text-center text-xs text-neutral-400">
+        Ao assinar, você concorda com os{' '}
+        <a href="/termos" target="_blank" rel="noopener noreferrer" className="font-medium text-brand hover:text-brand-dark">
+          Termos de Uso
+        </a>
+        .
+      </p>
       <p className="flex items-center justify-center gap-1.5 text-center text-xs text-neutral-400">
         <Lock className="h-3.5 w-3.5" />
         Pagamento no ambiente seguro do Asaas. Seus dados de cartão não passam pelo Smart CRM.

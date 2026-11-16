@@ -10,8 +10,8 @@ export const LINKS = {
   login: '/login',
   signup: '/cadastro',
   sales: salesWhatsapp(),
-  terms: '#',
-  privacy: '#',
+  terms: '/termos',
+  privacy: '/privacidade',
   about: '#produto',
   contact: salesWhatsapp(),
 } as const

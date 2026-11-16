@@ -2,12 +2,15 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 const PUBLIC_ROUTES = ['/login', '/cadastro']
+const LEGAL_ROUTES = ['/privacidade', '/termos']
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Página pública do imóvel (/i/:token): aberta, e quem está logado também vê (pré-visualizar)
   if (pathname.startsWith('/i/')) return NextResponse.next()
+  // Páginas legais: abertas para todos e sem redirecionar quem está logado
+  if (LEGAL_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))) return NextResponse.next()
   const isPublic = PUBLIC_ROUTES.some(r => pathname.startsWith(r))
 
   // Landing page: só a raiz exata e fora do fluxo do PWA (start_url = /?source=pwa)

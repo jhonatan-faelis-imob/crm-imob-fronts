@@ -244,6 +244,11 @@ export function PublicPropertyView({ share }: { share: PublicPropertyShare }) {
           <p>
             Apresentação enviada por {share.broker?.name ?? 'seu corretor'} · {share.organization.name}
           </p>
+          <p>
+            <a href="/privacidade" className="text-[12px] underline-offset-2 hover:underline">
+              Política de Privacidade
+            </a>
+          </p>
         </footer>
       </main>
 

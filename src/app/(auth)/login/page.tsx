@@ -165,6 +165,11 @@ export default function LoginPage() {
                 Cadastre sua imobiliária
               </Link>
             </p>
+            <p className="pt-2 text-[12px] text-neutral-400">
+              <Link href="/termos" className="hover:text-brand">Termos de Uso</Link>
+              {' · '}
+              <Link href="/privacidade" className="hover:text-brand">Política de Privacidade</Link>
+            </p>
           </div>
         </div>
       </div>
