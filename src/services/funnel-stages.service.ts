@@ -17,6 +17,10 @@ export const funnelStagesService = {
     const { data } = await api.delete(`/funnel-stages/${id}`)
     return data
   },
+  moveLeads: async (fromId: string, toStageId: string) => {
+    const { data } = await api.post(`/funnel-stages/${fromId}/move-leads`, { toStageId })
+    return data
+  },
   reorder: async (orders: { id: string; orderIndex: number }[]) => {
     const { data } = await api.patch('/funnel-stages/reorder', { orders })
     return data

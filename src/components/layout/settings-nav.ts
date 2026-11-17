@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { CreditCard, FileCheck, MessageSquareText, Plug, ShieldCheck, UsersRound, Workflow, type LucideIcon } from 'lucide-react'
+import { Columns3, CreditCard, FileCheck, MessageSquareText, Plug, ShieldCheck, UsersRound, Workflow, type LucideIcon } from 'lucide-react'
 import { canManageCadences } from '@/features/cadencias/constants'
 import { canManageDocuments } from '@/features/documentos/constants'
+import { canManageFunnel } from '@/features/funil/constants'
 import { canManageIntegrations } from '@/features/integracoes/constants'
 
 export interface SettingsNavItem {
@@ -19,6 +20,7 @@ export const SETTINGS_NAV_ITEMS: SettingsNavItem[] = [
   { href: '/mensagens', label: 'Mensagens', icon: MessageSquareText },
   // Equipe continua visível para todos, como era no menu principal
   { href: '/equipe', label: 'Equipe', icon: UsersRound },
+  { href: '/funil', label: 'Etapas do funil', icon: Columns3, canSee: (role) => canManageFunnel({ role }) },
   { href: '/cadencias', label: 'Cadências', icon: Workflow, canSee: (role) => canManageCadences({ role }) },
   { href: '/documentos', label: 'Documentos', icon: FileCheck, canSee: (role) => canManageDocuments({ role }) },
   { href: '/integracoes', label: 'Integrações', icon: Plug, canSee: (role) => canManageIntegrations({ role }) },

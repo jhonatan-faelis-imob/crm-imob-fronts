@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { List, Plus, SquareKanban, Workflow } from 'lucide-react'
+import { Columns3, List, Plus, SquareKanban, Workflow } from 'lucide-react'
 import Link from 'next/link'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/toast'
 import { canManageCadences } from '@/features/cadencias/constants'
+import { canManageFunnel } from '@/features/funil/constants'
 import { invalidateMyDayQueries } from '@/features/meu-dia/invalidate-my-day-queries'
 import { FiltersBar, defaultLeadFilters, type LeadFilters } from '@/features/leads/filters-bar'
 import { formatVgv, KanbanBoard } from '@/features/leads/components/kanban-board'
@@ -64,6 +65,7 @@ export default function LeadsPage() {
   const user = useAuthStore((state) => state.user)
   // Depois da hidratação: o usuário vem do localStorage e o HTML do servidor não o conhece
   const showCadences = isHydrated && canManageCadences(user)
+  const showFunnel = isHydrated && canManageFunnel(user)
 
   const { data: stages } = useQuery<ApiFunnelStage[]>({
     queryKey: ['funnel-stages'],
@@ -133,6 +135,16 @@ export default function LeadsPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          {showFunnel && (
+            <Link
+              href="/funil"
+              aria-label="Etapas do funil"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border-[0.5px] border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 sm:h-10"
+            >
+              <Columns3 className="h-4 w-4" />
+              <span className="hidden sm:inline">Etapas do funil</span>
+            </Link>
+          )}
           {showCadences && (
             <Link
               href="/cadencias"

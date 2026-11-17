@@ -139,6 +139,7 @@ app/
       │   ├── page.tsx              → Lista + Kanban
       │   └── [id]/page.tsx         → Detalhe do lead
       ├── tarefas/page.tsx          → Tarefas em aberto
+      ├── funil/page.tsx            → Etapas do funil (coordenador ou superior)
       ├── empreendimentos/
       │   ├── page.tsx
       │   └── [id]/page.tsx
@@ -512,6 +513,7 @@ src/
   | Cadências | `/cadencias` | gerente ou superior (`canManageCadences`) |
   | Documentos | `/documentos` | gerente ou superior (`canManageDocuments`) |
   | Integrações | `/integracoes` | gerente ou superior (`canManageIntegrations`, ícone Plug) |
+  | Etapas do funil | `/funil` | coordenador ou superior (`canManageFunnel`, ícone Columns3; fica antes de Cadências) |
 
 - Sem nenhum subitem visível, o grupo some. O grupo fica destacado e abre sozinho em `/mensagens`, `/equipe` e `/cadencias`
   (`useSettingsGroup`), e também em `/documentos` e `/integracoes`; fora delas começa recolhido. As três páginas mostram "Configurações" em muted acima do título.
@@ -714,6 +716,45 @@ enum, renderizado com `style={{ backgroundColor, color }}` — não usa o compon
   dois montam o toast com `cadenceToastDescription`. Chip `AutoTaskChip` (Zap) em lista, calendário (só ícone), detalhe da
   tarefa, aba de tarefas do lead e Meu dia. Kanban mostra um Info com os passos ativos (`['cadences']`, staleTime 5 min) num
   Popover que abre no toque e no hover.
+
+---
+
+## Etapas do funil — regras atuais
+
+- **Tela:** `/funil` (Configurações → "Etapas do funil", ícone Columns3), **coordenador ou superior** (`canManageFunnel`, mesma
+  regra do `@Roles('coordenador')` das rotas); quem não pode vê "Sem acesso". Também há o botão "Etapas do funil" no cabeçalho
+  de `/leads` (só ícone no celular), ao lado de Cadências. Está na lista NetworkOnly do PWA. Código em `src/features/funil`.
+- **Lista:** etapas na ordem do Kanban, arrastáveis (dnd-kit, alça visível; reordena na hora e salva com
+  `PATCH /funnel-stages/reorder`, desfazendo se falhar). Cada linha: círculo da cor, nome, selo "Padrão", "N leads" e menu
+  Editar, Mover leads (desabilitado sem leads) e Excluir (escondido nas padrão). "Nova etapa": nome, cor (paleta dos selos mais
+  campo #RRGGBB) e posição (antes ou depois de uma etapa; sugere antes de Ganho). Query `['funnel-stages']`, a mesma do Kanban.
+- **Backend (`src/modules/funnel-stages`, sem migration):**
+  - `GET /funnel-stages` devolve em cada etapa `leadsCount` (leads ativos) e `cadenceStepsCount`, com dois `groupBy`.
+  - `POST` cria na posição `orderIndex` (as etapas dessa posição em diante descem uma casa), sempre não padrão. Nome repetido
+    (sem acento e sem maiúsculas) dá 409 "Já existe uma etapa com esse nome". Cor `#RRGGBB`, nome até 40.
+  - `PATCH /:id` (`UpdateFunnelStageDto`, só `name` e `color`, inclusive nas padrão): `isDefault` e posição nunca mudam por
+    aqui (antes o corpo não era validado).
+  - `PATCH /reorder` (`ReorderStagesDto`): ids repetidos ou de outra organização dão 400; grava tudo numa transação.
+  - Todas as rotas de escrita: coordenador ou superior.
+- **Excluir (`DELETE /:id`):** padrão = 403; com leads **ativos** = 409 `{ code: 'STAGE_HAS_LEADS', count, message: 'Esta etapa
+  tem N leads. Mova-os antes de excluir.' }`; funil com 2 etapas ou menos = 409 `MIN_STAGES`. Os passos de cadência dela saem
+  junto, na mesma transação, e o corpo traz `removedCadenceSteps`. Leads arquivados que apontavam para ela ficam sem etapa
+  (`onDelete: SetNull`).
+- **Etapas de desfecho:** o nome normalizado (sem acento, minúsculas) `ganho` ou `perdido` é lido por `statusForStage`
+  (leads) e pela regra de venda e de perda. **Renomear essas duas para outro nome dá 409** `{ code: 'STAGE_IS_TERMINAL',
+  message: 'Esta etapa controla o registro de vendas e de perdas. Renomeá-la quebraria esse fluxo.' }`. Mudar só a forma
+  (GANHO, Ganhô) e a cor é permitido. O front abre um diálogo explicando.
+- **Mover leads (`POST /funnel-stages/:id/move-leads { toStageId }`, coordenador ou superior):** move todos os leads ativos da
+  etapa para a de destino numa transação (`LeadsService.moveAllToStage`), cada um pelo mesmo `moveToStage` do `updateStage`:
+  histórico de etapas, status e cadência de destino (cancela as automáticas pendentes da etapa antiga e cria as da nova).
+  Mesma etapa = 400; etapa de outra organização = 404; **mais de 300 leads = 400 pedindo para mover por partes**
+  (`MAX_MOVE_LEADS`). Devolve `{ moved, cadence: { created, cancelled } }` (aqui `created` é a **contagem** de tarefas, não a
+  lista do `updateStage`).
+- **Fluxo no front:** etapa com leads: "Excluir" abre direto o diálogo "Mover leads" (destino + "Mover e excluir", que chama
+  move-leads e depois o delete; se o delete falhar depois de mover, o erro diz isso). Etapa vazia: AlertDialog que avisa quantos
+  passos de cadência saem junto. Um 409 `STAGE_HAS_LEADS` (contagem velha) leva ao mesmo diálogo de mover. Depois de cada ação,
+  `invalidateFunnelQueries` invalida `['funnel-stages']` e, via `invalidateCadenceQueries`, `['cadences']`, `['tasks']`,
+  `['my-day']`, `['my-day-summary']`, `['leads']` e afins.
 
 ---
 
