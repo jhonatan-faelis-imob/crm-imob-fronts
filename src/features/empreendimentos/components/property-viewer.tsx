@@ -87,7 +87,7 @@ function CopyCode({ code }: { code: string }) {
       type="button"
       onClick={() => void copy()}
       aria-label={`Copiar código ${code}`}
-      className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full bg-neutral-100 px-3 font-mono text-xs font-medium text-neutral-600 hover:bg-neutral-200"
+      className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full bg-canvas px-3 font-mono text-xs font-medium text-muted-foreground hover:bg-line"
     >
       Cód. {code}
       <Copy className="h-3.5 w-3.5" />
@@ -98,7 +98,7 @@ function CopyCode({ code }: { code: string }) {
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="space-y-2.5">
-      <h3 className="text-[15px] font-semibold text-neutral-900">{title}</h3>
+      <h3 className="text-[15px] font-semibold text-brand">{title}</h3>
       {children}
     </section>
   )
@@ -109,7 +109,7 @@ function Description({ text }: { text: string }) {
   const long = text.length > 280
   return (
     <div>
-      <p className={`whitespace-pre-line text-[15px] leading-relaxed text-neutral-600 ${!expanded && long ? 'line-clamp-4' : ''}`}>
+      <p className={`whitespace-pre-line text-[15px] leading-relaxed text-muted-foreground ${!expanded && long ? 'line-clamp-4' : ''}`}>
         {text}
       </p>
       {long && (
@@ -148,25 +148,25 @@ function SharesList({ property }: { property: Property }) {
     }
   }
 
-  if (isLoading) return <p className="text-sm text-neutral-400">Carregando…</p>
+  if (isLoading) return <p className="text-sm text-muted-foreground">Carregando…</p>
   if (!shares || shares.length === 0) {
-    return <p className="rounded-[12px] bg-neutral-100 p-3 text-sm text-neutral-400">Você ainda não compartilhou este imóvel</p>
+    return <p className="rounded-[12px] bg-canvas p-3 text-sm text-muted-foreground">Você ainda não compartilhou este imóvel</p>
   }
 
   return (
     <>
-      <ul className="divide-y-[0.5px] divide-neutral-200 rounded-[12px] border-[0.5px] border-neutral-200">
+      <ul className="divide-y-[0.5px] divide-line rounded-[12px] border-[0.5px] border-line">
         {shares.map((share) => {
           const status = SHARE_STATUS_META[share.status]
           return (
             <li key={share.id} className="space-y-1.5 p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-sm font-medium text-neutral-900">{share.leadName ?? 'Link geral'}</span>
+                <span className="text-sm font-medium text-brand">{share.leadName ?? 'Link geral'}</span>
                 <span className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: status.bg, color: status.text }}>
                   {status.label}
                 </span>
               </div>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-muted-foreground">
                 {share.sentAt ? `Enviado em ${formatDate(share.sentAt)}` : 'Não enviado'}
                 {' · '}
                 {share.viewCount === 0
@@ -179,7 +179,7 @@ function SharesList({ property }: { property: Property }) {
                   <button
                     type="button"
                     onClick={() => void copyLink(share.url)}
-                    className="inline-flex min-h-9 items-center gap-1 rounded-[8px] border-[0.5px] border-neutral-200 px-2.5 text-xs font-medium text-neutral-600 hover:bg-neutral-100"
+                    className="inline-flex min-h-9 items-center gap-1 rounded-[8px] border-[0.5px] border-line px-2.5 text-xs font-medium text-muted-foreground hover:bg-canvas"
                   >
                     <Copy className="h-3.5 w-3.5" />
                     Copiar link
@@ -208,7 +208,7 @@ function SharesList({ property }: { property: Property }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-neutral-600 sm:h-10">
+            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-muted-foreground sm:h-10">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
@@ -216,7 +216,7 @@ function SharesList({ property }: { property: Property }) {
                 if (revoking) revoke.mutate(revoking.id)
                 setRevoking(null)
               }}
-              className="h-11 rounded-[8px] bg-danger px-4 text-white hover:bg-danger hover:opacity-90 sm:h-10"
+              className="h-11 rounded-[8px] bg-danger px-4 text-paper hover:bg-danger hover:opacity-90 sm:h-10"
             >
               Revogar
             </AlertDialogAction>
@@ -254,30 +254,30 @@ function PrivateBlock({ property }: { property: Property }) {
   }
 
   return (
-    <section className="rounded-[16px] border-[0.5px] border-dashed border-neutral-400 bg-neutral-100">
+    <section className="rounded-[16px] border-[0.5px] border-dashed border-line-strong bg-canvas">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         className="flex min-h-12 w-full items-center justify-between gap-2 px-4 text-left"
       >
-        <span className="flex items-center gap-2 text-sm font-semibold text-neutral-900">
-          <Lock className="h-4 w-4 text-neutral-400" />
+        <span className="flex items-center gap-2 text-sm font-semibold text-brand">
+          <Lock className="h-4 w-4 text-muted-foreground" />
           Só você vê
         </span>
-        <ChevronDown className={`h-4 w-4 text-neutral-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
         <div className="space-y-2 px-4 pb-4">
-          <p className="text-xs text-neutral-400">Nunca vai para o link nem para os portais.</p>
+          <p className="text-xs text-muted-foreground">Nunca vai para o link nem para os portais.</p>
           {rows.length === 0 ? (
-            <p className="text-sm text-neutral-400">Nada cadastrado.</p>
+            <p className="text-sm text-muted-foreground">Nada cadastrado.</p>
           ) : (
             <dl className="space-y-2">
               {rows.map((row) => (
                 <div key={row.label} className="grid grid-cols-[140px_1fr] gap-2 text-sm">
-                  <dt className="text-neutral-400">{row.label}</dt>
-                  <dd className="text-neutral-900">{row.value}</dd>
+                  <dt className="text-muted-foreground">{row.label}</dt>
+                  <dd className="text-brand">{row.value}</dd>
                 </div>
               ))}
             </dl>
@@ -339,9 +339,9 @@ function ViewerBody({ property, onOpenPortal }: { property: Property; onOpenPort
       />
 
       <header className="space-y-2">
-        <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">{typeLabel}</p>
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{typeLabel}</p>
         <div className="flex flex-wrap items-start gap-x-3 gap-y-1">
-          <h2 className="min-w-0 flex-1 text-[22px] font-semibold leading-tight text-neutral-900">{property.title}</h2>
+          <h2 className="min-w-0 flex-1 text-[22px] font-semibold leading-tight text-brand">{property.title}</h2>
           {property.code && <CopyCode code={property.code} />}
         </div>
         {isDevelopment ? (
@@ -356,10 +356,10 @@ function ViewerBody({ property, onOpenPortal }: { property: Property; onOpenPort
             <p className="text-[28px] font-semibold leading-tight text-brand">{formatMoney(property.price)}</p>
           )
         )}
-        <div className="text-sm text-neutral-600">
+        <div className="text-sm text-muted-foreground">
           <p>{fullAddress || property.city}</p>
           {!isDevelopment && (
-            <p className="mt-0.5 text-xs text-neutral-400">
+            <p className="mt-0.5 text-xs text-muted-foreground">
               Nos portais e no link, aparece: {ADDRESS_MODE_LABEL[property.portalAddressDisplay ?? 'street']}
             </p>
           )}
@@ -370,22 +370,22 @@ function ViewerBody({ property, onOpenPortal }: { property: Property; onOpenPort
       {(specs.length > 0 || isDevelopment) && (
         <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {isDevelopment && property.totalUnits !== undefined && (
-            <li className="flex items-center gap-2 rounded-[12px] bg-neutral-100 px-3 py-2.5 text-sm text-neutral-900">
-              <Building className="h-4 w-4 shrink-0 text-neutral-400" />
+            <li className="flex items-center gap-2 rounded-[12px] bg-canvas px-3 py-2.5 text-sm text-brand">
+              <Building className="h-4 w-4 shrink-0 text-muted-foreground" />
               {property.totalUnits} unidades
             </li>
           )}
           {developmentStatus && (
-            <li className="flex items-center gap-2 rounded-[12px] bg-neutral-100 px-3 py-2.5 text-sm text-neutral-900">
-              <CalendarDays className="h-4 w-4 shrink-0 text-neutral-400" />
+            <li className="flex items-center gap-2 rounded-[12px] bg-canvas px-3 py-2.5 text-sm text-brand">
+              <CalendarDays className="h-4 w-4 shrink-0 text-muted-foreground" />
               {developmentStatus.label}
             </li>
           )}
           {specs.map((spec) => {
             const Icon = SPEC_ICON[spec.key]
             return (
-              <li key={spec.key} className="flex items-center gap-2 rounded-[12px] bg-neutral-100 px-3 py-2.5 text-sm text-neutral-900">
-                <Icon className="h-4 w-4 shrink-0 text-neutral-400" />
+              <li key={spec.key} className="flex items-center gap-2 rounded-[12px] bg-canvas px-3 py-2.5 text-sm text-brand">
+                <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
                 {spec.value}
               </li>
             )
@@ -398,17 +398,17 @@ function ViewerBody({ property, onOpenPortal }: { property: Property; onOpenPort
           <ul className="space-y-1.5 text-sm">
             {conditions.map((condition) => (
               <li key={condition.label} className="flex justify-between gap-3">
-                <span className="text-neutral-400">{condition.label}</span>
-                <span className="font-medium text-neutral-900">{condition.value}</span>
+                <span className="text-muted-foreground">{condition.label}</span>
+                <span className="font-medium text-brand">{condition.value}</span>
               </li>
             ))}
             {property.acceptsFgts && (
-              <li className="flex items-center gap-1.5 text-neutral-900">
+              <li className="flex items-center gap-1.5 text-brand">
                 <Check className="h-4 w-4 text-success" /> Aceita FGTS
               </li>
             )}
             {property.acceptsFinancing && (
-              <li className="flex items-center gap-1.5 text-neutral-900">
+              <li className="flex items-center gap-1.5 text-brand">
                 <Check className="h-4 w-4 text-success" /> Aceita financiamento
               </li>
             )}
@@ -420,7 +420,7 @@ function ViewerBody({ property, onOpenPortal }: { property: Property; onOpenPort
         <Section title="Características">
           <ul className="flex flex-wrap gap-1.5">
             {featureLabels.map((label) => (
-              <li key={label} className="inline-flex items-center gap-1 rounded-full bg-brand-bg px-3 py-1 text-[13px] font-medium text-brand">
+              <li key={label} className="inline-flex items-center gap-1 rounded-full bg-line px-3 py-1 text-[13px] font-medium text-brand">
                 <Sparkles className="h-3 w-3" />
                 {label}
               </li>
@@ -463,7 +463,7 @@ function ViewerFooter({
           type="button"
           onClick={onShare}
           disabled={sold}
-          className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-400"
+          className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-semibold text-paper transition-colors hover:bg-ink disabled:cursor-not-allowed disabled:bg-line disabled:text-muted-foreground"
         >
           <Share2 className="h-4 w-4" />
           Compartilhar
@@ -471,7 +471,7 @@ function ViewerFooter({
         <button
           type="button"
           onClick={onEdit}
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-[8px] border-[1.5px] border-neutral-900 px-4 text-sm font-medium text-neutral-900 hover:bg-neutral-100"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-[8px] border-[1.5px] border-brand px-4 text-sm font-medium text-brand hover:bg-canvas"
         >
           <Pencil className="h-4 w-4" />
           Editar
@@ -479,12 +479,12 @@ function ViewerFooter({
         <button
           type="button"
           onClick={onClose}
-          className="min-h-11 rounded-[8px] border-[0.5px] border-neutral-200 px-3 text-sm font-medium text-neutral-600 hover:bg-neutral-100"
+          className="min-h-11 rounded-[8px] border-[0.5px] border-line px-3 text-sm font-medium text-muted-foreground hover:bg-canvas"
         >
           Fechar
         </button>
       </div>
-      {sold && <p className="text-center text-xs text-neutral-400">Imóvel vendido: não pode ser compartilhado</p>}
+      {sold && <p className="text-center text-xs text-muted-foreground">Imóvel vendido: não pode ser compartilhado</p>}
     </div>
   )
 }
@@ -520,20 +520,20 @@ export function PropertyViewer({
     <>
       {isMobile ? (
         <Sheet open={open} onOpenChange={onOpenChange}>
-          <SheetContent side="bottom" className="flex h-[100dvh] max-h-[100dvh] flex-col gap-0 rounded-none bg-white p-0">
+          <SheetContent side="bottom" className="flex h-[100dvh] max-h-[100dvh] flex-col gap-0 rounded-none bg-paper p-0">
             <SheetTitle className="sr-only">{property.title}</SheetTitle>
             <div className="flex-1 overflow-y-auto p-4">{body}</div>
-            <div className="shrink-0 border-t-[0.5px] border-neutral-200 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+            <div className="shrink-0 border-t-[0.5px] border-line bg-paper p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
               {footer}
             </div>
           </SheetContent>
         </Sheet>
       ) : (
         <Dialog open={open} onOpenChange={onOpenChange}>
-          <DialogContent className="flex max-h-[90vh] w-[calc(100%-2rem)] max-w-2xl flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0 sm:max-w-2xl">
+          <DialogContent className="flex max-h-[90vh] w-[calc(100%-2rem)] max-w-2xl flex-col gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0 sm:max-w-2xl">
             <DialogTitle className="sr-only">{property.title}</DialogTitle>
             <div className="flex-1 overflow-y-auto p-6">{body}</div>
-            <div className="shrink-0 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4">{footer}</div>
+            <div className="shrink-0 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4">{footer}</div>
           </DialogContent>
         </Dialog>
       )}

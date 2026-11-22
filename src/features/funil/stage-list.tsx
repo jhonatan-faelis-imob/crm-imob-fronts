@@ -43,7 +43,7 @@ function StageRow({ stage, actions }: { stage: ApiStage; actions: StageRowAction
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn(
-        'flex items-center gap-2 rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-2 pr-3 sm:gap-3',
+        'flex items-center gap-2 rounded-[16px] border-[0.5px] border-line bg-paper p-2 pr-3 sm:gap-3',
         isDragging && 'relative z-10 shadow-md',
       )}
     >
@@ -53,7 +53,7 @@ function StageRow({ stage, actions }: { stage: ApiStage; actions: StageRowAction
         {...attributes}
         {...listeners}
         aria-label={`Arrastar a etapa ${stage.name} para reordenar`}
-        className="flex size-11 shrink-0 cursor-grab touch-none items-center justify-center rounded-[8px] text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900 active:cursor-grabbing"
+        className="flex size-11 shrink-0 cursor-grab touch-none items-center justify-center rounded-[8px] text-muted-foreground hover:bg-canvas hover:text-brand active:cursor-grabbing"
       >
         <GripVertical className="h-4 w-4" />
       </button>
@@ -62,12 +62,12 @@ function StageRow({ stage, actions }: { stage: ApiStage; actions: StageRowAction
 
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-          <p className="truncate text-[15px] font-semibold text-neutral-900">{stage.name}</p>
+          <p className="truncate text-[15px] font-semibold text-brand">{stage.name}</p>
           {stage.isDefault && (
-            <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-600">Padrão</span>
+            <span className="rounded-full bg-canvas px-2 py-0.5 text-[11px] font-medium text-muted-foreground">Padrão</span>
           )}
         </div>
-        <p className="text-xs text-neutral-400">{leadsText(stage.leadsCount)}</p>
+        <p className="text-xs text-muted-foreground">{leadsText(stage.leadsCount)}</p>
       </div>
 
       <DropdownMenu>
@@ -76,13 +76,13 @@ function StageRow({ stage, actions }: { stage: ApiStage; actions: StageRowAction
             <button
               type="button"
               aria-label={`Ações da etapa ${stage.name}`}
-              className="flex size-11 shrink-0 items-center justify-center rounded-[8px] text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900 sm:size-9"
+              className="flex size-11 shrink-0 items-center justify-center rounded-[8px] text-muted-foreground hover:bg-canvas hover:text-brand sm:size-9"
             />
           }
         >
           <MoreHorizontal className="h-4 w-4" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 bg-white">
+        <DropdownMenuContent align="end" className="w-48 bg-paper">
           <DropdownMenuItem className="min-h-11" onClick={() => actions.onEdit(stage)}>
             <Pencil className="h-4 w-4" />
             Editar

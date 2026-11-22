@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 
 export const inputClassName =
-  'w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-[15px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand'
-export const labelClassName = 'mb-1.5 block text-[13px] font-medium text-neutral-900'
+  'w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] text-brand outline-none transition-colors placeholder:text-muted-foreground focus:border-brand'
+export const labelClassName = 'mb-1.5 block text-[13px] font-medium text-brand'
 export const errorClassName = 'mt-1 text-[12px] text-danger'
 
 export function FormField({

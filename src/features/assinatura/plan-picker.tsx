@@ -52,7 +52,7 @@ export function PlanPicker({
                 key={item.id}
                 className={cn(
                   'relative flex cursor-pointer flex-col rounded-[16px] border-[1.5px] p-4 transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-brand',
-                  selected ? 'border-brand bg-brand-bg' : 'border-neutral-200 bg-white hover:border-neutral-400',
+                  selected ? 'border-brand bg-line' : 'border-line bg-paper hover:border-line-strong',
                 )}
               >
                 <input
@@ -64,16 +64,16 @@ export function PlanPicker({
                   className="sr-only"
                 />
                 <span className="flex items-center justify-between gap-2">
-                  <span className="text-[15px] font-semibold text-neutral-900">{item.name}</span>
+                  <span className="text-[15px] font-semibold text-brand">{item.name}</span>
                   {currentPlanId === item.id && (
-                    <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-600">Atual</span>
+                    <span className="rounded-full bg-canvas px-2 py-0.5 text-[10px] font-medium text-muted-foreground">Atual</span>
                   )}
                 </span>
-                <span className="mt-1 text-[20px] font-semibold text-neutral-900">
+                <span className="mt-1 text-[20px] font-semibold text-brand">
                   {formatMoney(item.price)}
-                  <span className="text-xs font-normal text-neutral-400">/mês</span>
+                  <span className="text-xs font-normal text-muted-foreground">/mês</span>
                 </span>
-                <span className="mt-1 text-xs text-neutral-600">
+                <span className="mt-1 text-xs text-muted-foreground">
                   {isFixedSeats(item)
                     ? '1 usuário'
                     : `${item.seats} usuários inclusos, ${formatMoney(item.extraSeatPrice)} por usuário adicional`}
@@ -84,12 +84,12 @@ export function PlanPicker({
         </div>
       </fieldset>
 
-      <div className="flex flex-col gap-3 rounded-[16px] bg-neutral-100 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-[16px] bg-canvas p-4 sm:flex-row sm:items-center sm:justify-between">
         {fixed ? (
-          <p className="text-sm font-medium text-neutral-900">1 usuário</p>
+          <p className="text-sm font-medium text-brand">1 usuário</p>
         ) : (
           <div className="flex items-center gap-3">
-            <span id="seats-label" className="text-sm font-medium text-neutral-900">
+            <span id="seats-label" className="text-sm font-medium text-brand">
               Usuários
             </span>
             <div className="flex items-center gap-2" role="group" aria-labelledby="seats-label">
@@ -98,7 +98,7 @@ export function PlanPicker({
                 onClick={() => setSeats(seats - 1)}
                 disabled={seats <= plan.seats}
                 aria-label="Menos usuários"
-                className="flex h-11 w-11 items-center justify-center rounded-[8px] border-[1.5px] border-neutral-200 bg-white text-neutral-900 disabled:opacity-40"
+                className="flex h-11 w-11 items-center justify-center rounded-[8px] border-[1.5px] border-line bg-paper text-brand disabled:opacity-40"
               >
                 <Minus className="h-4 w-4" />
               </button>
@@ -110,23 +110,23 @@ export function PlanPicker({
                 value={seats}
                 onChange={(event) => setSeats(event.target.valueAsNumber)}
                 aria-label="Quantidade de usuários"
-                className="h-11 w-16 rounded-[8px] border-[1.5px] border-neutral-200 bg-white text-center text-[15px] font-semibold text-neutral-900 outline-none focus:border-brand"
+                className="h-11 w-16 rounded-[8px] border-[1.5px] border-line bg-paper text-center text-[15px] font-semibold text-brand outline-none focus:border-brand"
               />
               <button
                 type="button"
                 onClick={() => setSeats(seats + 1)}
                 disabled={seats >= MAX_SEATS}
                 aria-label="Mais usuários"
-                className="flex h-11 w-11 items-center justify-center rounded-[8px] border-[1.5px] border-neutral-200 bg-white text-neutral-900 disabled:opacity-40"
+                className="flex h-11 w-11 items-center justify-center rounded-[8px] border-[1.5px] border-line bg-paper text-brand disabled:opacity-40"
               >
                 <Plus className="h-4 w-4" />
               </button>
             </div>
           </div>
         )}
-        <p className="text-sm text-neutral-600" aria-live="polite">
+        <p className="text-sm text-muted-foreground" aria-live="polite">
           Total mensal{' '}
-          <span className="ml-1 text-[22px] font-semibold text-neutral-900">{formatMoney(planTotal(plan, seats))}</span>
+          <span className="ml-1 text-[22px] font-semibold text-brand">{formatMoney(planTotal(plan, seats))}</span>
         </p>
       </div>
 

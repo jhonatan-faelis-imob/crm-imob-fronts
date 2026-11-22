@@ -18,7 +18,7 @@ export function TabPreponents() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-neutral-400">
+        <p className="text-sm text-muted-foreground">
           {fields.length === 0
             ? 'Nenhum preponente adicionado'
             : `${fields.length} preponente${fields.length > 1 ? 's' : ''} adicionado${fields.length > 1 ? 's' : ''}`}
@@ -27,7 +27,7 @@ export function TabPreponents() {
           <button
             type="button"
             onClick={() => setIsFormOpen(true)}
-            className="inline-flex items-center gap-2 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+            className="inline-flex items-center gap-2 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink"
           >
             <Plus className="h-4 w-4" />
             Novo preponente
@@ -42,15 +42,15 @@ export function TabPreponents() {
           {fields.map((field, index) => (
             <li
               key={field.id}
-              className="flex items-center justify-between rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4"
+              className="flex items-center justify-between rounded-[16px] border-[0.5px] border-line bg-paper p-4"
             >
               <div className="flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-bg text-brand">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-line text-brand">
                   <UserRound className="h-4 w-4" />
                 </span>
                 <div>
-                  <p className="text-sm font-medium text-neutral-900">{field.name}</p>
-                  <p className="text-xs text-neutral-400">
+                  <p className="text-sm font-medium text-brand">{field.name}</p>
+                  <p className="text-xs text-muted-foreground">
                     {PREPONENT_RELATION_META[field.relation]} · {field.cpf}
                   </p>
                 </div>
@@ -59,7 +59,7 @@ export function TabPreponents() {
                 type="button"
                 aria-label="Remover preponente"
                 onClick={() => remove(index)}
-                className="rounded-[8px] p-2 text-neutral-400 hover:bg-[#FFEBEE] hover:text-danger"
+                className="rounded-[8px] p-2 text-muted-foreground hover:bg-[#FFEBEE] hover:text-danger"
               >
                 <Trash2 className="h-4 w-4" />
               </button>

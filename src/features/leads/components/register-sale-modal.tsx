@@ -70,13 +70,13 @@ function PropertyPicker({
 
   if (selected) {
     return (
-      <div className="flex items-center justify-between gap-2 rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5">
-        <span className="truncate text-[15px] text-neutral-900">{propertyLabel(selected.title, selected.code)}</span>
+      <div className="flex items-center justify-between gap-2 rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5">
+        <span className="truncate text-[15px] text-brand">{propertyLabel(selected.title, selected.code)}</span>
         <button
           type="button"
           aria-label="Remover empreendimento"
           onClick={() => onSelect(null)}
-          className="shrink-0 rounded-[8px] p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
+          className="shrink-0 rounded-[8px] p-1 text-muted-foreground hover:bg-canvas hover:text-brand"
         >
           <X className="h-4 w-4" />
         </button>
@@ -87,7 +87,7 @@ function PropertyPicker({
   return (
     <div>
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
           id="sale-property"
           value={query}
@@ -107,21 +107,21 @@ function PropertyPicker({
         // preventDefault keeps focus on the input, so its blur doesn't close the list before the click lands
         <div
           onMouseDown={(event) => event.preventDefault()}
-          className="mt-1 max-h-40 space-y-1 overflow-y-auto rounded-[12px] border-[0.5px] border-neutral-200 bg-white p-1"
+          className="mt-1 max-h-40 space-y-1 overflow-y-auto rounded-[12px] border-[0.5px] border-line bg-paper p-1"
         >
           {results.map((property) => (
             <button
               key={property.id}
               type="button"
               onClick={() => onSelect({ id: property.id, title: property.title, code: property.code ?? null })}
-              className="flex w-full flex-col rounded-[8px] px-3 py-2 text-left hover:bg-neutral-100"
+              className="flex w-full flex-col rounded-[8px] px-3 py-2 text-left hover:bg-canvas"
             >
-              <span className="truncate text-sm font-medium text-neutral-900">{propertyLabel(property.title, property.code)}</span>
-              <span className="truncate text-xs text-neutral-400">{property.city}</span>
+              <span className="truncate text-sm font-medium text-brand">{propertyLabel(property.title, property.code)}</span>
+              <span className="truncate text-xs text-muted-foreground">{property.city}</span>
             </button>
           ))}
           {results.length === 0 && (
-            <p className="px-3 py-2 text-sm text-neutral-400">
+            <p className="px-3 py-2 text-sm text-muted-foreground">
               {isLoading ? 'Buscando...' : 'Nenhum imóvel encontrado.'}
             </p>
           )}
@@ -225,19 +225,19 @@ function RegisterSaleForm({
         </FieldGrid>
       </div>
 
-      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
+      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
         <button
           type="button"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="rounded-[8px] border-[1.5px] border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-[8px] border-[1.5px] border-line px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-canvas disabled:cursor-not-allowed disabled:opacity-50"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting ? 'Confirmando...' : 'Confirmar venda'}
         </button>
@@ -266,8 +266,8 @@ export function RegisterSaleModal({
         if (!nextOpen && !isSubmitting) onCancel()
       }}
     >
-      <DialogContent className="grid-cols-none flex max-h-[90vh] w-[calc(100%-2rem)] max-w-lg flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0 sm:max-w-lg">
-        <DialogHeader className="shrink-0 gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
+      <DialogContent className="grid-cols-none flex max-h-[90vh] w-[calc(100%-2rem)] max-w-lg flex-col gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0 sm:max-w-lg">
+        <DialogHeader className="shrink-0 gap-1 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14">
           <DialogTitle>Registrar venda</DialogTitle>
           <DialogDescription>
             {lead?.name}

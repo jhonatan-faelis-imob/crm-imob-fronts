@@ -15,7 +15,7 @@ export default function DashboardLayout({
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Fixa: fica fora da área que rola */}
         <SubscriptionBanner />
-        <main className="flex-1 overflow-y-auto bg-page p-6 pb-24 lg:pb-6">{children}</main>
+        <main className="flex-1 overflow-y-auto bg-canvas p-6 pb-24 lg:pb-6">{children}</main>
         <BottomNav />
       </div>
       <InstallPWA />

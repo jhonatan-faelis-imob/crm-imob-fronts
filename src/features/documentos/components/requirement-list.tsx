@@ -24,7 +24,7 @@ import type { DocumentRequirement } from '@/types'
 import { categoryLabel } from '../constants'
 
 const iconButtonClassName =
-  'flex h-11 w-11 shrink-0 items-center justify-center rounded-[8px] text-neutral-400 transition-colors disabled:opacity-40 sm:h-9 sm:w-9'
+  'flex h-11 w-11 shrink-0 items-center justify-center rounded-[8px] text-muted-foreground transition-colors disabled:opacity-40 sm:h-9 sm:w-9'
 
 export interface RequirementActions {
   onToggle: (requirement: DocumentRequirement, active: boolean) => void
@@ -50,7 +50,7 @@ function RequirementRow({
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn(
-        'flex items-center gap-2 bg-white py-2.5 sm:gap-3',
+        'flex items-center gap-2 bg-paper py-2.5 sm:gap-3',
         !requirement.active && 'opacity-60',
         isDragging && 'relative z-10 rounded-[12px] shadow-md',
       )}
@@ -61,13 +61,13 @@ function RequirementRow({
         {...attributes}
         {...listeners}
         aria-label="Arrastar para reordenar"
-        className={`${iconButtonClassName} -ml-2 cursor-grab touch-none hover:bg-neutral-100 hover:text-neutral-900 active:cursor-grabbing`}
+        className={`${iconButtonClassName} -ml-2 cursor-grab touch-none hover:bg-canvas hover:text-brand active:cursor-grabbing`}
       >
         <GripVertical className="h-4 w-4" />
       </button>
       <div className="min-w-0 flex-1">
-        <p className="break-words text-sm font-medium text-neutral-900">{requirement.name}</p>
-        <p className="text-xs text-neutral-400">
+        <p className="break-words text-sm font-medium text-brand">{requirement.name}</p>
+        <p className="text-xs text-muted-foreground">
           {categoryLabel(requirement.category)}
           {!requirement.required && ' · Opcional'}
           {requirement.appliesWhen === 'has_fgts' && ' · Só com FGTS'}
@@ -83,7 +83,7 @@ function RequirementRow({
         type="button"
         onClick={() => actions.onEdit(requirement)}
         aria-label="Editar documento"
-        className={`${iconButtonClassName} hover:bg-neutral-100 hover:text-neutral-900`}
+        className={`${iconButtonClassName} hover:bg-canvas hover:text-brand`}
       >
         <Pencil className="h-4 w-4" />
       </button>
@@ -127,7 +127,7 @@ export function RequirementList({
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={requirements.map((item) => item.id)} strategy={verticalListSortingStrategy}>
-        <ul className="divide-y-[0.5px] divide-neutral-200">
+        <ul className="divide-y-[0.5px] divide-line">
           {requirements.map((requirement) => (
             <RequirementRow
               key={requirement.id}

@@ -40,7 +40,7 @@ export function EventsList({ provider, poll = false }: { provider: IntegrationPr
           type="button"
           onClick={() => refetch()}
           disabled={isFetching}
-          className="inline-flex h-9 items-center gap-1.5 rounded-[8px] border-[1.5px] border-neutral-200 px-3 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-100 disabled:opacity-60"
+          className="inline-flex h-9 items-center gap-1.5 rounded-[8px] border-[1.5px] border-line px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-canvas disabled:opacity-60"
         >
           {isFetching ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
           Atualizar
@@ -55,9 +55,9 @@ export function EventsList({ provider, poll = false }: { provider: IntegrationPr
       ) : isError ? (
         <p className="rounded-[12px] bg-danger-bg p-3 text-xs text-danger">Não foi possível carregar a atividade.</p>
       ) : !events?.length ? (
-        <p className="rounded-[12px] bg-neutral-100 p-3 text-sm text-neutral-400">Nenhuma atividade ainda.</p>
+        <p className="rounded-[12px] bg-canvas p-3 text-sm text-muted-foreground">Nenhuma atividade ainda.</p>
       ) : (
-        <ul className="divide-y-[0.5px] divide-neutral-200 rounded-[12px] border-[0.5px] border-neutral-200">
+        <ul className="divide-y-[0.5px] divide-line rounded-[12px] border-[0.5px] border-line">
           {events.map((event) => {
             const meta = EVENT_STATUS_META[event.status]
             return (
@@ -65,9 +65,9 @@ export function EventsList({ provider, poll = false }: { provider: IntegrationPr
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className={cn('rounded-full px-2 py-0.5 text-[11px] font-medium', meta.className)}>{meta.label}</span>
-                    <span className="text-xs text-neutral-400">{formatDateTime(event.createdAt)}</span>
+                    <span className="text-xs text-muted-foreground">{formatDateTime(event.createdAt)}</span>
                   </div>
-                  <p className="mt-1 break-words text-sm text-neutral-900">
+                  <p className="mt-1 break-words text-sm text-brand">
                     {event.status === 'teste' ? 'Teste recebido ✓' : event.summary}
                   </p>
                 </div>

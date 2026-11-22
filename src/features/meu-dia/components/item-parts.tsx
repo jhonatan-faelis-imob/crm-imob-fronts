@@ -2,7 +2,7 @@ import type { MyDayReason } from '@/types'
 import { SEVERITY_CLASS_NAME } from '../constants'
 
 export function ItemRibbon() {
-  return <p className="bg-brand px-4 py-1.5 text-xs font-medium text-white sm:px-5">Comece por aqui</p>
+  return <p className="bg-brand px-4 py-1.5 text-xs font-medium text-paper sm:px-5">Comece por aqui</p>
 }
 
 export function ReasonChips({ reasons }: { reasons: MyDayReason[] }) {

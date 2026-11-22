@@ -12,12 +12,12 @@ import { moneyInput, parseMoney, todayInput } from './rules'
 import { invalidateAdmin } from './use-admin'
 
 const dialogClassName =
-  'flex max-h-[92vh] w-[calc(100%-1rem)] max-w-sm flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0'
-const headerClassName = 'shrink-0 gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14'
+  'flex max-h-[92vh] w-[calc(100%-1rem)] max-w-sm flex-col gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0'
+const headerClassName = 'shrink-0 gap-1 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14'
 const footerClassName =
-  'mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6'
+  'mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6'
 const cancelClassName =
-  'min-h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-600 hover:bg-neutral-100'
+  'min-h-11 rounded-[8px] border-[1.5px] border-line px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-canvas'
 
 /** Bloquear ou desbloquear, com motivo obrigatório (vai para o histórico) */
 export function ReasonDialog({
@@ -83,7 +83,7 @@ export function ReasonDialog({
             type="button"
             disabled={reason.trim() === '' || mutation.isPending}
             onClick={() => mutation.mutate()}
-            className={`min-h-11 rounded-[8px] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50 ${
+            className={`min-h-11 rounded-[8px] px-4 py-2.5 text-sm font-medium text-paper disabled:opacity-50 ${
               isBlock ? 'bg-danger' : 'bg-success'
             }`}
           >
@@ -206,7 +206,7 @@ export function PaymentDialog({
             type="button"
             disabled={!valid || mutation.isPending}
             onClick={() => mutation.mutate()}
-            className="min-h-11 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-50"
+            className="min-h-11 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper hover:bg-ink disabled:opacity-50"
           >
             {mutation.isPending ? 'Registrando...' : 'Registrar'}
           </button>

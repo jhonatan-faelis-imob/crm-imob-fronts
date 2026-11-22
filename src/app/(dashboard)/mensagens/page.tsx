@@ -68,13 +68,13 @@ export default function MensagensPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs font-medium text-neutral-400">Configurações</p>
-          <h1 className="text-[28px] font-semibold text-neutral-900">Mensagens</h1>
+          <p className="text-xs font-medium text-muted-foreground">Configurações</p>
+          <h1 className="text-[28px] font-semibold text-brand">Mensagens</h1>
         </div>
         <button
           type="button"
           onClick={() => openForm(null)}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-medium text-paper transition-colors hover:bg-ink"
         >
           <Plus className="h-4 w-4" />
           Novo modelo
@@ -83,20 +83,20 @@ export default function MensagensPage() {
 
       <div className="flex flex-col gap-2 sm:flex-row">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Buscar modelo"
             aria-label="Buscar modelo"
-            className="w-full rounded-[12px] border-[0.5px] border-neutral-200 bg-white py-2.5 pl-9 pr-3 text-base text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand"
+            className="w-full rounded-[12px] border-[0.5px] border-line bg-paper py-2.5 pl-9 pr-3 text-base text-brand outline-none transition-colors placeholder:text-muted-foreground focus:border-brand"
           />
         </div>
         <select
           value={typeFilter}
           onChange={(event) => setTypeFilter(event.target.value)}
           aria-label="Filtrar por tipo"
-          className="rounded-[12px] border-[0.5px] border-neutral-200 bg-white px-3 py-2.5 text-base text-neutral-900 outline-none focus:border-brand sm:w-52"
+          className="rounded-[12px] border-[0.5px] border-line bg-paper px-3 py-2.5 text-base text-brand outline-none focus:border-brand sm:w-52"
         >
           <option value="">Todos os tipos</option>
           {TEMPLATE_TYPES.map((type) => (
@@ -114,7 +114,7 @@ export default function MensagensPage() {
           ))}
         </div>
       ) : isError ? (
-        <p className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-6 text-center text-sm text-danger">
+        <p className="rounded-[16px] border-[0.5px] border-line bg-paper p-6 text-center text-sm text-danger">
           Não foi possível carregar os modelos.
         </p>
       ) : visibleTemplates.length === 0 ? (
@@ -144,7 +144,7 @@ export default function MensagensPage() {
       <TemplateFormDialog key={formSession} open={isFormOpen} onOpenChange={setIsFormOpen} template={editingTemplate} />
 
       <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
+        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
           <AlertDialogHeader className="p-4 sm:p-6">
             <AlertDialogTitle>Excluir modelo?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -153,14 +153,14 @@ export default function MensagensPage() {
               afetadas.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="mx-0 mb-0 gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
-            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-neutral-600 sm:h-10">
+          <AlertDialogFooter className="mx-0 mb-0 gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
+            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-muted-foreground sm:h-10">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deletingTemplate && removeTemplate.mutate(deletingTemplate.id)}
               disabled={removeTemplate.isPending}
-              className="h-11 rounded-[8px] bg-danger px-4 text-white hover:bg-danger hover:opacity-90 sm:h-10"
+              className="h-11 rounded-[8px] bg-danger px-4 text-paper hover:bg-danger hover:opacity-90 sm:h-10"
             >
               Excluir modelo
             </AlertDialogAction>

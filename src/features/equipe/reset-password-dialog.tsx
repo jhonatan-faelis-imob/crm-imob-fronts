@@ -45,8 +45,8 @@ export function ResetPasswordDialog({ member, onClose }: { member: Member | null
 
   return (
     <Dialog open={member !== null} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="flex w-[calc(100%-2rem)] max-w-md flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
-        <DialogHeader className="gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
+      <DialogContent className="flex w-[calc(100%-2rem)] max-w-md flex-col gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
+        <DialogHeader className="gap-1 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14">
           <DialogTitle>{saved ? 'Senha redefinida' : 'Resetar senha'}</DialogTitle>
           <DialogDescription>
             {saved ? `Repasse a senha para ${member?.name}.` : `${member?.name} será desconectado de todos os aparelhos.`}
@@ -75,7 +75,7 @@ export function ResetPasswordDialog({ member, onClose }: { member: Member | null
                 <button
                   type="button"
                   onClick={() => setPassword(generatePassword())}
-                  className="min-h-11 shrink-0 rounded-[8px] border-[1.5px] border-neutral-200 px-3 text-sm font-medium text-neutral-900 hover:border-brand hover:text-brand"
+                  className="min-h-11 shrink-0 rounded-[8px] border-[1.5px] border-line px-3 text-sm font-medium text-brand hover:border-brand hover:text-brand"
                 >
                   Gerar
                 </button>
@@ -86,12 +86,12 @@ export function ResetPasswordDialog({ member, onClose }: { member: Member | null
           )}
         </div>
 
-        <DialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
+        <DialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
           {saved ? (
             <button
               type="button"
               onClick={onClose}
-              className="min-h-11 rounded-[8px] bg-brand px-4 text-sm font-medium text-white hover:bg-brand-dark"
+              className="min-h-11 rounded-[8px] bg-brand px-4 text-sm font-medium text-paper hover:bg-ink"
             >
               Concluir
             </button>
@@ -100,7 +100,7 @@ export function ResetPasswordDialog({ member, onClose }: { member: Member | null
               <button
                 type="button"
                 onClick={onClose}
-                className="min-h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-sm font-medium text-neutral-600 hover:bg-neutral-100"
+                className="min-h-11 rounded-[8px] border-[1.5px] border-line px-4 text-sm font-medium text-muted-foreground hover:bg-canvas"
               >
                 Cancelar
               </button>
@@ -108,7 +108,7 @@ export function ResetPasswordDialog({ member, onClose }: { member: Member | null
                 type="button"
                 disabled={password.length < 8 || reset.isPending}
                 onClick={() => member && reset.mutate({ id: member.id, value: password })}
-                className="min-h-11 rounded-[8px] bg-brand px-4 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-60"
+                className="min-h-11 rounded-[8px] bg-brand px-4 text-sm font-medium text-paper hover:bg-ink disabled:opacity-60"
               >
                 {reset.isPending ? 'Salvando...' : 'Redefinir senha'}
               </button>

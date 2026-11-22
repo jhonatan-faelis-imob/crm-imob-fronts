@@ -46,7 +46,7 @@ export function DetailHeader({
     <div className="space-y-3">
       <Link
         href="/leads"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-400 hover:text-neutral-900"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-brand"
       >
         <ArrowLeft className="h-4 w-4" />
         Leads
@@ -54,7 +54,7 @@ export function DetailHeader({
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-2.5">
-          <h1 className="text-[28px] font-semibold text-neutral-900">{lead.name}</h1>
+          <h1 className="text-[28px] font-semibold text-brand">{lead.name}</h1>
           <StagePopover stages={stages ?? []} currentStage={currentStage} onSelect={onSelectStage} />
           {urgency && (
             <span
@@ -71,7 +71,7 @@ export function DetailHeader({
           <button
             type="button"
             onClick={onEdit}
-            className="inline-flex items-center gap-2 rounded-[8px] border-[1.5px] border-neutral-900 px-4 py-2.5 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-100"
+            className="inline-flex items-center gap-2 rounded-[8px] border-[1.5px] border-brand px-4 py-2.5 text-sm font-medium text-brand transition-colors hover:bg-canvas"
           >
             <Pencil className="h-4 w-4" />
             Editar lead
@@ -83,7 +83,7 @@ export function DetailHeader({
                 <button
                   type="button"
                   aria-label="Mais opções"
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border-[0.5px] border-neutral-200 text-neutral-600 hover:bg-neutral-100"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border-[0.5px] border-line text-muted-foreground hover:bg-canvas"
                 />
               }
             >

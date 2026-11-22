@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 
 // A LP permite zoom (o viewport do app trava a escala)
 export const viewport: Viewport = {
-  themeColor: '#121212',
+  themeColor: '#060B23',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -47,7 +47,7 @@ const NOSCRIPT_STYLE =
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div data-landing className={`${jakarta.className} min-h-screen bg-white text-[#1C1B1A] antialiased`}>
+    <div data-landing className={`${jakarta.className} min-h-screen bg-paper text-[#1C1B1A] antialiased`}>
       <script dangerouslySetInnerHTML={{ __html: MOTION_READY_SCRIPT }} />
       <noscript dangerouslySetInnerHTML={{ __html: NOSCRIPT_STYLE }} />
       <NavScrollState />

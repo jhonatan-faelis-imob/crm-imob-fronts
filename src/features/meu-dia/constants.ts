@@ -26,7 +26,7 @@ export const FILTERS: { value: MyDayFilter; label: string; count: keyof MyDayCou
 export const SEVERITY_CLASS_NAME: Record<MyDayReason['severity'], string> = {
   critical: 'bg-[#FFEBEE] text-danger',
   warning: 'bg-[#FFF3E0] text-warning',
-  info: 'bg-neutral-100 text-neutral-600',
+  info: 'bg-canvas text-muted-foreground',
 }
 
 export const RETURN_OPTIONS: { label: string; days?: number; months?: number }[] = [

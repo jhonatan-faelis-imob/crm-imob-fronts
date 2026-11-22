@@ -6,8 +6,8 @@ import type { RankingEntry } from './types'
 
 export function RankingSection({ entries }: { entries: RankingEntry[] }) {
   return (
-    <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5 lg:p-6">
-      <h2 className="text-[20px] font-semibold text-neutral-900">Ranking do mês</h2>
+    <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-5 lg:p-6">
+      <h2 className="text-[20px] font-semibold text-brand">Ranking do mês</h2>
 
       <ul className="mt-4 space-y-2">
         {entries.map((entry, index) => {
@@ -15,31 +15,31 @@ export function RankingSection({ entries }: { entries: RankingEntry[] }) {
           return (
             <li
               key={entry.id}
-              className={`rounded-[12px] p-3 ${entry.isCurrentUser ? 'bg-neutral-100' : ''}`}
+              className={`rounded-[12px] p-3 ${entry.isCurrentUser ? 'bg-canvas' : ''}`}
             >
               <div className="flex items-center gap-3">
-                <span className="w-5 shrink-0 text-sm font-medium text-neutral-400">
+                <span className="w-5 shrink-0 text-sm font-medium text-muted-foreground">
                   {position}º
                 </span>
                 <Avatar>
-                  <AvatarFallback className="bg-brand-bg text-brand">
+                  <AvatarFallback className="bg-line text-brand">
                     {getInitials(entry.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
-                    <span className="truncate text-sm font-medium text-neutral-900">
+                    <span className="truncate text-sm font-medium text-brand">
                       {entry.name}
                     </span>
                     {position === 1 && entry.vgv > 0 && <Trophy className="h-4 w-4 shrink-0 text-amber-500" />}
                   </div>
-                  <span className="text-xs text-neutral-400">{entry.units} unidades</span>
+                  <span className="text-xs text-muted-foreground">{entry.units} unidades</span>
                 </div>
                 <div className="shrink-0 text-right">
-                  <p className="text-sm font-semibold text-neutral-900">
+                  <p className="text-sm font-semibold text-brand">
                     {formatCurrency(entry.vgv)}
                   </p>
-                  <p className="text-xs text-neutral-400">
+                  <p className="text-xs text-muted-foreground">
                     {entry.goalPct === null ? 'Sem meta' : `${entry.goalPct}% da meta`}
                   </p>
                 </div>

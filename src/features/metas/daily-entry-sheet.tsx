@@ -71,7 +71,7 @@ function toFormValues(counts: Partial<Record<FunnelApiKey, number>> | null | und
 }
 
 const inputClassName =
-  'w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-base text-neutral-900 outline-none transition-colors focus:border-brand'
+  'w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-base text-brand outline-none transition-colors focus:border-brand'
 const errorClassName = 'mt-1 text-[12px] text-danger'
 
 // Uma instância por dia (key = data): trocar de dia nunca herda o que foi digitado no anterior
@@ -117,7 +117,7 @@ function DayEntryForm({
   return (
     <>
       <div className="space-y-2 px-4">
-        <p className="text-xs text-neutral-400">
+        <p className="text-xs text-muted-foreground">
           {saved
             ? 'Este dia já tem registro salvo. Salvar de novo substitui os números.'
             : 'Os números vêm das suas ligações, leads e movimentações deste dia. Ajuste se fez algo fora do sistema.'}
@@ -126,7 +126,7 @@ function DayEntryForm({
           type="button"
           onClick={fillFromSystem}
           disabled={!autoFill}
-          className="rounded-[8px] border-[1.5px] border-neutral-200 px-3 py-2 text-sm font-medium text-neutral-600 transition-colors hover:border-brand hover:text-brand disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-[8px] border-[1.5px] border-line px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-brand hover:text-brand disabled:cursor-not-allowed disabled:opacity-60"
         >
           Atualizar com dados do sistema
         </button>
@@ -141,19 +141,19 @@ function DayEntryForm({
           return (
             <div key={stage.key}>
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <label htmlFor={stage.key} className="text-[13px] font-medium text-neutral-900">
+                <label htmlFor={stage.key} className="text-[13px] font-medium text-brand">
                   {stage.label}
                 </label>
                 {systemValue !== undefined && (
                   <div className="flex items-center gap-1.5">
-                    <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-600">
+                    <span className="rounded-full bg-canvas px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                       Sistema: {systemValue}
                     </span>
                     {differsFromSystem && (
                       <button
                         type="button"
                         onClick={() => setValue(stage.key, systemValue, { shouldDirty: true })}
-                        className="rounded-[8px] px-1.5 py-0.5 text-[11px] font-medium text-brand hover:bg-brand-bg"
+                        className="rounded-[8px] px-1.5 py-0.5 text-[11px] font-medium text-brand hover:bg-line"
                       >
                         Usar {systemValue}
                       </button>
@@ -169,7 +169,7 @@ function DayEntryForm({
                 className={`mt-1.5 ${inputClassName}`}
                 {...register(stage.key)}
               />
-              <p className="mt-1 text-xs text-neutral-400">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Meta do dia: {summary?.funnel?.dailyTarget[stage.apiKey] ?? 0} · Falta no período:{' '}
                 {summary?.funnel?.remaining[stage.apiKey] ?? 0}
               </p>
@@ -299,7 +299,7 @@ export function DailyEntrySheet({
             render={
               <button
                 type="button"
-                className="flex-1 rounded-[8px] border-[1.5px] border-neutral-900 bg-transparent px-4 py-2.5 text-sm font-medium text-neutral-900"
+                className="flex-1 rounded-[8px] border-[1.5px] border-brand bg-transparent px-4 py-2.5 text-sm font-medium text-brand"
               />
             }
           >
@@ -309,7 +309,7 @@ export function DailyEntrySheet({
             type="submit"
             form={FORM_ID}
             disabled={upsertEntry.isPending || !goal || !summary || isDayLoading || entryQuery.isError}
-            className="flex-1 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-70"
+            className="flex-1 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:cursor-not-allowed disabled:opacity-70"
           >
             Salvar
           </button>
@@ -321,18 +321,18 @@ export function DailyEntrySheet({
             if (!nextOpen) setPendingDate(null)
           }}
         >
-          <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
+          <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
             <AlertDialogHeader className="p-4 sm:p-6">
               <AlertDialogTitle>Descartar alterações deste dia?</AlertDialogTitle>
               <AlertDialogDescription>Os números que você digitou ainda não foram salvos.</AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter className="mx-0 mb-0 gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
-              <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-neutral-600 sm:h-10">
+            <AlertDialogFooter className="mx-0 mb-0 gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
+              <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-muted-foreground sm:h-10">
                 Continuar editando
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={discardAndChangeDate}
-                className="h-11 rounded-[8px] bg-danger px-4 text-white hover:bg-danger hover:opacity-90 sm:h-10"
+                className="h-11 rounded-[8px] bg-danger px-4 text-paper hover:bg-danger hover:opacity-90 sm:h-10"
               >
                 Descartar
               </AlertDialogAction>

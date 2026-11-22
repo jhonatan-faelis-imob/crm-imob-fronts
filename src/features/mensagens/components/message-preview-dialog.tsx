@@ -18,7 +18,7 @@ export type WhatsAppLead = MessageLead
 export type { MessageDraft }
 
 const secondaryClassName =
-  'h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 sm:h-10'
+  'h-11 rounded-[8px] border-[1.5px] border-line px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-canvas sm:h-10'
 
 /**
  * Só {{documentos_pendentes}} precisa do servidor (checklist do lead). Pede o render da variável sozinha
@@ -133,7 +133,7 @@ export function MessagePreviewDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl border-[0.5px] border-neutral-200 bg-white ring-0 sm:max-w-md">
+      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl border-[0.5px] border-line bg-paper ring-0 sm:max-w-md">
         <DialogHeader className="gap-1 pr-8">
           <DialogTitle>{draft.templateName}</DialogTitle>
           <DialogDescription>Para {lead.name}. Revise o texto antes de abrir o WhatsApp.</DialogDescription>
@@ -141,14 +141,14 @@ export function MessagePreviewDialog({
 
         {lead.phone2 && (
           <div>
-            <label htmlFor="whatsapp-phone" className="text-[13px] font-medium text-neutral-900">
+            <label htmlFor="whatsapp-phone" className="text-[13px] font-medium text-brand">
               Número
             </label>
             <select
               id="whatsapp-phone"
               value={phone}
               onChange={(event) => setPhone(event.target.value)}
-              className="mt-1.5 w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-base text-neutral-900 outline-none transition-colors focus:border-brand"
+              className="mt-1.5 w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-base text-brand outline-none transition-colors focus:border-brand"
             >
               <option value={lead.phone}>{lead.phone} (principal)</option>
               <option value={lead.phone2}>{lead.phone2}</option>
@@ -157,7 +157,7 @@ export function MessagePreviewDialog({
         )}
 
         <div>
-          <label htmlFor="whatsapp-text" className="text-[13px] font-medium text-neutral-900">
+          <label htmlFor="whatsapp-text" className="text-[13px] font-medium text-brand">
             Mensagem
           </label>
           <textarea
@@ -165,12 +165,12 @@ export function MessagePreviewDialog({
             value={text}
             onChange={(event) => setText(event.target.value)}
             rows={6}
-            className="mt-1.5 w-full resize-none rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-base text-neutral-900 outline-none transition-colors focus:border-brand"
+            className="mt-1.5 w-full resize-none rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-base text-brand outline-none transition-colors focus:border-brand"
           />
         </div>
 
         {documentsMissing && documents.isPending && (
-          <p className="flex items-center gap-2 text-[13px] text-neutral-400">
+          <p className="flex items-center gap-2 text-[13px] text-muted-foreground">
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
             Buscando os documentos pendentes...
           </p>
@@ -207,7 +207,7 @@ export function MessagePreviewDialog({
             type="button"
             onClick={openWhatsApp}
             disabled={!text.trim() || placeholders.length > 0}
-            className="h-11 rounded-[8px] bg-[#25D366] px-4 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:h-10"
+            className="h-11 rounded-[8px] bg-[#25D366] px-4 text-sm font-medium text-paper transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:h-10"
           >
             Abrir no WhatsApp
           </button>

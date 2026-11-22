@@ -7,11 +7,11 @@ function Inlines({ text }: { text: string }) {
       {parseInline(text).map((part, index) => {
         switch (part.type) {
           case 'bold':
-            return <strong key={index} className="font-semibold text-neutral-900">{part.text}</strong>
+            return <strong key={index} className="font-semibold text-brand">{part.text}</strong>
           case 'italic':
             return <em key={index}>{part.text}</em>
           case 'code':
-            return <code key={index} className="rounded bg-neutral-100 px-1 py-0.5 font-mono text-[13px]">{part.text}</code>
+            return <code key={index} className="rounded bg-canvas px-1 py-0.5 font-mono text-[13px]">{part.text}</code>
           case 'link': {
             const className = 'font-medium text-brand underline-offset-2 hover:underline'
             if (part.href.startsWith('/') || part.href.startsWith('#')) {
@@ -28,15 +28,15 @@ function Inlines({ text }: { text: string }) {
 }
 
 const HEADING_CLASS: Record<number, string> = {
-  2: 'mt-12 scroll-mt-6 border-l-4 border-brand pl-3 text-[22px] font-semibold leading-snug text-neutral-900 first:mt-0',
-  3: 'mt-8 scroll-mt-6 text-[18px] font-semibold leading-snug text-neutral-900',
-  4: 'mt-6 scroll-mt-6 text-[16px] font-semibold text-neutral-900',
+  2: 'mt-12 scroll-mt-6 border-l-4 border-brand pl-3 text-[22px] font-semibold leading-snug text-brand first:mt-0',
+  3: 'mt-8 scroll-mt-6 text-[18px] font-semibold leading-snug text-brand',
+  4: 'mt-6 scroll-mt-6 text-[16px] font-semibold text-brand',
 }
 
 /** Renderiza os blocos do leitor de Markdown com os componentes do design system */
 export function MarkdownView({ blocks }: { blocks: Block[] }) {
   return (
-    <div className="space-y-4 text-[15px] leading-7 text-neutral-600">
+    <div className="space-y-4 text-[15px] leading-7 text-muted-foreground">
       {blocks.map((block, index) => {
         switch (block.type) {
           case 'heading': {
@@ -49,7 +49,7 @@ export function MarkdownView({ blocks }: { blocks: Block[] }) {
           case 'list': {
             const Tag = block.ordered ? 'ol' : 'ul'
             return (
-              <Tag key={index} className={`space-y-1.5 pl-5 ${block.ordered ? 'list-decimal' : 'list-disc'} marker:text-neutral-400`}>
+              <Tag key={index} className={`space-y-1.5 pl-5 ${block.ordered ? 'list-decimal' : 'list-disc'} marker:text-muted-foreground`}>
                 {block.items.map((item, itemIndex) => (
                   <li key={itemIndex} className="pl-1">
                     <Inlines text={item.text} />
@@ -67,9 +67,9 @@ export function MarkdownView({ blocks }: { blocks: Block[] }) {
           }
           case 'table':
             return (
-              <div key={index} className="overflow-x-auto rounded-[12px] border-[0.5px] border-neutral-200">
+              <div key={index} className="overflow-x-auto rounded-[12px] border-[0.5px] border-line">
                 <table className="w-full min-w-[480px] text-sm">
-                  <thead className="bg-neutral-100 text-left text-xs text-neutral-600">
+                  <thead className="bg-canvas text-left text-xs text-muted-foreground">
                     <tr>
                       {block.header.map((cell, cellIndex) => (
                         <th key={cellIndex} className="px-4 py-3 font-medium"><Inlines text={cell} /></th>
@@ -78,9 +78,9 @@ export function MarkdownView({ blocks }: { blocks: Block[] }) {
                   </thead>
                   <tbody>
                     {block.rows.map((row, rowIndex) => (
-                      <tr key={rowIndex} className="border-t-[0.5px] border-neutral-200 align-top">
+                      <tr key={rowIndex} className="border-t-[0.5px] border-line align-top">
                         {row.map((cell, cellIndex) => (
-                          <td key={cellIndex} className="px-4 py-3 text-neutral-900"><Inlines text={cell} /></td>
+                          <td key={cellIndex} className="px-4 py-3 text-brand"><Inlines text={cell} /></td>
                         ))}
                       </tr>
                     ))}
@@ -90,12 +90,12 @@ export function MarkdownView({ blocks }: { blocks: Block[] }) {
             )
           case 'quote':
             return (
-              <blockquote key={index} className="rounded-[12px] bg-neutral-100 px-4 py-3 text-neutral-600">
+              <blockquote key={index} className="rounded-[12px] bg-canvas px-4 py-3 text-muted-foreground">
                 <Inlines text={block.text} />
               </blockquote>
             )
           default:
-            return <hr key={index} className="border-neutral-200" />
+            return <hr key={index} className="border-line" />
         }
       })}
     </div>

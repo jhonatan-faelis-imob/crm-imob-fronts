@@ -54,11 +54,11 @@ export function LeadCard({ lead }: { lead: Lead }) {
       onKeyDown={(event) => {
         if (event.key === 'Enter') router.push(`/leads/${lead.id}`)
       }}
-      className="group relative block cursor-pointer rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4 transition-colors hover:border-brand"
+      className="group relative block cursor-pointer rounded-[16px] border-[0.5px] border-line bg-paper p-4 transition-colors hover:border-brand"
     >
       <div className="absolute right-3 top-3 flex items-center gap-1">
         {lead.hasPendingTask && (
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-bg text-brand">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-line text-brand">
             <ListTodo className="h-3.5 w-3.5" />
           </span>
         )}
@@ -70,7 +70,7 @@ export function LeadCard({ lead }: { lead: Lead }) {
               <button
                 type="button"
                 aria-label="Mais opções"
-                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-canvas hover:text-brand"
               />
             }
           >
@@ -87,9 +87,9 @@ export function LeadCard({ lead }: { lead: Lead }) {
         </DropdownMenu>
       </div>
 
-      <p className="pr-14 text-sm font-medium text-neutral-900">{lead.name}</p>
+      <p className="pr-14 text-sm font-medium text-brand">{lead.name}</p>
 
-      <div className="mt-1.5 flex items-center gap-1.5 text-xs text-neutral-400">
+      <div className="mt-1.5 flex items-center gap-1.5 text-xs text-muted-foreground">
         <SourceIcon className="h-3.5 w-3.5" />
         {source.label}
       </div>
@@ -108,7 +108,7 @@ export function LeadCard({ lead }: { lead: Lead }) {
         </div>
       )}
 
-      <p className="mt-2 text-sm font-semibold text-neutral-900">
+      <p className="mt-2 text-sm font-semibold text-brand">
         {formatCurrency(lead.interestValue ?? 0)}
       </p>
 
@@ -117,13 +117,13 @@ export function LeadCard({ lead }: { lead: Lead }) {
           {visibleTags.map((tag) => (
             <span
               key={tag.id}
-              className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-600"
+              className="rounded-full bg-canvas px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
             >
               {tag.label}
             </span>
           ))}
           {hiddenTagsCount > 0 && (
-            <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-400">
+            <span className="rounded-full bg-canvas px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
               +{hiddenTagsCount}
             </span>
           )}
@@ -132,14 +132,14 @@ export function LeadCard({ lead }: { lead: Lead }) {
 
       <div className="mt-3 flex items-center gap-2">
         <Avatar size="sm">
-          <AvatarFallback className="bg-brand-bg text-brand">
+          <AvatarFallback className="bg-line text-brand">
             {getInitials(lead.ownerName)}
           </AvatarFallback>
         </Avatar>
-        <span className="truncate text-xs text-neutral-600">{lead.ownerName}</span>
+        <span className="truncate text-xs text-muted-foreground">{lead.ownerName}</span>
       </div>
 
-      <p className={`mt-2 text-xs ${isStale ? 'font-medium text-warning' : 'text-neutral-400'}`}>
+      <p className={`mt-2 text-xs ${isStale ? 'font-medium text-warning' : 'text-muted-foreground'}`}>
         {days === 0 ? 'Contato hoje' : `Sem contato há ${days} dia${days > 1 ? 's' : ''}`}
       </p>
     </div>

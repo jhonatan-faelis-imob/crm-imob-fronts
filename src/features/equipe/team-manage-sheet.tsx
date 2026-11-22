@@ -51,21 +51,21 @@ function CoordinatorBlock({
   const label = team.coordinator ? 'Trocar coordenador' : 'Definir coordenador'
 
   return (
-    <section className="space-y-3 rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4">
+    <section className="space-y-3 rounded-[16px] border-[0.5px] border-line bg-paper p-4">
       <div className="flex items-center gap-2.5">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#FFF3E0] text-warning">
           <Crown className="h-4 w-4" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-neutral-400">Coordenador</p>
-          <p className="truncate text-sm font-medium text-neutral-900">{team.coordinator?.name ?? 'Sem coordenador'}</p>
+          <p className="text-xs text-muted-foreground">Coordenador</p>
+          <p className="truncate text-sm font-medium text-brand">{team.coordinator?.name ?? 'Sem coordenador'}</p>
         </div>
         {canChange && team.coordinator && (
           <button
             type="button"
             disabled={setCoordinator.isPending}
             onClick={() => setCoordinator.mutate({ teamId: team.id, coordinatorId: null })}
-            className="shrink-0 rounded-[8px] px-2 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-100 disabled:opacity-60"
+            className="shrink-0 rounded-[8px] px-2 py-1.5 text-xs font-medium text-muted-foreground hover:bg-canvas disabled:opacity-60"
           >
             Remover
           </button>
@@ -97,12 +97,12 @@ function CoordinatorBlock({
               onClick={() =>
                 setCoordinator.mutate({ teamId: team.id, coordinatorId: choice }, { onSuccess: () => setChoice('') })
               }
-              className="shrink-0 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
+              className="shrink-0 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:opacity-60"
             >
               {label}
             </button>
           </div>
-          <p className="mt-1.5 text-xs text-neutral-400">
+          <p className="mt-1.5 text-xs text-muted-foreground">
             {options.length === 0
               ? 'Ninguém disponível: crie um membro com cargo coordenador ou superior.'
               : 'Quem coordena passa a fazer parte da equipe. Cada pessoa coordena uma equipe só.'}
@@ -125,10 +125,10 @@ function AddMembers({ teamId, candidates }: { teamId: string; candidates: Member
     <section className="space-y-2">
       <p className={labelClassName}>Adicionar quem está sem equipe</p>
       {candidates.length === 0 ? (
-        <p className="text-xs text-neutral-400">Ninguém sem equipe no momento.</p>
+        <p className="text-xs text-muted-foreground">Ninguém sem equipe no momento.</p>
       ) : (
         <>
-          <div className="flex flex-wrap gap-1.5 rounded-[12px] border-[1.5px] border-neutral-200 bg-white p-2">
+          <div className="flex flex-wrap gap-1.5 rounded-[12px] border-[1.5px] border-line bg-paper p-2">
             {candidates.map((member) => {
               const isSelected = selected.includes(member.id)
               return (
@@ -139,8 +139,8 @@ function AddMembers({ teamId, candidates }: { teamId: string; candidates: Member
                   onClick={() => toggle(member.id)}
                   className={`min-h-9 rounded-full border-[0.5px] px-3 py-1 text-xs font-medium transition-colors ${
                     isSelected
-                      ? 'border-brand bg-brand-bg text-brand'
-                      : 'border-neutral-200 text-neutral-600 hover:border-brand hover:text-brand'
+                      ? 'border-brand bg-line text-brand'
+                      : 'border-line text-muted-foreground hover:border-brand hover:text-brand'
                   }`}
                 >
                   {isSelected ? '✓' : '+'} {member.name} · {ROLE_META[member.role].label}
@@ -154,7 +154,7 @@ function AddMembers({ teamId, candidates }: { teamId: string; candidates: Member
             onClick={() =>
               updateMembers.mutate({ teamId, change: { addUserIds: selected } }, { onSuccess: () => setSelected([]) })
             }
-            className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-60 sm:w-auto"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:opacity-60 sm:w-auto"
           >
             <Plus className="h-4 w-4" />
             Adicionar{selected.length > 0 ? ` (${selected.length})` : ''}
@@ -205,21 +205,21 @@ function TeamManageBody({
       <section className="space-y-2">
         <p className={labelClassName}>Na equipe ({team.members.length})</p>
         {team.members.length === 0 ? (
-          <p className="rounded-[12px] bg-neutral-100 p-4 text-center text-sm text-neutral-400">
+          <p className="rounded-[12px] bg-canvas p-4 text-center text-sm text-muted-foreground">
             Ninguém nesta equipe ainda.
           </p>
         ) : (
-          <ul className="divide-y-[0.5px] divide-neutral-200 rounded-[16px] border-[0.5px] border-neutral-200 bg-white">
+          <ul className="divide-y-[0.5px] divide-line rounded-[16px] border-[0.5px] border-line bg-paper">
             {team.members.map((member) => {
               const isCoordinator = member.id === team.coordinatorId
               const canRemove = !isCoordinator && canManageUser(actorRole, member.role)
               return (
                 <li key={member.id} className="flex items-center gap-2.5 px-3 py-2.5">
                   <Avatar size="sm">
-                    <AvatarFallback className="bg-brand-bg text-xs text-brand">{getInitials(member.name)}</AvatarFallback>
+                    <AvatarFallback className="bg-line text-xs text-brand">{getInitials(member.name)}</AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
-                    <p className={`truncate text-sm font-medium ${member.active ? 'text-neutral-900' : 'text-neutral-400'}`}>
+                    <p className={`truncate text-sm font-medium ${member.active ? 'text-brand' : 'text-muted-foreground'}`}>
                       {member.name}
                     </p>
                     {isCoordinator && <p className="text-[11px] text-warning">Coordenador da equipe</p>}
@@ -231,7 +231,7 @@ function TeamManageBody({
                       aria-label={`Remover ${member.name} da equipe`}
                       disabled={updateMembers.isPending}
                       onClick={() => updateMembers.mutate({ teamId: team.id, change: { removeUserIds: [member.id] } })}
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] text-neutral-400 hover:bg-[#FFEBEE] hover:text-danger disabled:opacity-60"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] text-muted-foreground hover:bg-[#FFEBEE] hover:text-danger disabled:opacity-60"
                     >
                       <UserMinus className="h-4 w-4" />
                     </button>
@@ -268,7 +268,7 @@ export function TeamManageSheet({
   return (
     <Sheet open={team !== null} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full gap-0 bg-[#F7F5F3] p-0 sm:max-w-md">
-        <SheetHeader className="border-b-[0.5px] border-neutral-200 bg-white p-4 pr-12 sm:p-6 sm:pr-14">
+        <SheetHeader className="border-b-[0.5px] border-line bg-paper p-4 pr-12 sm:p-6 sm:pr-14">
           <SheetTitle>{team?.name ?? 'Equipe'}</SheetTitle>
           <SheetDescription>Gerenciar coordenador e membros.</SheetDescription>
         </SheetHeader>

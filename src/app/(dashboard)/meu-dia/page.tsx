@@ -171,28 +171,28 @@ export default function MeuDiaPage() {
     <div className="mx-auto max-w-3xl space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-h-[76px] min-w-0">
-          <h1 className="text-[28px] font-semibold text-neutral-900">Meu dia</h1>
+          <h1 className="text-[28px] font-semibold text-brand">Meu dia</h1>
           {isHydrated && (
             <>
-              <p className="text-base font-medium text-neutral-600">
+              <p className="text-base font-medium text-muted-foreground">
                 {greeting(new Date().getHours())}
                 {user ? `, ${firstName(user.name)}` : ''}
               </p>
-              <p className="text-sm text-neutral-400">{formatToday()}</p>
+              <p className="text-sm text-muted-foreground">{formatToday()}</p>
             </>
           )}
         </div>
 
         {canViewAs && (
           <div className="sm:w-56">
-            <label htmlFor="view-as" className="text-[13px] font-medium text-neutral-900">
+            <label htmlFor="view-as" className="text-[13px] font-medium text-brand">
               Ver como
             </label>
             <select
               id="view-as"
               value={viewedUserId}
               onChange={(event) => selectUser(event.target.value)}
-              className="mt-1.5 w-full rounded-[12px] border-[0.5px] border-neutral-200 bg-white px-3 py-2.5 text-base text-neutral-900 outline-none focus:border-brand"
+              className="mt-1.5 w-full rounded-[12px] border-[0.5px] border-line bg-paper px-3 py-2.5 text-base text-brand outline-none focus:border-brand"
             >
               <option value="">Eu</option>
               {(users ?? [])
@@ -226,8 +226,8 @@ export default function MeuDiaPage() {
                 onClick={() => setFilter(option.value)}
                 className={`min-h-11 shrink-0 whitespace-nowrap rounded-full border-[0.5px] px-3 text-sm font-medium transition-colors sm:min-h-9 ${
                   isActive
-                    ? 'border-brand bg-brand text-white'
-                    : 'border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-100'
+                    ? 'border-brand bg-brand text-paper'
+                    : 'border-line bg-paper text-muted-foreground hover:bg-canvas'
                 }`}
               >
                 {option.label} {counts[option.count]}
@@ -244,7 +244,7 @@ export default function MeuDiaPage() {
           ))}
         </div>
       ) : isError ? (
-        <p className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-6 text-center text-sm text-danger">
+        <p className="rounded-[16px] border-[0.5px] border-line bg-paper p-6 text-center text-sm text-danger">
           Não foi possível carregar o seu dia.
         </p>
       ) : items.length === 0 ? (
@@ -257,7 +257,7 @@ export default function MeuDiaPage() {
       ) : (
         <div className="space-y-6">
           {visibleItems.length === 0 && (
-            <p className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-6 text-center text-sm text-neutral-400">
+            <p className="rounded-[16px] border-[0.5px] border-line bg-paper p-6 text-center text-sm text-muted-foreground">
               {canLoadMore ? 'Nenhum item neste filtro entre os carregados.' : 'Nenhum item neste filtro.'}
             </p>
           )}
@@ -267,7 +267,7 @@ export default function MeuDiaPage() {
             if (bandItems.length === 0) return null
             return (
               <section key={band.value} className="space-y-3">
-                <h2 className="text-[20px] font-semibold text-neutral-900">{band.title}</h2>
+                <h2 className="text-[20px] font-semibold text-brand">{band.title}</h2>
                 {bandItems.map(renderItem)}
               </section>
             )
@@ -278,13 +278,13 @@ export default function MeuDiaPage() {
               type="button"
               onClick={() => setLimit((current) => Math.min(current + PAGE_SIZE, MAX_ITEMS))}
               disabled={isFetching}
-              className="h-11 w-full rounded-[8px] border-[1.5px] border-neutral-200 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-70"
+              className="h-11 w-full rounded-[8px] border-[1.5px] border-line text-sm font-medium text-muted-foreground transition-colors hover:bg-canvas disabled:cursor-not-allowed disabled:opacity-70"
             >
               Carregar mais
             </button>
           )}
           {hasMore && !canLoadMore && (
-            <p className="text-center text-sm text-neutral-400">Mostrando os {MAX_ITEMS} itens mais prioritários.</p>
+            <p className="text-center text-sm text-muted-foreground">Mostrando os {MAX_ITEMS} itens mais prioritários.</p>
           )}
         </div>
       )}

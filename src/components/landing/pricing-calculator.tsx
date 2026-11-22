@@ -45,7 +45,7 @@ export function PricingCalculator() {
   }
 
   return (
-    <div className="mx-auto mt-10 max-w-[860px] rounded-[20px] border border-[#E6E2DD] bg-white p-6 sm:p-8">
+    <div className="mx-auto mt-10 max-w-[860px] rounded-[20px] border border-[#E6E2DD] bg-paper p-6 sm:p-8">
       <h3 className="text-[20px] font-extrabold tracking-[-0.02em]">Calcule o valor da sua equipe</h3>
 
       <div className="mt-6 grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
@@ -57,7 +57,7 @@ export function PricingCalculator() {
                 key={item.id}
                 className={`flex min-h-12 cursor-pointer items-center justify-center rounded-[12px] border px-2 text-center text-[14px] font-semibold transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[#FF385C] ${
                   item.id === planId
-                    ? 'border-[#1C1B1A] bg-[#1C1B1A] text-white'
+                    ? 'border-[#1C1B1A] bg-[#1C1B1A] text-paper'
                     : 'border-[#E6E2DD] text-[#1C1B1A] hover:border-[#1C1B1A]'
                 }`}
               >

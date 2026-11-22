@@ -66,7 +66,7 @@ export function PropertyCodeField({
         spellCheck={false}
         className={`${inputClassName} font-mono uppercase placeholder:font-sans placeholder:normal-case`}
       />
-      <p className="mt-1 text-xs text-neutral-400">
+      <p className="mt-1 text-xs text-muted-foreground">
         {isEditing && originalCode && trimmed === ''
           ? 'Em branco, o código atual é mantido.'
           : PROPERTY_CODE_HELP}
@@ -85,7 +85,7 @@ export function PropertyCodeField({
 export function CodeChip({ code, className = '' }: { code: string | null | undefined; className?: string }) {
   if (!code) return null
   return (
-    <span className={`inline-flex items-center rounded-full bg-neutral-100 px-2 py-0.5 font-mono text-[11px] font-medium text-neutral-600 ${className}`}>
+    <span className={`inline-flex items-center rounded-full bg-canvas px-2 py-0.5 font-mono text-[11px] font-medium text-muted-foreground ${className}`}>
       Cód. {code}
     </span>
   )

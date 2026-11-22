@@ -61,7 +61,7 @@ export function DeleteMemberDialog({
 
   return (
     <AlertDialog open={member !== null} onOpenChange={(open) => !open && onClose()}>
-      <AlertDialogContent className="max-h-[90vh] w-[calc(100%-2rem)] gap-0 overflow-y-auto rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0 sm:max-w-md">
+      <AlertDialogContent className="max-h-[90vh] w-[calc(100%-2rem)] gap-0 overflow-y-auto rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0 sm:max-w-md">
         <form onSubmit={submit}>
           <AlertDialogHeader className="p-4 sm:p-6">
             <AlertDialogTitle>Excluir {member?.name}?</AlertDialogTitle>
@@ -94,7 +94,7 @@ export function DeleteMemberDialog({
                   onClose()
                   onSuggestDeactivate(member)
                 }}
-                className="min-h-11 w-full rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-sm font-medium text-neutral-900 hover:border-brand hover:text-brand"
+                className="min-h-11 w-full rounded-[8px] border-[1.5px] border-line px-4 text-sm font-medium text-brand hover:border-brand hover:text-brand"
               >
                 Desativar em vez de excluir
               </button>
@@ -116,15 +116,15 @@ export function DeleteMemberDialog({
             )}
           </div>
 
-          <AlertDialogFooter className="mx-0 mb-0 gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
-            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-neutral-600 sm:h-10">
+          <AlertDialogFooter className="mx-0 mb-0 gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
+            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-muted-foreground sm:h-10">
               {hasBlockers ? 'Fechar' : 'Cancelar'}
             </AlertDialogCancel>
             {!hasBlockers && (
               <AlertDialogAction
                 type="submit"
                 disabled={!isConfirmed || remove.isPending}
-                className="h-11 rounded-[8px] bg-danger px-4 text-white hover:bg-danger hover:opacity-90 sm:h-10"
+                className="h-11 rounded-[8px] bg-danger px-4 text-paper hover:bg-danger hover:opacity-90 sm:h-10"
               >
                 {remove.isPending ? 'Excluindo...' : 'Excluir definitivamente'}
               </AlertDialogAction>

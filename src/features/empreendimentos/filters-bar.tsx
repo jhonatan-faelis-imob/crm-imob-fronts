@@ -35,7 +35,7 @@ export const defaultPropertyFilters: PropertyFilters = {
 export type ViewMode = 'grid' | 'list'
 
 const selectClassName =
-  'rounded-[8px] border-[1.5px] border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-brand'
+  'rounded-[8px] border-[1.5px] border-line bg-paper px-3 py-2 text-sm text-brand outline-none focus:border-brand'
 
 export function FiltersBar({
   kind,
@@ -53,13 +53,13 @@ export function FiltersBar({
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
       <div className="relative flex-1 sm:min-w-[220px]">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
           type="text"
           value={filters.search}
           onChange={(event) => onChange({ ...filters, search: event.target.value })}
           placeholder="Buscar por título, bairro ou código"
-          className="w-full rounded-[8px] border-[1.5px] border-neutral-200 bg-white py-2 pl-9 pr-3 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-brand"
+          className="w-full rounded-[8px] border-[1.5px] border-line bg-paper py-2 pl-9 pr-3 text-sm text-brand outline-none placeholder:text-muted-foreground focus:border-brand"
         />
       </div>
 
@@ -149,13 +149,13 @@ export function FiltersBar({
       )}
 
       {kind === 'revenda' && (
-        <div className="flex items-center gap-1 rounded-[8px] border-[0.5px] border-neutral-200 bg-white p-1 sm:ml-auto">
+        <div className="flex items-center gap-1 rounded-[8px] border-[0.5px] border-line bg-paper p-1 sm:ml-auto">
           <button
             type="button"
             aria-label="Visualizar em grade"
             onClick={() => onViewModeChange('grid')}
             className={`rounded-[6px] p-1.5 ${
-              viewMode === 'grid' ? 'bg-brand-bg text-brand' : 'text-neutral-400 hover:bg-neutral-100'
+              viewMode === 'grid' ? 'bg-line text-brand' : 'text-muted-foreground hover:bg-canvas'
             }`}
           >
             <LayoutGrid className="h-4 w-4" />
@@ -165,7 +165,7 @@ export function FiltersBar({
             aria-label="Visualizar em lista"
             onClick={() => onViewModeChange('list')}
             className={`rounded-[6px] p-1.5 ${
-              viewMode === 'list' ? 'bg-brand-bg text-brand' : 'text-neutral-400 hover:bg-neutral-100'
+              viewMode === 'list' ? 'bg-line text-brand' : 'text-muted-foreground hover:bg-canvas'
             }`}
           >
             <List className="h-4 w-4" />

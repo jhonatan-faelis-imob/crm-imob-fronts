@@ -28,18 +28,18 @@ export function ConfirmDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         onClick={(event) => event.stopPropagation()}
-        className="w-[calc(100%-2rem)] max-w-sm rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0"
+        className="w-[calc(100%-2rem)] max-w-sm rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0"
       >
-        <DialogHeader className="gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
+        <DialogHeader className="gap-1 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14">
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        <DialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
+        <DialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="rounded-[8px] border-[1.5px] border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-600 hover:bg-neutral-100"
+            className="rounded-[8px] border-[1.5px] border-line px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-canvas"
           >
             {cancelLabel}
           </button>
@@ -47,7 +47,7 @@ export function ConfirmDialog({
             type="button"
             onClick={onConfirm}
             disabled={isConfirming}
-            className={`rounded-[8px] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 ${
+            className={`rounded-[8px] px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 ${
               destructive ? 'bg-danger' : 'bg-brand'
             }`}
           >

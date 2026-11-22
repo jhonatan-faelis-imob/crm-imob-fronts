@@ -6,23 +6,32 @@
 @theme inline {
   --font-sans: var(--font-jakarta);
 
-  --color-brand: #FF385C;
-  --color-brand-dark: #E31C5F;
-  --color-brand-light: #FF6B81;
-  --color-brand-bg: #FFF0F2;
+  /* Paleta Smart CRM: só estas cores */
+  --color-ink: #060B23;
+  --color-brand: #0B1E4D;
+  --color-signal: #FF385C;
+  --color-paper: #F8FAFF;
+  --color-canvas: #EFF1F8;
+  --color-line: #E0E4ED;
+  --color-line-strong: #C4CAD8;
+  --color-ink-line: #32364B;
+  --color-ink-text: #D4D6DE;
+  --color-ink-muted: #9C9FAB;
 
-  --color-page: #F7F5F3;
+  /* Escala do funil (Novo -> Ganho). Perdido = signal; sem retorno = line-strong */
+  --color-funnel-1: #BDC3D2;
+  --color-funnel-2: #9EA6BB;
+  --color-funnel-3: #828CA6;
+  --color-funnel-4: #657291;
+  --color-funnel-5: #46557A;
+  --color-funnel-6: #273862;
+  --color-funnel-7: #0B1E4D;
 
-  --color-neutral-900: #222222;
-  --color-neutral-600: #484848;
-  --color-neutral-400: #767676;
-  --color-neutral-200: #DDDDDD;
-  --color-neutral-100: #F7F7F7;
-
-  --color-success: #008A05;
-  --color-warning: #C45800;
-  --color-info: #0070F3;
-  --color-danger: #D93B30;
+  /* LEGACY (fase 1): aliases temporários, serão removidos na fase 2 */
+  --color-danger: #FF385C;
+  --color-warning: #FF385C;
+  --color-success: #0B1E4D;
+  --color-info: #0B1E4D;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -59,33 +68,33 @@
 }
 
 :root {
-  --background: #F7F5F3;
-  --foreground: #222222;
-  --card: #ffffff;
-  --card-foreground: #222222;
-  --popover: #ffffff;
-  --popover-foreground: #222222;
-  --primary: #FF385C;
-  --primary-foreground: #ffffff;
-  --secondary: #F7F7F7;
-  --secondary-foreground: #222222;
-  --muted: #F7F7F7;
-  --muted-foreground: #767676;
-  --accent: #FFF0F2;
-  --accent-foreground: #E31C5F;
-  --destructive: #D93B30;
-  --border: #DDDDDD;
-  --input: #DDDDDD;
-  --ring: #FF385C;
+  --background: #EFF1F8;
+  --foreground: #0B1E4D;
+  --card: #F8FAFF;
+  --card-foreground: #0B1E4D;
+  --popover: #F8FAFF;
+  --popover-foreground: #0B1E4D;
+  --primary: #0B1E4D;
+  --primary-foreground: #F8FAFF;
+  --secondary: #E0E4ED;
+  --secondary-foreground: #0B1E4D;
+  --muted: #E0E4ED;
+  --muted-foreground: #526082;
+  --accent: #E0E4ED;
+  --accent-foreground: #0B1E4D;
+  --destructive: #FF385C;
+  --border: #E0E4ED;
+  --input: #C4CAD8;
+  --ring: #0B1E4D;
   --radius: 0.625rem;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #222222;
-  --sidebar-primary: #FF385C;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #FFF0F2;
-  --sidebar-accent-foreground: #E31C5F;
-  --sidebar-border: #DDDDDD;
-  --sidebar-ring: #FF385C;
+  --sidebar: #060B23;
+  --sidebar-foreground: #D4D6DE;
+  --sidebar-primary: #0B1E4D;
+  --sidebar-primary-foreground: #F8FAFF;
+  --sidebar-accent: #0B1E4D;
+  --sidebar-accent-foreground: #F8FAFF;
+  --sidebar-border: #32364B;
+  --sidebar-ring: #0B1E4D;
 }
 
 @layer base {

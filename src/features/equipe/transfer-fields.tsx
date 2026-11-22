@@ -74,7 +74,7 @@ export function TransferFields({
           ))}
         </select>
         {candidates.length === 0 && (
-          <p className="mt-1 text-xs text-neutral-400">Não há outra pessoa ativa que você possa escolher.</p>
+          <p className="mt-1 text-xs text-muted-foreground">Não há outra pessoa ativa que você possa escolher.</p>
         )}
       </div>
 
@@ -82,7 +82,7 @@ export function TransferFields({
         <fieldset className="space-y-2">
           <legend className={labelClassName}>O que transferir</legend>
           {kinds.map((kind) => (
-            <label key={kind} className="flex min-h-11 items-center gap-3 text-sm text-neutral-900">
+            <label key={kind} className="flex min-h-11 items-center gap-3 text-sm text-brand">
               <input
                 type="checkbox"
                 checked={!skipped.includes(kind)}

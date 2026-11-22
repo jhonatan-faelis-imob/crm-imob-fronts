@@ -16,12 +16,12 @@ import { BILLING_TYPE_LABEL, clampSeats, isFixedSeats, seatsShortfall } from './
 import { invalidateBilling } from './use-billing-actions'
 
 const dialogClassName =
-  'flex max-h-[92vh] w-[calc(100%-1rem)] max-w-xl flex-col gap-0 overflow-y-auto rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0'
-const headerClassName = 'gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14'
+  'flex max-h-[92vh] w-[calc(100%-1rem)] max-w-xl flex-col gap-0 overflow-y-auto rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0'
+const headerClassName = 'gap-1 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14'
 const footerClassName =
-  'mx-0 mb-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6'
+  'mx-0 mb-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6'
 const secondaryClassName =
-  'min-h-11 rounded-[8px] border-[1.5px] border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-neutral-900 hover:border-brand hover:text-brand'
+  'min-h-11 rounded-[8px] border-[1.5px] border-line bg-paper px-4 py-2.5 text-sm font-medium text-brand hover:border-brand hover:text-brand'
 
 const NEXT_CHARGE_NOTICE = 'Alterações valem a partir da próxima cobrança.'
 
@@ -30,9 +30,9 @@ export function OverdueNotice({ billing }: { billing: BillingMe }) {
   return (
     <div role="alert" className="flex flex-col gap-3 rounded-[16px] border-[1.5px] border-warning bg-warning/10 p-4 sm:flex-row sm:items-center">
       <AlertTriangle className="h-5 w-5 shrink-0 text-warning" />
-      <div className="min-w-0 flex-1 text-sm text-neutral-900">
+      <div className="min-w-0 flex-1 text-sm text-brand">
         <p className="font-semibold">Sua assinatura está em atraso.</p>
-        <p className="text-neutral-600">
+        <p className="text-muted-foreground">
           {billing.openPayment
             ? `Cobrança de ${formatMoney(billing.openPayment.value)} com vencimento em ${formatDay(billing.openPayment.dueDate)}.`
             : 'Regularize o pagamento para evitar o bloqueio.'}
@@ -43,7 +43,7 @@ export function OverdueNotice({ billing }: { billing: BillingMe }) {
           href={billing.openPayment.invoiceUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] bg-warning px-4 text-sm font-semibold text-white"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] bg-warning px-4 text-sm font-semibold text-paper"
         >
           Pagar agora
           <ExternalLink className="h-4 w-4" />
@@ -108,7 +108,7 @@ function ChangePlanDialog({
             type="button"
             onClick={() => change.mutate()}
             disabled={unchanged || change.isPending || seatsShortfall(billing.seatsUsed, seats) > 0}
-            className="min-h-11 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-50"
+            className="min-h-11 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper hover:bg-ink disabled:opacity-50"
           >
             {change.isPending ? 'Salvando...' : 'Confirmar'}
           </button>
@@ -136,7 +136,7 @@ function CancelDialog({ billing, open, onClose }: { billing: BillingMe; open: bo
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
-      <DialogContent className="w-[calc(100%-1rem)] max-w-sm gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
+      <DialogContent className="w-[calc(100%-1rem)] max-w-sm gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
         <DialogHeader className={headerClassName}>
           <DialogTitle>Cancelar assinatura</DialogTitle>
           <DialogDescription>
@@ -165,7 +165,7 @@ function CancelDialog({ billing, open, onClose }: { billing: BillingMe; open: bo
             type="button"
             onClick={() => cancel.mutate()}
             disabled={reason.trim() === '' || cancel.isPending}
-            className="min-h-11 rounded-[8px] bg-danger px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+            className="min-h-11 rounded-[8px] bg-danger px-4 py-2.5 text-sm font-medium text-paper disabled:opacity-50"
           >
             {cancel.isPending ? 'Cancelando...' : 'Cancelar assinatura'}
           </button>
@@ -187,8 +187,8 @@ export function ActiveSubscription({ billing }: { billing: BillingMe }) {
     <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-sm text-neutral-400">Plano atual</p>
-          <p className="text-[22px] font-semibold text-neutral-900">
+          <p className="text-sm text-muted-foreground">Plano atual</p>
+          <p className="text-[22px] font-semibold text-brand">
             {billing.planName} · {billing.seats === 1 ? '1 usuário' : `${billing.seats} usuários`}
           </p>
         </div>
@@ -199,16 +199,16 @@ export function ActiveSubscription({ billing }: { billing: BillingMe }) {
 
       <dl className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">
         <div>
-          <dt className="text-neutral-400">Valor mensal</dt>
-          <dd className="font-medium text-neutral-900">{formatMoney(billing.monthlyPrice)}</dd>
+          <dt className="text-muted-foreground">Valor mensal</dt>
+          <dd className="font-medium text-brand">{formatMoney(billing.monthlyPrice)}</dd>
         </div>
         <div>
-          <dt className="text-neutral-400">Próxima cobrança</dt>
-          <dd className="font-medium text-neutral-900">{formatDay(billing.currentPeriodEnd ?? billing.trialEndsAt)}</dd>
+          <dt className="text-muted-foreground">Próxima cobrança</dt>
+          <dd className="font-medium text-brand">{formatDay(billing.currentPeriodEnd ?? billing.trialEndsAt)}</dd>
         </div>
         <div>
-          <dt className="text-neutral-400">Forma de pagamento</dt>
-          <dd className="font-medium text-neutral-900">{BILLING_TYPE_LABEL[billing.billingType ?? ''] ?? '—'}</dd>
+          <dt className="text-muted-foreground">Forma de pagamento</dt>
+          <dd className="font-medium text-brand">{BILLING_TYPE_LABEL[billing.billingType ?? ''] ?? '—'}</dd>
         </div>
       </dl>
 
@@ -229,7 +229,7 @@ export function ActiveSubscription({ billing }: { billing: BillingMe }) {
           Cancelar assinatura
         </button>
       </div>
-      <p className="text-xs text-neutral-400">{NEXT_CHARGE_NOTICE}</p>
+      <p className="text-xs text-muted-foreground">{NEXT_CHARGE_NOTICE}</p>
 
       {changing && <ChangePlanDialog billing={billing} mode={changing} onClose={() => setChanging(null)} />}
       {canceling && <CancelDialog billing={billing} open={canceling} onClose={() => setCanceling(false)} />}

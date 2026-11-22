@@ -27,8 +27,8 @@ export function ChoiceGroup<T extends string>({
             onClick={() => onChange(option.value)}
             className={`min-h-11 rounded-[8px] border-[1.5px] px-3 text-sm font-medium transition-colors sm:min-h-10 ${
               selected
-                ? 'border-brand bg-brand-bg text-brand'
-                : 'border-neutral-200 text-neutral-600 hover:border-neutral-400'
+                ? 'border-brand bg-line text-brand'
+                : 'border-line text-muted-foreground hover:border-line-strong'
             }`}
           >
             {option.label}

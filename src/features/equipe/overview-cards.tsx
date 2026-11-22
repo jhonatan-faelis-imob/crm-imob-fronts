@@ -32,13 +32,13 @@ export function OverviewCards({ members, teams }: { members: Member[]; teams: Te
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {cards.map(({ label, value, icon: Icon }) => (
-        <div key={label} className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5">
+        <div key={label} className="rounded-[16px] border-[0.5px] border-line bg-paper p-5">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[28px] font-semibold text-neutral-900">{value}</p>
-              <p className="mt-1 text-[13px] text-neutral-400">{label}</p>
+              <p className="text-[28px] font-semibold text-brand">{value}</p>
+              <p className="mt-1 text-[13px] text-muted-foreground">{label}</p>
             </div>
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-bg text-brand">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-line text-brand">
               <Icon className="h-[18px] w-[18px]" />
             </div>
           </div>

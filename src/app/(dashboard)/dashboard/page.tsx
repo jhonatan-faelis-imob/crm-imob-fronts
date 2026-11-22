@@ -138,10 +138,10 @@ function RankingCard({
   isLoading: boolean
 }) {
   return (
-    <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5 lg:p-6">
+    <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-5 lg:p-6">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-[20px] font-semibold text-neutral-900">{title}</h2>
-        <span className="shrink-0 rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-600">
+        <h2 className="text-[20px] font-semibold text-brand">{title}</h2>
+        <span className="shrink-0 rounded-full bg-canvas px-3 py-1 text-xs font-medium text-muted-foreground">
           {monthLabel}
         </span>
       </div>
@@ -152,24 +152,24 @@ function RankingCard({
           ))}
         </div>
       ) : entries.length === 0 ? (
-        <p className="mt-4 text-sm text-neutral-400">Nenhuma venda no período.</p>
+        <p className="mt-4 text-sm text-muted-foreground">Nenhuma venda no período.</p>
       ) : (
         <ul className="mt-4 space-y-3">
           {entries.map((entry) => (
             <li key={entry.broker?.id ?? entry.position} className="flex items-center gap-3">
-              <span className="w-5 shrink-0 text-sm font-medium text-neutral-400">
+              <span className="w-5 shrink-0 text-sm font-medium text-muted-foreground">
                 {entry.position}º
               </span>
               <Avatar>
-                <AvatarFallback className="bg-brand-bg text-brand">
+                <AvatarFallback className="bg-line text-brand">
                   {getInitials(entry.broker?.name ?? '?')}
                 </AvatarFallback>
               </Avatar>
-              <span className="min-w-0 flex-1 truncate text-sm font-medium text-neutral-900">
+              <span className="min-w-0 flex-1 truncate text-sm font-medium text-brand">
                 {entry.broker?.name ?? 'Corretor removido'}
               </span>
               {entry.position === 1 && <Trophy className="h-4 w-4 shrink-0 text-amber-500" />}
-              <span className="shrink-0 text-sm font-semibold text-neutral-900">
+              <span className="shrink-0 text-sm font-semibold text-brand">
                 {formatValue(entry)}
               </span>
             </li>
@@ -269,12 +269,12 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-[28px] font-semibold text-neutral-900">Dashboard</h1>
-          <p className="mt-1 text-sm text-neutral-400">{formatHeaderDate(new Date())}</p>
+          <h1 className="text-[28px] font-semibold text-brand">Dashboard</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{formatHeaderDate(new Date())}</p>
         </div>
         <Link
           href="/leads"
-          className="inline-flex items-center justify-center gap-2 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+          className="inline-flex items-center justify-center gap-2 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink"
         >
           <Plus className="h-4 w-4" />
           Novo lead
@@ -282,14 +282,14 @@ export default function DashboardPage() {
       </div>
 
       {alerts.length > 0 && (
-        <div className="rounded-[16px] border-[0.5px] border-[#FECDD3] bg-brand-bg p-5">
+        <div className="rounded-[16px] border-[0.5px] border-[#FECDD3] bg-line p-5">
           <div className="flex items-center gap-2">
             <Bell className="h-5 w-5 text-brand" />
             <h2 className="text-base font-semibold text-brand">Alertas</h2>
           </div>
           <ul className="mt-3 space-y-2">
             {alerts.map((alert) => (
-              <li key={alert} className="flex items-start gap-2 text-sm text-neutral-900">
+              <li key={alert} className="flex items-start gap-2 text-sm text-brand">
                 <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
                 {alert}
               </li>
@@ -304,13 +304,13 @@ export default function DashboardPage() {
               <Skeleton key={i} className="h-[92px] rounded-[16px]" />
             ))
           : metrics.map(({ label, value, icon: Icon }) => (
-              <div key={label} className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5">
+              <div key={label} className="rounded-[16px] border-[0.5px] border-line bg-paper p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-[28px] font-semibold text-neutral-900">{value}</p>
-                    <p className="mt-1 text-[13px] text-neutral-400">{label}</p>
+                    <p className="text-[28px] font-semibold text-brand">{value}</p>
+                    <p className="mt-1 text-[13px] text-muted-foreground">{label}</p>
                   </div>
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-bg text-brand">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-line text-brand">
                     <Icon className="h-[18px] w-[18px]" />
                   </div>
                 </div>
@@ -319,26 +319,26 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5 lg:p-6">
-          <h2 className="text-[20px] font-semibold text-neutral-900">Funil de vendas</h2>
+        <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-5 lg:p-6">
+          <h2 className="text-[20px] font-semibold text-brand">Funil de vendas</h2>
 
           <div className="mt-5 space-y-3">
             {!stages ? (
               Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-8 w-full" />)
             ) : funnelByStage.length === 0 ? (
-              <p className="text-sm text-neutral-400">Nenhuma etapa de funil cadastrada.</p>
+              <p className="text-sm text-muted-foreground">Nenhuma etapa de funil cadastrada.</p>
             ) : (
               funnelByStage.map(({ stage, count }) => {
                 const pct = Math.round((count / maxFunnelCount) * 100)
                 return (
                   <div key={stage.id}>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium text-neutral-900">{stage.name}</span>
-                      <span className="text-neutral-400">
+                      <span className="font-medium text-brand">{stage.name}</span>
+                      <span className="text-muted-foreground">
                         {count} · {pct}%
                       </span>
                     </div>
-                    <div className="mt-1.5 h-2 w-full rounded-full bg-neutral-100">
+                    <div className="mt-1.5 h-2 w-full rounded-full bg-canvas">
                       <div
                         className="h-2 rounded-full"
                         style={{ width: `${pct}%`, backgroundColor: stage.color }}
@@ -351,8 +351,8 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5 lg:p-6">
-          <h2 className="text-[20px] font-semibold text-neutral-900">Tarefas em aberto</h2>
+        <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-5 lg:p-6">
+          <h2 className="text-[20px] font-semibold text-brand">Tarefas em aberto</h2>
           {isTasksLoading ? (
             <div className="mt-4 space-y-3">
               {Array.from({ length: 4 }).map((_, i) => (
@@ -366,12 +366,12 @@ export default function DashboardPage() {
                 const badge = getTaskBadge(task.dueDate)
                 return (
                   <li key={task.id} className="flex items-start gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-600">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-canvas text-muted-foreground">
                       <Icon className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="truncate text-sm font-medium text-neutral-900">{task.title}</p>
+                        <p className="truncate text-sm font-medium text-brand">{task.title}</p>
                         {badge && (
                           <span
                             className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium ${badge.className}`}
@@ -380,7 +380,7 @@ export default function DashboardPage() {
                           </span>
                         )}
                       </div>
-                      <p className="mt-0.5 truncate text-xs text-neutral-400">
+                      <p className="mt-0.5 truncate text-xs text-muted-foreground">
                         {task.lead?.name ?? 'Sem lead vinculado'} · {formatTaskDateTime(task.dueDate)}
                       </p>
                     </div>
@@ -388,13 +388,13 @@ export default function DashboardPage() {
                 )
               })}
               {(openTasks?.data ?? []).length === 0 && (
-                <p className="text-sm text-neutral-400">Nenhuma tarefa em aberto.</p>
+                <p className="text-sm text-muted-foreground">Nenhuma tarefa em aberto.</p>
               )}
             </ul>
           )}
           <Link
             href="/tarefas"
-            className="mt-4 flex items-center gap-1 text-sm font-medium text-brand hover:text-brand-dark"
+            className="mt-4 flex items-center gap-1 text-sm font-medium text-brand hover:text-brand"
           >
             Ver todas
             <ArrowRight className="h-4 w-4" />
@@ -420,27 +420,27 @@ export default function DashboardPage() {
       </div>
 
       <section>
-        <h2 className="text-[20px] font-semibold text-neutral-900">Vendas por empreendimento</h2>
+        <h2 className="text-[20px] font-semibold text-brand">Vendas por empreendimento</h2>
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           {isSalesByPropertyLoading ? (
             Array.from({ length: 4 }).map((_, i) => (
               <Skeleton key={i} className="h-[92px] rounded-[16px]" />
             ))
           ) : propertySales.length === 0 ? (
-            <p className="text-sm text-neutral-400">Nenhuma venda registrada no período.</p>
+            <p className="text-sm text-muted-foreground">Nenhuma venda registrada no período.</p>
           ) : (
             propertySales.map((property) => (
               <div
                 key={property.id}
-                className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5"
+                className="rounded-[16px] border-[0.5px] border-line bg-paper p-5"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-bg text-brand">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-line text-brand">
                     <Building2 className="h-5 w-5" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-neutral-900">{property.name}</p>
-                    <p className="text-xs text-neutral-400">
+                    <p className="truncate text-sm font-medium text-brand">{property.name}</p>
+                    <p className="text-xs text-muted-foreground">
                       {property.units} unidade{property.units !== 1 ? 's' : ''} · {formatCurrency(property.vgv)}
                     </p>
                   </div>

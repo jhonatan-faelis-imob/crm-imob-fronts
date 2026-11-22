@@ -31,9 +31,9 @@ import type { CadenceStage, CadenceStep } from '@/types'
 import { MAX_STEPS_PER_STAGE, formatOffset } from '../constants'
 
 const iconButtonClassName =
-  'flex h-11 w-11 shrink-0 items-center justify-center rounded-[8px] text-neutral-400 transition-colors disabled:cursor-not-allowed disabled:opacity-50 sm:h-9 sm:w-9'
+  'flex h-11 w-11 shrink-0 items-center justify-center rounded-[8px] text-muted-foreground transition-colors disabled:cursor-not-allowed disabled:opacity-50 sm:h-9 sm:w-9'
 const secondaryButtonClassName =
-  'inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border-[0.5px] border-neutral-200 px-4 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-60 sm:h-10 sm:w-auto'
+  'inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border-[0.5px] border-line px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-canvas disabled:cursor-not-allowed disabled:opacity-60 sm:h-10 sm:w-auto'
 
 interface StepActions {
   onToggle: (step: CadenceStep, active: boolean) => void
@@ -64,7 +64,7 @@ function StepRow({
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn(
-        'flex items-center gap-2 bg-white py-2.5 sm:gap-3',
+        'flex items-center gap-2 bg-paper py-2.5 sm:gap-3',
         !step.active && 'opacity-60',
         isDragging && 'relative z-10 rounded-[12px] shadow-md',
       )}
@@ -75,7 +75,7 @@ function StepRow({
         {...attributes}
         {...listeners}
         aria-label="Arrastar para reordenar"
-        className={`${iconButtonClassName} -ml-2 cursor-grab touch-none hover:bg-neutral-100 hover:text-neutral-900 active:cursor-grabbing`}
+        className={`${iconButtonClassName} -ml-2 cursor-grab touch-none hover:bg-canvas hover:text-brand active:cursor-grabbing`}
       >
         <GripVertical className="h-4 w-4" />
       </button>
@@ -86,11 +86,11 @@ function StepRow({
         <Icon className="h-4 w-4" />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-xs text-neutral-400">
+        <p className="text-xs text-muted-foreground">
           {formatOffset(step.offsetDays)} · {step.dueTime} · {type.label}
           {step.skipWeekends && ' · sem fim de semana'}
         </p>
-        <p className="break-words text-sm font-medium text-neutral-900">{step.title}</p>
+        <p className="break-words text-sm font-medium text-brand">{step.title}</p>
       </div>
       <Switch
         checked={step.active}
@@ -105,13 +105,13 @@ function StepRow({
             <button
               type="button"
               aria-label="Ações do passo"
-              className={`${iconButtonClassName} hover:bg-neutral-100 hover:text-neutral-900 sm:hidden`}
+              className={`${iconButtonClassName} hover:bg-canvas hover:text-brand sm:hidden`}
             />
           }
         >
           <MoreHorizontal className="h-4 w-4" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-44 bg-white">
+        <DropdownMenuContent align="end" className="w-44 bg-paper">
           <DropdownMenuItem className="min-h-11" onClick={() => actions.onEdit(step)}>
             <Pencil className="h-4 w-4" />
             Editar
@@ -131,7 +131,7 @@ function StepRow({
           type="button"
           onClick={() => actions.onEdit(step)}
           aria-label="Editar passo"
-          className={`${iconButtonClassName} hover:bg-neutral-100 hover:text-neutral-900`}
+          className={`${iconButtonClassName} hover:bg-canvas hover:text-brand`}
         >
           <Pencil className="h-4 w-4" />
         </button>
@@ -141,7 +141,7 @@ function StepRow({
           disabled={!canDuplicate}
           aria-label="Duplicar passo"
           title={canDuplicate ? 'Duplicar passo' : `Máximo de ${MAX_STEPS_PER_STAGE} passos`}
-          className={`${iconButtonClassName} hover:bg-neutral-100 hover:text-neutral-900`}
+          className={`${iconButtonClassName} hover:bg-canvas hover:text-brand`}
         >
           <Copy className="h-4 w-4" />
         </button>
@@ -195,13 +195,13 @@ export function StageSteps({
   return (
     <div>
       {steps.length === 0 ? (
-        <p className="rounded-[12px] bg-neutral-100 p-3 text-sm text-neutral-400">
+        <p className="rounded-[12px] bg-canvas p-3 text-sm text-muted-foreground">
           Nenhuma tarefa automática nesta etapa.
         </p>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={steps.map((step) => step.id)} strategy={verticalListSortingStrategy}>
-            <ul className="divide-y-[0.5px] divide-neutral-200">
+            <ul className="divide-y-[0.5px] divide-line">
               {steps.map((step) => (
                 <StepRow
                   key={step.id}

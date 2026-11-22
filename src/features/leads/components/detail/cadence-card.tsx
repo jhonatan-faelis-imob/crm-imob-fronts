@@ -18,7 +18,7 @@ import type { Task } from '@/types'
 import { formatDateTimeBR } from './format'
 
 const secondaryButtonClassName =
-  'inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-[8px] border-[0.5px] border-neutral-200 px-3 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-60 sm:h-10'
+  'inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-[8px] border-[0.5px] border-line px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-canvas disabled:cursor-not-allowed disabled:opacity-60 sm:h-10'
 
 export function CadenceCard({
   leadId,
@@ -57,9 +57,9 @@ export function CadenceCard({
   const hasSteps = (data?.steps.length ?? 0) > 0
 
   return (
-    <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5">
+    <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-5">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-neutral-900">Cadência</h3>
+        <h3 className="text-sm font-semibold text-brand">Cadência</h3>
         {data?.stage && (
           <span
             className="rounded-full px-2 py-0.5 text-[11px] font-medium"
@@ -78,16 +78,16 @@ export function CadenceCard({
       ) : isError ? (
         <p className="mt-3 text-sm text-danger">Não foi possível carregar a cadência.</p>
       ) : !data?.stage ? (
-        <p className="mt-3 text-sm text-neutral-400">O lead não está em nenhuma etapa do funil.</p>
+        <p className="mt-3 text-sm text-muted-foreground">O lead não está em nenhuma etapa do funil.</p>
       ) : (
         <>
           {!hasSteps && (
-            <div className="mt-3 rounded-[12px] bg-neutral-100 p-3 text-sm text-neutral-600">
+            <div className="mt-3 rounded-[12px] bg-canvas p-3 text-sm text-muted-foreground">
               <p>Esta etapa não tem cadência definida.</p>
               {isHydrated && canManageCadences(user) && (
                 <Link
                   href="/cadencias"
-                  className="mt-1 inline-flex min-h-11 items-center gap-1.5 font-medium text-brand hover:text-brand-dark sm:min-h-0"
+                  className="mt-1 inline-flex min-h-11 items-center gap-1.5 font-medium text-brand hover:text-brand sm:min-h-0"
                 >
                   <Workflow className="h-4 w-4" />
                   Configurar cadências
@@ -97,7 +97,7 @@ export function CadenceCard({
           )}
 
           {tasks.length > 0 && (
-            <ul className="mt-3 divide-y-[0.5px] divide-neutral-200">
+            <ul className="mt-3 divide-y-[0.5px] divide-line">
               {tasks.map((task) => {
                 const type = TASK_TYPE_META[task.type]
                 const status = TASK_STATUS_META[task.status]
@@ -118,12 +118,12 @@ export function CadenceCard({
                       <span className="min-w-0 flex-1">
                         <span
                           className={`block break-words text-sm font-medium ${
-                            task.status === 'pendente' ? 'text-neutral-900' : 'text-neutral-400 line-through'
+                            task.status === 'pendente' ? 'text-brand' : 'text-muted-foreground line-through'
                           }`}
                         >
                           {task.title}
                         </span>
-                        <span className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-neutral-400">
+                        <span className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
                           <span
                             className="rounded-full px-2 py-0.5 text-[11px] font-medium"
                             style={{ backgroundColor: status.bg, color: status.text }}
@@ -134,7 +134,7 @@ export function CadenceCard({
                         </span>
                       </span>
                       <Avatar size="sm" title={task.assignedToName}>
-                        <AvatarFallback className="bg-brand-bg text-brand">
+                        <AvatarFallback className="bg-line text-brand">
                           {getInitials(task.assignedToName)}
                         </AvatarFallback>
                       </Avatar>
@@ -146,7 +146,7 @@ export function CadenceCard({
           )}
 
           {hasSteps && tasks.length === 0 && (
-            <p className="mt-3 text-sm text-neutral-400">Nenhuma tarefa automática desta etapa ainda.</p>
+            <p className="mt-3 text-sm text-muted-foreground">Nenhuma tarefa automática desta etapa ainda.</p>
           )}
         </>
       )}
@@ -169,7 +169,7 @@ export function CadenceCard({
         )}
       </div>
 
-      <p className="mt-3 text-xs text-neutral-400">
+      <p className="mt-3 text-xs text-muted-foreground">
         Alterar aqui vale só para este lead. A regra geral fica em Configurações → Cadências.
       </p>
     </div>

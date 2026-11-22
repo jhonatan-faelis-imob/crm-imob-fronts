@@ -48,7 +48,7 @@ function ScoreRing({ score }: { score: number }) {
           strokeDashoffset={offset}
         />
       </svg>
-      <span className="absolute text-sm font-semibold text-neutral-900">{score}</span>
+      <span className="absolute text-sm font-semibold text-brand">{score}</span>
     </div>
   )
 }
@@ -59,31 +59,31 @@ export function SummaryCard({ lead, onAnalyze }: { lead: Lead; onAnalyze: () => 
   const whatsappHref = whatsappUrl(lead.phone)
 
   return (
-    <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5">
+    <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-5">
       <div className="flex items-center gap-3">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-bg text-xl font-semibold text-brand">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-line text-xl font-semibold text-brand">
           {getInitials(lead.name)}
         </div>
         <div className="min-w-0">
-          <p className="truncate text-base font-semibold text-neutral-900">{lead.name}</p>
-          <p className="text-sm text-neutral-400">{PROFILE_LABEL[lead.profile]}</p>
+          <p className="truncate text-base font-semibold text-brand">{lead.name}</p>
+          <p className="text-sm text-muted-foreground">{PROFILE_LABEL[lead.profile]}</p>
         </div>
       </div>
 
-      <div className="mt-4 flex items-center gap-3 rounded-[12px] bg-neutral-100 p-3">
+      <div className="mt-4 flex items-center gap-3 rounded-[12px] bg-canvas p-3">
         {lead.aiScore !== undefined ? (
           <ScoreRing score={lead.aiScore} />
         ) : (
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white text-center text-[11px] text-neutral-400">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-paper text-center text-[11px] text-muted-foreground">
             Sem score
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-neutral-400">Score de IA</p>
+          <p className="text-xs text-muted-foreground">Score de IA</p>
           <button
             type="button"
             onClick={onAnalyze}
-            className="mt-1 inline-flex items-center gap-1.5 rounded-[8px] bg-brand px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-brand-dark"
+            className="mt-1 inline-flex items-center gap-1.5 rounded-[8px] bg-brand px-3 py-1.5 text-xs font-medium text-paper transition-colors hover:bg-ink"
           >
             <Sparkles className="h-3.5 w-3.5" />
             Analisar com IA
@@ -93,7 +93,7 @@ export function SummaryCard({ lead, onAnalyze }: { lead: Lead; onAnalyze: () => 
 
       <div className="mt-4 space-y-2.5 text-sm">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-neutral-600">{lead.phone}</span>
+          <span className="text-muted-foreground">{lead.phone}</span>
           <a
             href={whatsappHref}
             target="_blank"
@@ -105,32 +105,32 @@ export function SummaryCard({ lead, onAnalyze }: { lead: Lead; onAnalyze: () => 
           </a>
         </div>
         {lead.email && (
-          <div className="flex items-center gap-2 text-neutral-600">
-            <Mail className="h-4 w-4 shrink-0 text-neutral-400" />
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Mail className="h-4 w-4 shrink-0 text-muted-foreground" />
             <span className="truncate">{lead.email}</span>
           </div>
         )}
-        <div className="flex items-start gap-2 text-neutral-600">
-          <SourceIcon className="mt-0.5 h-4 w-4 shrink-0 text-neutral-400" />
+        <div className="flex items-start gap-2 text-muted-foreground">
+          <SourceIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
           <span className="min-w-0">
             {source.label}
             {lead.sourceDetail && (
-              <span className="block break-words text-xs text-neutral-400">{lead.sourceDetail}</span>
+              <span className="block break-words text-xs text-muted-foreground">{lead.sourceDetail}</span>
             )}
           </span>
         </div>
-        <div className="flex items-center gap-2 text-neutral-600">
-          <Calendar className="h-4 w-4 shrink-0 text-neutral-400" />
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Calendar className="h-4 w-4 shrink-0 text-muted-foreground" />
           Cadastrado em {formatDateBR(lead.createdAt)}
         </div>
       </div>
 
       {lead.tags && lead.tags.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-1.5 border-t-[0.5px] border-neutral-200 pt-4">
+        <div className="mt-4 flex flex-wrap gap-1.5 border-t-[0.5px] border-line pt-4">
           {lead.tags.map((tag) => (
             <span
               key={tag.id}
-              className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-600"
+              className="rounded-full bg-canvas px-2.5 py-1 text-xs font-medium text-muted-foreground"
             >
               {tag.label}
             </span>
@@ -144,8 +144,8 @@ export function SummaryCard({ lead, onAnalyze }: { lead: Lead; onAnalyze: () => 
 function FinancialRow({ label, value, strong }: { label: string; value: number | undefined; strong?: boolean }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <span className="text-neutral-400">{label}</span>
-      <span className={strong ? 'font-semibold text-neutral-900' : 'text-neutral-900'}>
+      <span className="text-muted-foreground">{label}</span>
+      <span className={strong ? 'font-semibold text-brand' : 'text-brand'}>
         {value !== undefined ? formatCurrency(value) : '—'}
       </span>
     </div>
@@ -167,13 +167,13 @@ export function FinancialCard({
   onSimulate: () => void
 }) {
   return (
-    <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5">
+    <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-5">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-neutral-900">Financeiro</h3>
+        <h3 className="text-sm font-semibold text-brand">Financeiro</h3>
         <button
           type="button"
           onClick={onSimulate}
-          className="-my-2 inline-flex min-h-11 items-center gap-1.5 rounded-[8px] px-2 text-sm font-medium text-brand hover:bg-brand-bg"
+          className="-my-2 inline-flex min-h-11 items-center gap-1.5 rounded-[8px] px-2 text-sm font-medium text-brand hover:bg-line"
         >
           <Calculator className="h-4 w-4" />
           Simular
@@ -186,15 +186,15 @@ export function FinancialCard({
         <FinancialRow label="Valor de interesse" value={lead.interestValue} strong />
       </div>
       {referenceValue !== undefined && (
-        <p className="mt-3 rounded-[12px] bg-neutral-100 px-3 py-2 text-xs text-neutral-600">
-          Imóvel de referência: até <strong className="text-neutral-900">{formatCurrency(referenceValue)}</strong>
+        <p className="mt-3 rounded-[12px] bg-canvas px-3 py-2 text-xs text-muted-foreground">
+          Imóvel de referência: até <strong className="text-brand">{formatCurrency(referenceValue)}</strong>
         </p>
       )}
       {lead.income !== undefined && (
         <button
           type="button"
           onClick={onViewLinkedProperties}
-          className="mt-4 flex items-center gap-1 text-sm font-medium text-brand hover:text-brand-dark"
+          className="mt-4 flex items-center gap-1 text-sm font-medium text-brand hover:text-brand"
         >
           Enquadra em {matchCount} empreendimento{matchCount === 1 ? '' : 's'}
           <ArrowRight className="h-3.5 w-3.5" />
@@ -206,21 +206,21 @@ export function FinancialCard({
 
 export function ResponsibleCard({ lead, onTransfer }: { lead: Lead; onTransfer: () => void }) {
   return (
-    <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5">
-      <h3 className="text-sm font-semibold text-neutral-900">Responsável</h3>
+    <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-5">
+      <h3 className="text-sm font-semibold text-brand">Responsável</h3>
       <div className="mt-3 flex items-center gap-3">
         <Avatar>
-          <AvatarFallback className="bg-brand-bg text-brand">{getInitials(lead.ownerName)}</AvatarFallback>
+          <AvatarFallback className="bg-line text-brand">{getInitials(lead.ownerName)}</AvatarFallback>
         </Avatar>
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-neutral-900">{lead.ownerName}</p>
-          <p className="text-xs text-neutral-400">{lead.teamId ? 'Equipe atribuída' : 'Sem equipe atribuída'}</p>
+          <p className="truncate text-sm font-medium text-brand">{lead.ownerName}</p>
+          <p className="text-xs text-muted-foreground">{lead.teamId ? 'Equipe atribuída' : 'Sem equipe atribuída'}</p>
         </div>
       </div>
       <button
         type="button"
         onClick={onTransfer}
-        className="mt-4 w-full rounded-[8px] border-[1.5px] border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-600 transition-colors hover:border-brand hover:text-brand"
+        className="mt-4 w-full rounded-[8px] border-[1.5px] border-line px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-brand hover:text-brand"
       >
         Transferir
       </button>
@@ -244,8 +244,8 @@ export function NextTaskCard({
     .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
 
   return (
-    <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5">
-      <h3 className="text-sm font-semibold text-neutral-900">Próxima tarefa</h3>
+    <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-5">
+      <h3 className="text-sm font-semibold text-brand">Próxima tarefa</h3>
       {nextTask ? (
         <div
           role="button"
@@ -257,15 +257,15 @@ export function NextTaskCard({
           className="mt-3 cursor-pointer rounded-[12px]"
         >
           <p className="text-xs font-medium text-brand">{TASK_TYPE_LABEL[nextTask.type]}</p>
-          <p className="mt-1 text-sm font-medium text-neutral-900">{nextTask.title}</p>
-          <p className="mt-1 text-xs text-neutral-400">{formatDateTimeBR(nextTask.dueDate)}</p>
+          <p className="mt-1 text-sm font-medium text-brand">{nextTask.title}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{formatDateTimeBR(nextTask.dueDate)}</p>
           <button
             type="button"
             onClick={(event) => {
               event.stopPropagation()
               onComplete(nextTask)
             }}
-            className="mt-3 w-full rounded-[8px] bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+            className="mt-3 w-full rounded-[8px] bg-brand px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-ink"
           >
             Concluir
           </button>
@@ -274,7 +274,7 @@ export function NextTaskCard({
         <button
           type="button"
           onClick={onScheduleNew}
-          className="mt-3 w-full rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+          className="mt-3 w-full rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink"
         >
           Agendar tarefa
         </button>

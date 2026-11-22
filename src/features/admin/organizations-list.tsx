@@ -44,9 +44,9 @@ export function OrganizationsList({
   }
   if (!rows || rows.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-2 rounded-[16px] border-[0.5px] border-neutral-200 bg-white px-6 py-10 text-center">
-        <Building2 className="h-6 w-6 text-neutral-400" />
-        <p className="text-sm text-neutral-600">Nenhuma imobiliária encontrada.</p>
+      <div className="flex flex-col items-center gap-2 rounded-[16px] border-[0.5px] border-line bg-paper px-6 py-10 text-center">
+        <Building2 className="h-6 w-6 text-muted-foreground" />
+        <p className="text-sm text-muted-foreground">Nenhuma imobiliária encontrada.</p>
       </div>
     )
   }
@@ -61,32 +61,32 @@ export function OrganizationsList({
               type="button"
               onClick={() => onOpen(row.id)}
               className={cn(
-                'flex w-full items-center gap-3 rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4 text-left',
+                'flex w-full items-center gap-3 rounded-[16px] border-[0.5px] border-line bg-paper p-4 text-left',
                 highlight(row.subscriptionStatus),
               )}
             >
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="flex items-center gap-2">
-                  <p className="truncate text-[15px] font-semibold text-neutral-900">{row.name}</p>
+                  <p className="truncate text-[15px] font-semibold text-brand">{row.name}</p>
                   <StatusBadge status={row.subscriptionStatus} />
                 </div>
-                <p className="text-xs text-neutral-600">
+                <p className="text-xs text-muted-foreground">
                   {row.planName} · {row.activeUsers}/{row.seats} usuários · {formatMoney(row.monthlyPrice)}
                 </p>
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-muted-foreground">
                   Vence {formatDay(dueDate(row))} · Último acesso {formatDateTime(row.lastAccessAt)}
                 </p>
               </div>
-              <ChevronRight className="h-4 w-4 shrink-0 text-neutral-400" />
+              <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
             </button>
           </li>
         ))}
       </ul>
 
       {/* Desktop: tabela */}
-      <div className="hidden overflow-hidden rounded-[16px] border-[0.5px] border-neutral-200 bg-white lg:block">
+      <div className="hidden overflow-hidden rounded-[16px] border-[0.5px] border-line bg-paper lg:block">
         <table className="w-full text-sm">
-          <thead className="bg-neutral-100 text-left text-xs text-neutral-600">
+          <thead className="bg-canvas text-left text-xs text-muted-foreground">
             <tr>
               <th className="px-4 py-3 font-medium">Imobiliária</th>
               <th className="px-4 py-3 font-medium">Plano</th>
@@ -103,26 +103,26 @@ export function OrganizationsList({
                 key={row.id}
                 onClick={() => onOpen(row.id)}
                 className={cn(
-                  'cursor-pointer border-t-[0.5px] border-neutral-200 hover:bg-neutral-100',
+                  'cursor-pointer border-t-[0.5px] border-line hover:bg-canvas',
                   highlight(row.subscriptionStatus),
                 )}
               >
                 <td className="px-4 py-3">
-                  <button type="button" className="text-left font-medium text-neutral-900 hover:text-brand">
+                  <button type="button" className="text-left font-medium text-brand hover:text-brand">
                     {row.name}
                   </button>
-                  <p className="text-xs text-neutral-400">{row.slug}</p>
+                  <p className="text-xs text-muted-foreground">{row.slug}</p>
                 </td>
-                <td className="px-4 py-3 text-neutral-600">{row.planName}</td>
-                <td className={cn('px-4 py-3', row.activeUsers >= row.seats ? 'text-warning' : 'text-neutral-600')}>
+                <td className="px-4 py-3 text-muted-foreground">{row.planName}</td>
+                <td className={cn('px-4 py-3', row.activeUsers >= row.seats ? 'text-warning' : 'text-muted-foreground')}>
                   {row.activeUsers}/{row.seats}
                 </td>
                 <td className="px-4 py-3">
                   <StatusBadge status={row.subscriptionStatus} />
                 </td>
-                <td className="px-4 py-3 text-right text-neutral-900">{formatMoney(row.monthlyPrice)}</td>
-                <td className="px-4 py-3 text-neutral-600">{formatDay(dueDate(row))}</td>
-                <td className="px-4 py-3 text-neutral-600">{formatDateTime(row.lastAccessAt)}</td>
+                <td className="px-4 py-3 text-right text-brand">{formatMoney(row.monthlyPrice)}</td>
+                <td className="px-4 py-3 text-muted-foreground">{formatDay(dueDate(row))}</td>
+                <td className="px-4 py-3 text-muted-foreground">{formatDateTime(row.lastAccessAt)}</td>
               </tr>
             ))}
           </tbody>

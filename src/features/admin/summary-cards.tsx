@@ -3,7 +3,7 @@ import { formatMoney } from '@/features/assinatura/constants'
 import { cn } from '@/lib/utils'
 import type { AdminSummary } from '@/services/admin.service'
 
-const cardClassName = 'rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4'
+const cardClassName = 'rounded-[16px] border-[0.5px] border-line bg-paper p-4'
 
 export function SummaryCards({ summary, isLoading }: { summary: AdminSummary | undefined; isLoading: boolean }) {
   if (isLoading || !summary) {
@@ -27,13 +27,13 @@ export function SummaryCards({ summary, isLoading }: { summary: AdminSummary | u
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
       {cards.map((card) => (
         <div key={card.label} className={cardClassName}>
-          <p className="text-xs text-neutral-400">{card.label}</p>
+          <p className="text-xs text-muted-foreground">{card.label}</p>
           <p className={cn('mt-1 text-[26px] font-semibold', card.className)}>{card.value}</p>
         </div>
       ))}
       <div className={cn(cardClassName, 'col-span-2 lg:col-span-1')}>
-        <p className="text-xs text-neutral-400">Receita mensal (ativas)</p>
-        <p className="mt-1 text-[22px] font-semibold text-neutral-900">{formatMoney(summary.monthlyRevenue)}</p>
+        <p className="text-xs text-muted-foreground">Receita mensal (ativas)</p>
+        <p className="mt-1 text-[22px] font-semibold text-brand">{formatMoney(summary.monthlyRevenue)}</p>
       </div>
     </div>
   )

@@ -62,7 +62,7 @@ export function TaskListView({
 
   if (orderedKeys.length === 0) {
     return (
-      <p className="rounded-[16px] border-[0.5px] border-dashed border-neutral-200 p-8 text-center text-sm text-neutral-400">
+      <p className="rounded-[16px] border-[0.5px] border-dashed border-line p-8 text-center text-sm text-muted-foreground">
         Nenhuma tarefa encontrada com os filtros atuais.
       </p>
     )
@@ -79,11 +79,11 @@ export function TaskListView({
           >
             <div className="flex items-center gap-2 px-1">
               <h3
-                className={`text-sm font-semibold ${key === 'vencidas' ? 'text-danger' : 'text-neutral-900'}`}
+                className={`text-sm font-semibold ${key === 'vencidas' ? 'text-danger' : 'text-brand'}`}
               >
                 {groupLabel(key, groupTasks)}
               </h3>
-              <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-600">
+              <span className="rounded-full bg-canvas px-2 py-0.5 text-xs font-medium text-muted-foreground">
                 {groupTasks.length}
               </span>
             </div>

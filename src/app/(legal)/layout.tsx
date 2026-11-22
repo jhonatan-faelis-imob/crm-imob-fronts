@@ -3,7 +3,7 @@ import type { Viewport } from 'next'
 // Páginas legais públicas: sem sidebar nem navegação do CRM. Permite zoom (o app trava a escala).
 // Podem ser indexadas: não definir robots aqui.
 export const viewport: Viewport = {
-  themeColor: '#FF385C',
+  themeColor: '#060B23',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,

@@ -29,7 +29,7 @@ export function StagePopover({
             style={currentStage ? stageBadgeStyle(currentStage) : undefined}
             className={cn(
               'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-opacity hover:opacity-80',
-              !currentStage && 'bg-neutral-100 text-neutral-400',
+              !currentStage && 'bg-canvas text-muted-foreground',
               className,
             )}
           />
@@ -39,7 +39,7 @@ export function StagePopover({
         <ChevronDown className="h-3 w-3" />
       </PopoverTrigger>
       <PopoverContent align="start">
-        <p className="mb-2 px-1 text-xs font-medium text-neutral-400">Mover para</p>
+        <p className="mb-2 px-1 text-xs font-medium text-muted-foreground">Mover para</p>
         <StageOptionsList
           stages={stages}
           currentStageId={currentStage?.id}

@@ -84,8 +84,8 @@ const newGoalSchema = z
 type NewGoalFormData = z.infer<typeof newGoalSchema>
 
 const inputClassName =
-  'w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-[15px] text-neutral-900 outline-none transition-colors focus:border-brand'
-const labelClassName = 'mb-1.5 block text-[13px] font-medium text-neutral-900'
+  'w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] text-brand outline-none transition-colors focus:border-brand'
+const labelClassName = 'mb-1.5 block text-[13px] font-medium text-brand'
 const errorClassName = 'mt-1 text-[12px] text-danger'
 
 export function NewGoalSheet({
@@ -290,8 +290,8 @@ export function NewGoalSheet({
           )}
 
           {withFunnel && (
-            <div className="space-y-4 rounded-[12px] border-[0.5px] border-neutral-200 p-4">
-              <p className="text-[13px] font-medium text-neutral-900">Funil individual</p>
+            <div className="space-y-4 rounded-[12px] border-[0.5px] border-line p-4">
+              <p className="text-[13px] font-medium text-brand">Funil individual</p>
 
               <div>
                 <label htmlFor="individualVgv" className={labelClassName}>
@@ -347,14 +347,14 @@ export function NewGoalSheet({
                 )}
               </div>
 
-              <details open={errors.rates ? true : undefined} className="rounded-[12px] bg-neutral-100 p-3">
-                <summary className="cursor-pointer text-[13px] font-medium text-neutral-900">
+              <details open={errors.rates ? true : undefined} className="rounded-[12px] bg-canvas p-3">
+                <summary className="cursor-pointer text-[13px] font-medium text-brand">
                   Taxas de conversão (avançado)
                 </summary>
                 <div className="mt-3 space-y-3">
                   {CONVERSION_RATE_FIELDS.map(({ key, label }) => (
                     <div key={key}>
-                      <label htmlFor={key} className="mb-1 block text-xs text-neutral-600">
+                      <label htmlFor={key} className="mb-1 block text-xs text-muted-foreground">
                         {label}
                       </label>
                       <input
@@ -373,21 +373,21 @@ export function NewGoalSheet({
               </details>
 
               {funnelPreview && (
-                <div className="rounded-[12px] bg-neutral-100 p-3">
-                  <p className="text-xs font-medium text-neutral-600">
+                <div className="rounded-[12px] bg-canvas p-3">
+                  <p className="text-xs font-medium text-muted-foreground">
                     Funil calculado automaticamente
                   </p>
                   <div className="mt-2 grid grid-cols-3 gap-2 text-center sm:grid-cols-6">
                     {FUNNEL_STAGES.map((stage) => (
                       <div key={stage.key}>
-                        <p className="text-sm font-semibold text-neutral-900">
+                        <p className="text-sm font-semibold text-brand">
                           {Math.ceil(funnelPreview.stages[stage.key])}
                         </p>
-                        <p className="text-[10px] text-neutral-400">{stage.label}</p>
+                        <p className="text-[10px] text-muted-foreground">{stage.label}</p>
                       </div>
                     ))}
                   </div>
-                  <div className="mt-3 flex items-center justify-between text-xs text-neutral-600">
+                  <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
                     <span>
                       Unidades: <strong>{Math.ceil(funnelPreview.units)}</strong>
                     </span>
@@ -406,7 +406,7 @@ export function NewGoalSheet({
             render={
               <button
                 type="button"
-                className="flex-1 rounded-[8px] border-[1.5px] border-neutral-900 bg-transparent px-4 py-2.5 text-sm font-medium text-neutral-900"
+                className="flex-1 rounded-[8px] border-[1.5px] border-brand bg-transparent px-4 py-2.5 text-sm font-medium text-brand"
               />
             }
           >
@@ -416,7 +416,7 @@ export function NewGoalSheet({
             type="button"
             onClick={handleSubmit(onSubmit)}
             disabled={isSubmitting || saveGoal.isPending}
-            className="flex-1 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-70"
+            className="flex-1 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:cursor-not-allowed disabled:opacity-70"
           >
             Salvar
           </button>

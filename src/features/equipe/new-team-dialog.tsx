@@ -71,7 +71,7 @@ function NewTeamFormBody({
               </option>
             ))}
           </select>
-          <p className="mt-1.5 text-xs text-neutral-400">Você pode criar a equipe agora e definir o coordenador depois.</p>
+          <p className="mt-1.5 text-xs text-muted-foreground">Você pode criar a equipe agora e definir o coordenador depois.</p>
         </FormField>
 
         <FormField label="Descrição" htmlFor="new-team-description">
@@ -90,11 +90,11 @@ function NewTeamFormBody({
         </div>
       </form>
 
-      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
+      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-[8px] border-[1.5px] border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100"
+          className="rounded-[8px] border-[1.5px] border-line px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-canvas"
         >
           Cancelar
         </button>
@@ -102,7 +102,7 @@ function NewTeamFormBody({
           type="button"
           disabled={isSubmitting}
           onClick={handleSubmit(onSubmit)}
-          className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
+          className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:opacity-60"
         >
           {isSubmitting ? 'Criando...' : 'Criar equipe'}
         </button>
@@ -138,8 +138,8 @@ export function NewTeamDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] w-[calc(100%-2rem)] max-w-md flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
-        <DialogHeader className="shrink-0 gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
+      <DialogContent className="flex max-h-[90vh] w-[calc(100%-2rem)] max-w-md flex-col gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
+        <DialogHeader className="shrink-0 gap-1 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14">
           <DialogTitle>Nova equipe</DialogTitle>
           <DialogDescription>Coordenador e membros podem ficar para depois.</DialogDescription>
         </DialogHeader>

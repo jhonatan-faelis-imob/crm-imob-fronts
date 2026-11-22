@@ -62,16 +62,16 @@ const PAYMENT_STATUS: Record<string, { label: string; className: string }> = {
   RECEIVED: { label: 'Paga', className: 'bg-success/10 text-success' },
   RECEIVED_IN_CASH: { label: 'Paga', className: 'bg-success/10 text-success' },
   OVERDUE: { label: 'Vencida', className: 'bg-warning/10 text-warning' },
-  REFUNDED: { label: 'Estornada', className: 'bg-neutral-100 text-neutral-600' },
-  REFUND_REQUESTED: { label: 'Estorno pedido', className: 'bg-neutral-100 text-neutral-600' },
-  REFUND_IN_PROGRESS: { label: 'Estornando', className: 'bg-neutral-100 text-neutral-600' },
+  REFUNDED: { label: 'Estornada', className: 'bg-canvas text-muted-foreground' },
+  REFUND_REQUESTED: { label: 'Estorno pedido', className: 'bg-canvas text-muted-foreground' },
+  REFUND_IN_PROGRESS: { label: 'Estornando', className: 'bg-canvas text-muted-foreground' },
   CHARGEBACK_REQUESTED: { label: 'Contestada', className: 'bg-danger/10 text-danger' },
   AWAITING_RISK_ANALYSIS: { label: 'Em análise', className: 'bg-info/10 text-info' },
-  DELETED: { label: 'Removida', className: 'bg-neutral-100 text-neutral-400' },
+  DELETED: { label: 'Removida', className: 'bg-canvas text-muted-foreground' },
 }
 
 export function paymentStatusMeta(status: string) {
-  return PAYMENT_STATUS[status] ?? { label: status, className: 'bg-neutral-100 text-neutral-600' }
+  return PAYMENT_STATUS[status] ?? { label: status, className: 'bg-canvas text-muted-foreground' }
 }
 
 export const PAID_STATUSES = ['CONFIRMED', 'RECEIVED', 'RECEIVED_IN_CASH']

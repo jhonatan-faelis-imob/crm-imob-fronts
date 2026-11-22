@@ -27,8 +27,8 @@ export interface CompleteTaskData {
 type CompletableTask = Pick<Task, 'id' | 'title' | 'type'>
 
 const inputClassName =
-  'w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-[15px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand'
-const labelClassName = 'mb-1.5 block text-[13px] font-medium text-neutral-900'
+  'w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] text-brand outline-none transition-colors placeholder:text-muted-foreground focus:border-brand'
+const labelClassName = 'mb-1.5 block text-[13px] font-medium text-brand'
 const errorClassName = 'mt-1 text-[12px] text-danger'
 
 function formatDateInputValue(date: Date) {
@@ -95,8 +95,8 @@ function CompleteTaskForm({
           />
         </div>
 
-        <div className="border-t-[0.5px] border-neutral-200 pt-4">
-          <label className="flex items-center gap-2 text-[13px] font-medium text-neutral-900">
+        <div className="border-t-[0.5px] border-line pt-4">
+          <label className="flex items-center gap-2 text-[13px] font-medium text-brand">
             <input
               type="checkbox"
               checked={hasNextTask}
@@ -180,18 +180,18 @@ function CompleteTaskForm({
         </div>
       </div>
 
-      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
+      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-[8px] border-[1.5px] border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100"
+          className="rounded-[8px] border-[1.5px] border-line px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-canvas"
         >
           Cancelar
         </button>
         <button
           type="button"
           onClick={handleConfirm}
-          className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+          className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink"
         >
           Concluir tarefa
         </button>
@@ -223,8 +223,8 @@ export function CompleteTaskModal({
         if (!nextOpen) onClose()
       }}
     >
-      <DialogContent className="flex max-h-[90vh] w-[calc(100%-2rem)] max-w-md flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
-        <DialogHeader className="shrink-0 flex-row items-center gap-3 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
+      <DialogContent className="flex max-h-[90vh] w-[calc(100%-2rem)] max-w-md flex-col gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
+        <DialogHeader className="shrink-0 flex-row items-center gap-3 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#E8F5E9] text-success">
             <CheckCircle2 className="h-6 w-6" />
           </span>

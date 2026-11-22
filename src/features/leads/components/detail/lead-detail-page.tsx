@@ -51,7 +51,7 @@ const TABS = [
 ] as const
 
 const tabTriggerClassName =
-  'rounded-none border-transparent bg-transparent px-1 py-2.5 text-sm font-medium text-neutral-400 shadow-none after:bg-brand hover:text-neutral-600 data-active:border-transparent data-active:bg-transparent data-active:text-brand data-active:shadow-none'
+  'rounded-none border-transparent bg-transparent px-1 py-2.5 text-sm font-medium text-muted-foreground shadow-none after:bg-brand hover:text-muted-foreground data-active:border-transparent data-active:bg-transparent data-active:text-brand data-active:shadow-none'
 
 export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead }) {
   const router = useRouter()
@@ -310,13 +310,13 @@ export function LeadDetailPage({ lead, apiLead }: { lead: Lead; apiLead: ApiLead
           >
             <TabsList
               variant="line"
-              className="h-auto w-full justify-start gap-4 overflow-x-auto border-b-[0.5px] border-neutral-200 bg-transparent p-0"
+              className="h-auto w-full justify-start gap-4 overflow-x-auto border-b-[0.5px] border-line bg-transparent p-0"
             >
               {TABS.map((tab) => (
                 <TabsTrigger key={tab.value} value={tab.value} className={tabTriggerClassName}>
                   {tab.label}
                   {tab.value === 'documentos' && docs && docs.requiredTotal > 0 && (
-                    <span className="ml-1.5 rounded-full bg-neutral-100 px-1.5 py-0.5 text-[11px] font-medium text-neutral-600">
+                    <span className="ml-1.5 rounded-full bg-canvas px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
                       {docs.requiredApproved}/{docs.requiredTotal}
                     </span>
                   )}

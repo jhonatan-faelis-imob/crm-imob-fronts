@@ -18,8 +18,8 @@ const itemSchema = z.object({
 export type ChecklistItemFormData = z.infer<typeof itemSchema>
 
 const inputClassName =
-  'mt-1.5 w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-base text-neutral-900 outline-none transition-colors focus:border-brand'
-const labelClassName = 'text-[13px] font-medium text-neutral-900'
+  'mt-1.5 w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-base text-brand outline-none transition-colors focus:border-brand'
+const labelClassName = 'text-[13px] font-medium text-brand'
 
 // Novo documento avulso ou renomear um avulso (só o nome muda)
 export function ChecklistItemDialog({
@@ -53,10 +53,10 @@ export function ChecklistItemDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl border-[0.5px] border-neutral-200 bg-white ring-0 sm:max-w-md">
+      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl border-[0.5px] border-line bg-paper ring-0 sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{isRename ? 'Renomear documento' : 'Adicionar documento'}</DialogTitle>
-          {!isRename && <p className="text-sm text-neutral-400">Vale só para este cliente.</p>}
+          {!isRename && <p className="text-sm text-muted-foreground">Vale só para este cliente.</p>}
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="min-w-0 space-y-4">
@@ -72,7 +72,7 @@ export function ChecklistItemDialog({
             <>
               <div>
                 <label htmlFor="item-description" className={labelClassName}>
-                  Descrição <span className="font-normal text-neutral-400">(opcional)</span>
+                  Descrição <span className="font-normal text-muted-foreground">(opcional)</span>
                 </label>
                 <input id="item-description" className={inputClassName} {...register('description')} />
               </div>
@@ -102,7 +102,7 @@ export function ChecklistItemDialog({
                   </select>
                 </div>
               </div>
-              <label className="flex min-h-11 items-center gap-2.5 text-sm text-neutral-900">
+              <label className="flex min-h-11 items-center gap-2.5 text-sm text-brand">
                 <input type="checkbox" className="h-4 w-4 accent-brand" {...register('required')} />
                 Obrigatório
               </label>
@@ -113,14 +113,14 @@ export function ChecklistItemDialog({
             <button
               type="button"
               onClick={() => onOpenChange(false)}
-              className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-sm font-medium text-neutral-600 hover:bg-neutral-100 sm:h-10"
+              className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-sm font-medium text-muted-foreground hover:bg-canvas sm:h-10"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="h-11 rounded-[8px] bg-brand px-4 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-70 sm:h-10"
+              className="h-11 rounded-[8px] bg-brand px-4 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:opacity-70 sm:h-10"
             >
               Salvar
             </button>

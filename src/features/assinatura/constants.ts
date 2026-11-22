@@ -8,7 +8,7 @@ export const STATUS_META: Record<SubscriptionStatus, { label: string; className:
   ativa: { label: 'Ativa', className: 'bg-success/10 text-success' },
   atrasada: { label: 'Atrasada', className: 'bg-warning/10 text-warning' },
   bloqueada: { label: 'Bloqueada', className: 'bg-danger/10 text-danger' },
-  cancelada: { label: 'Cancelada', className: 'bg-neutral-100 text-neutral-600' },
+  cancelada: { label: 'Cancelada', className: 'bg-canvas text-muted-foreground' },
 }
 
 export function statusLabel(status: string) {

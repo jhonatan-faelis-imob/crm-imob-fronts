@@ -27,16 +27,16 @@ export function MemberCard({
 
   return (
     <div
-      className={`flex flex-col gap-4 rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5 transition-colors hover:border-brand ${
+      className={`flex flex-col gap-4 rounded-[16px] border-[0.5px] border-line bg-paper p-5 transition-colors hover:border-brand ${
         member.active ? '' : 'opacity-60'
       }`}
     >
       <div className="flex items-start gap-3">
         <Avatar className="size-16">
-          <AvatarFallback className="bg-brand-bg text-lg text-brand">{getInitials(member.name)}</AvatarFallback>
+          <AvatarFallback className="bg-line text-lg text-brand">{getInitials(member.name)}</AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[15px] font-semibold text-neutral-900">{member.name}</p>
+          <p className="truncate text-[15px] font-semibold text-brand">{member.name}</p>
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
             <span
               className="rounded-full px-2 py-0.5 text-[11px] font-medium"
@@ -50,38 +50,38 @@ export function MemberCard({
               </span>
             )}
           </div>
-          {member.creci && <p className="mt-1 text-xs text-neutral-400">{member.creci}</p>}
-          <p className="text-xs text-neutral-400">{teamName ?? 'Sem equipe'}</p>
+          {member.creci && <p className="mt-1 text-xs text-muted-foreground">{member.creci}</p>}
+          <p className="text-xs text-muted-foreground">{teamName ?? 'Sem equipe'}</p>
         </div>
       </div>
 
-      <div className="border-t-[0.5px] border-neutral-200 pt-4">
+      <div className="border-t-[0.5px] border-line pt-4">
         <div className="grid grid-cols-3 gap-2 text-center">
           <div>
-            <p className="text-sm font-semibold text-neutral-900">{member.metrics.leadsCount}</p>
-            <p className="text-[11px] text-neutral-400">Leads</p>
+            <p className="text-sm font-semibold text-brand">{member.metrics.leadsCount}</p>
+            <p className="text-[11px] text-muted-foreground">Leads</p>
           </div>
           <div>
-            <p className="text-sm font-semibold text-neutral-900">{member.metrics.salesCount}</p>
-            <p className="text-[11px] text-neutral-400">Vendas</p>
+            <p className="text-sm font-semibold text-brand">{member.metrics.salesCount}</p>
+            <p className="text-[11px] text-muted-foreground">Vendas</p>
           </div>
           <div>
-            <p className="truncate text-sm font-semibold text-neutral-900">
+            <p className="truncate text-sm font-semibold text-brand">
               {formatCurrency(member.metrics.vgv)}
             </p>
-            <p className="text-[11px] text-neutral-400">VGV</p>
+            <p className="text-[11px] text-muted-foreground">VGV</p>
           </div>
         </div>
 
         <div className="mt-3">
-          <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-100">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-canvas">
             <div className="h-full rounded-full bg-brand" style={{ width: `${Math.min(100, goalPct)}%` }} />
           </div>
-          <p className="mt-1.5 text-xs text-neutral-400">{goalPct}% da meta individual</p>
+          <p className="mt-1.5 text-xs text-muted-foreground">{goalPct}% da meta individual</p>
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-2 border-t-[0.5px] border-neutral-200 pt-3">
+      <div className="flex items-center justify-between gap-2 border-t-[0.5px] border-line pt-3">
         <div className="flex items-center gap-1.5">
           <a
             href={whatsappHref}

@@ -47,16 +47,16 @@ export function SellerLeadPicker() {
 
   if (sellerLeadId) {
     return (
-      <div className="flex min-h-11 items-center justify-between gap-2 rounded-[12px] border-[1.5px] border-neutral-200 px-3 py-2">
-        <span className="flex min-w-0 items-center gap-2 text-[15px] text-neutral-900">
-          <UserRound className="h-4 w-4 shrink-0 text-neutral-400" />
+      <div className="flex min-h-11 items-center justify-between gap-2 rounded-[12px] border-[1.5px] border-line px-3 py-2">
+        <span className="flex min-w-0 items-center gap-2 text-[15px] text-brand">
+          <UserRound className="h-4 w-4 shrink-0 text-muted-foreground" />
           <span className="truncate">{sellerLeadName || 'Lead vinculado'}</span>
         </span>
         <button
           type="button"
           onClick={clear}
           aria-label="Remover proprietário"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] text-muted-foreground hover:bg-canvas hover:text-brand"
         >
           <X className="h-4 w-4" />
         </button>
@@ -66,7 +66,7 @@ export function SellerLeadPicker() {
 
   return (
     <div className="relative">
-      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
       <input
         id="prop-seller"
         type="search"
@@ -77,22 +77,22 @@ export function SellerLeadPicker() {
         className={`${inputClassName} pl-9`}
       />
       {isFetching && (
-        <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-neutral-400" />
+        <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
       )}
       {search.length >= MIN_TERM && !isFetching && (
-        <div className="absolute inset-x-0 top-full z-20 mt-1 max-h-60 overflow-y-auto rounded-[12px] border-[0.5px] border-neutral-200 bg-white p-1 shadow-lg">
+        <div className="absolute inset-x-0 top-full z-20 mt-1 max-h-60 overflow-y-auto rounded-[12px] border-[0.5px] border-line bg-paper p-1 shadow-lg">
           {results.length === 0 ? (
-            <p className="px-3 py-2.5 text-sm text-neutral-400">Nenhum lead encontrado</p>
+            <p className="px-3 py-2.5 text-sm text-muted-foreground">Nenhum lead encontrado</p>
           ) : (
             results.map((option) => (
               <button
                 key={option.id}
                 type="button"
                 onClick={() => select(option)}
-                className="flex min-h-11 w-full flex-col items-start justify-center rounded-[8px] px-3 py-1.5 text-left hover:bg-neutral-100"
+                className="flex min-h-11 w-full flex-col items-start justify-center rounded-[8px] px-3 py-1.5 text-left hover:bg-canvas"
               >
-                <span className="text-sm font-medium text-neutral-900">{option.name}</span>
-                {option.phone && <span className="text-xs text-neutral-400">{option.phone}</span>}
+                <span className="text-sm font-medium text-brand">{option.name}</span>
+                {option.phone && <span className="text-xs text-muted-foreground">{option.phone}</span>}
               </button>
             ))
           )}

@@ -33,7 +33,7 @@ interface UserOption {
 }
 
 const fieldClassName =
-  'h-10 w-full min-w-0 rounded-[12px] border-[1.5px] border-neutral-200 bg-neutral-100 px-3 text-[16px] text-neutral-900 outline-none sm:text-sm'
+  'h-10 w-full min-w-0 rounded-[12px] border-[1.5px] border-line bg-canvas px-3 text-[16px] text-brand outline-none sm:text-sm'
 
 function KeyField({ view }: { view: GoogleAdsView }) {
   const [revealed, setRevealed] = useState<string | null>(null)
@@ -60,14 +60,14 @@ function KeyField({ view }: { view: GoogleAdsView }) {
 
   return (
     <div>
-      <p className="mb-1 text-xs font-medium text-neutral-600">Chave</p>
+      <p className="mb-1 text-xs font-medium text-muted-foreground">Chave</p>
       <div className="flex gap-2">
         <input readOnly value={revealed ?? view.keyMasked ?? ''} aria-label="Chave do webhook" className={`${fieldClassName} font-mono`} />
         <button
           type="button"
           onClick={() => (revealed ? setRevealed(null) : reveal.mutate())}
           disabled={reveal.isPending}
-          className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-[8px] border-[1.5px] border-neutral-200 px-3 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-100 disabled:opacity-60"
+          className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-[8px] border-[1.5px] border-line px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-canvas disabled:opacity-60"
         >
           {reveal.isPending ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -129,11 +129,11 @@ function Distribution({ view, onSaved }: { view: GoogleAdsView; onSaved: (view: 
   return (
     <>
       <div>
-        <p className="mb-1 text-xs font-medium text-neutral-600">Quem recebe estes leads</p>
+        <p className="mb-1 text-xs font-medium text-muted-foreground">Quem recebe estes leads</p>
         {selected.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-2">
             {selected.map((id) => (
-              <span key={id} className="flex items-center gap-1 rounded-full bg-brand-bg px-2.5 py-1 text-xs font-medium text-brand">
+              <span key={id} className="flex items-center gap-1 rounded-full bg-line px-2.5 py-1 text-xs font-medium text-brand">
                 {byId.get(id)?.name ?? 'Usuário'}
                 <button type="button" onClick={() => toggle(id)} aria-label={`Remover ${byId.get(id)?.name ?? 'usuário'}`} className="rounded-full hover:bg-brand/10">
                   <X className="h-3 w-3" />
@@ -145,29 +145,29 @@ function Distribution({ view, onSaved }: { view: GoogleAdsView; onSaved: (view: 
         {isLoading ? (
           <Skeleton className="h-10 rounded-[12px]" />
         ) : available.length > 0 ? (
-          <div className="flex flex-wrap gap-1.5 rounded-[12px] border-[1.5px] border-neutral-200 bg-white p-2">
+          <div className="flex flex-wrap gap-1.5 rounded-[12px] border-[1.5px] border-line bg-paper p-2">
             {available.map((user) => (
               <button
                 key={user.id}
                 type="button"
                 onClick={() => toggle(user.id)}
-                className="min-h-8 rounded-full border-[0.5px] border-neutral-200 px-2.5 py-1 text-xs font-medium text-neutral-600 transition-colors hover:border-brand hover:text-brand"
+                className="min-h-8 rounded-full border-[0.5px] border-line px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-brand hover:text-brand"
               >
                 {user.name}
               </button>
             ))}
           </div>
         ) : (
-          <p className="text-xs text-neutral-400">Nenhum outro corretor ativo para adicionar.</p>
+          <p className="text-xs text-muted-foreground">Nenhum outro corretor ativo para adicionar.</p>
         )}
-        <p className="mt-2 text-xs text-neutral-400">
+        <p className="mt-2 text-xs text-muted-foreground">
           Os leads vão para quem recebeu menos nas últimas 24 horas.
           {selected.length === 0 && ' Sem ninguém escolhido, vão para quem ativou a integração.'}
         </p>
       </div>
 
       <div className="flex items-center justify-between gap-3">
-        <label htmlFor="first-contact" className="text-sm text-neutral-900">
+        <label htmlFor="first-contact" className="text-sm text-brand">
           Criar tarefa de primeiro contato
         </label>
         <Switch
@@ -178,7 +178,7 @@ function Distribution({ view, onSaved }: { view: GoogleAdsView; onSaved: (view: 
       </div>
       {draft.createFirstContactTask && (
         <div>
-          <label htmlFor="first-contact-minutes" className="mb-1 block text-xs font-medium text-neutral-600">
+          <label htmlFor="first-contact-minutes" className="mb-1 block text-xs font-medium text-muted-foreground">
             Prazo da tarefa (minutos)
           </label>
           <input
@@ -189,7 +189,7 @@ function Distribution({ view, onSaved }: { view: GoogleAdsView; onSaved: (view: 
             max={1440}
             value={minutesText}
             onChange={(event) => setMinutesText(event.target.value)}
-            className="h-10 w-28 rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 text-[16px] text-neutral-900 outline-none focus:border-brand sm:text-sm"
+            className="h-10 w-28 rounded-[12px] border-[1.5px] border-line bg-paper px-3 text-[16px] text-brand outline-none focus:border-brand sm:text-sm"
           />
           {!minutesValid && <p className="mt-1 text-xs text-danger">Informe de 1 a 1440 minutos.</p>}
         </div>
@@ -199,7 +199,7 @@ function Distribution({ view, onSaved }: { view: GoogleAdsView; onSaved: (view: 
         type="button"
         onClick={() => save.mutate()}
         disabled={save.isPending || !minutesValid}
-        className="inline-flex h-10 items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
+        className="inline-flex h-10 items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:opacity-60"
       >
         {save.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
         Salvar distribuição
@@ -269,7 +269,7 @@ export function GoogleAdsPanel({ open, onOpenChange }: { open: boolean; onOpenCh
             <button
               type="button"
               onClick={() => setConfirmDisable(true)}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-sm font-medium text-danger hover:bg-danger-bg sm:h-10"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-line px-4 text-sm font-medium text-danger hover:bg-danger-bg sm:h-10"
             >
               <Power className="h-4 w-4" />
               Desativar
@@ -277,7 +277,7 @@ export function GoogleAdsPanel({ open, onOpenChange }: { open: boolean; onOpenCh
             <button
               type="button"
               onClick={() => setConfirmRotate(true)}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-sm font-medium text-neutral-600 hover:bg-neutral-100 sm:h-10"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-line px-4 text-sm font-medium text-muted-foreground hover:bg-canvas sm:h-10"
             >
               <KeyRound className="h-4 w-4" />
               Gerar nova chave
@@ -306,17 +306,17 @@ export function GoogleAdsPanel({ open, onOpenChange }: { open: boolean; onOpenCh
 
           <Step number={1} title="Ativar">
             {enabled ? (
-              <p className="text-sm text-neutral-600">Integração ativa.</p>
+              <p className="text-sm text-muted-foreground">Integração ativa.</p>
             ) : (
               <>
                 {view.webhookUrl && (
-                  <p className="text-sm text-neutral-600">A integração está desligada. Religar mantém a mesma URL e a mesma chave.</p>
+                  <p className="text-sm text-muted-foreground">A integração está desligada. Religar mantém a mesma URL e a mesma chave.</p>
                 )}
                 <button
                   type="button"
                   onClick={() => enable.mutate()}
                   disabled={enable.isPending}
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:opacity-60"
                 >
                   {enable.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
                   Ativar integração
@@ -329,7 +329,7 @@ export function GoogleAdsPanel({ open, onOpenChange }: { open: boolean; onOpenCh
             {enabled && view.webhookUrl ? (
               <>
                 <div>
-                  <p className="mb-1 text-xs font-medium text-neutral-600">URL do webhook</p>
+                  <p className="mb-1 text-xs font-medium text-muted-foreground">URL do webhook</p>
                   <div className="flex gap-2">
                     <input readOnly value={view.webhookUrl} aria-label="URL do webhook" className={fieldClassName} />
                     <CopyButton getValue={() => view.webhookUrl ?? ''} label="Copiar URL" />
@@ -337,17 +337,17 @@ export function GoogleAdsPanel({ open, onOpenChange }: { open: boolean; onOpenCh
                 </div>
                 {/* key: chave nova (rotação) remonta o campo e esconde a que estava aberta */}
                 <KeyField key={view.keyMasked ?? 'sem-chave'} view={view} />
-                <ol className="list-decimal space-y-1 pl-4 text-sm text-neutral-600">
+                <ol className="list-decimal space-y-1 pl-4 text-sm text-muted-foreground">
                   <li>No Google Ads, abra o formulário de lead da sua campanha.</li>
                   <li>Vá em exportar leads, outras opções de integração de dados.</li>
                   <li>Cole a URL e a chave.</li>
                   <li>Clique em enviar dados de teste.</li>
                 </ol>
-                <p className="text-xs text-neutral-400">Os nomes dos menus podem variar um pouco.</p>
+                <p className="text-xs text-muted-foreground">Os nomes dos menus podem variar um pouco.</p>
                 <Notice tone="warning">Se a chave estiver errada em um dos lados, os leads não chegam e o Google não mostra erro.</Notice>
               </>
             ) : (
-              <p className="text-sm text-neutral-400">A URL e a chave aparecem depois de ativar.</p>
+              <p className="text-sm text-muted-foreground">A URL e a chave aparecem depois de ativar.</p>
             )}
           </Step>
 
@@ -355,7 +355,7 @@ export function GoogleAdsPanel({ open, onOpenChange }: { open: boolean; onOpenCh
             {enabled ? (
               <Distribution key={JSON.stringify(view.config)} view={view} onSaved={applied} />
             ) : (
-              <p className="text-sm text-neutral-400">Escolha quem recebe os leads depois de ativar.</p>
+              <p className="text-sm text-muted-foreground">Escolha quem recebe os leads depois de ativar.</p>
             )}
           </Step>
 
@@ -366,7 +366,7 @@ export function GoogleAdsPanel({ open, onOpenChange }: { open: boolean; onOpenCh
       )}
 
       <AlertDialog open={confirmRotate} onOpenChange={(value) => !rotate.isPending && setConfirmRotate(value)}>
-        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
+        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
           <AlertDialogHeader className="p-4 sm:p-6">
             <AlertDialogTitle>Gerar nova chave?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -374,14 +374,14 @@ export function GoogleAdsPanel({ open, onOpenChange }: { open: boolean; onOpenCh
               do Google Ads.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="mx-0 mb-0 flex-col-reverse gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:flex-row sm:justify-end sm:p-6">
-            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-neutral-600 sm:h-10">
+          <AlertDialogFooter className="mx-0 mb-0 flex-col-reverse gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:flex-row sm:justify-end sm:p-6">
+            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-muted-foreground sm:h-10">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => rotate.mutate()}
               disabled={rotate.isPending}
-              className="h-11 rounded-[8px] bg-danger px-4 text-white hover:bg-danger hover:opacity-90 sm:h-10"
+              className="h-11 rounded-[8px] bg-danger px-4 text-paper hover:bg-danger hover:opacity-90 sm:h-10"
             >
               {rotate.isPending ? 'Gerando...' : 'Gerar nova chave'}
             </AlertDialogAction>
@@ -390,21 +390,21 @@ export function GoogleAdsPanel({ open, onOpenChange }: { open: boolean; onOpenCh
       </AlertDialog>
 
       <AlertDialog open={confirmDisable} onOpenChange={(value) => !disable.isPending && setConfirmDisable(value)}>
-        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
+        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
           <AlertDialogHeader className="p-4 sm:p-6">
             <AlertDialogTitle>Desativar o Google Ads?</AlertDialogTitle>
             <AlertDialogDescription>
               Os leads enviados pelo Google deixam de entrar. A URL, a chave e a distribuição ficam guardadas para quando religar.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="mx-0 mb-0 flex-col-reverse gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:flex-row sm:justify-end sm:p-6">
-            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-neutral-600 sm:h-10">
+          <AlertDialogFooter className="mx-0 mb-0 flex-col-reverse gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:flex-row sm:justify-end sm:p-6">
+            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-muted-foreground sm:h-10">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => disable.mutate()}
               disabled={disable.isPending}
-              className="h-11 rounded-[8px] bg-danger px-4 text-white hover:bg-danger hover:opacity-90 sm:h-10"
+              className="h-11 rounded-[8px] bg-danger px-4 text-paper hover:bg-danger hover:opacity-90 sm:h-10"
             >
               {disable.isPending ? 'Desativando...' : 'Desativar'}
             </AlertDialogAction>

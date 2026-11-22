@@ -2,7 +2,7 @@ import type { Viewport } from 'next'
 
 // Página pública do imóvel: sem sidebar nem navegação do CRM. Permite zoom (o app trava a escala)
 export const viewport: Viewport = {
-  themeColor: '#FF385C',
+  themeColor: '#060B23',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,

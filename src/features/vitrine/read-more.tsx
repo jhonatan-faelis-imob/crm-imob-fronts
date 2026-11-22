@@ -9,7 +9,7 @@ export function ReadMore({ text }: { text: string }) {
 
   return (
     <div>
-      <p className={`whitespace-pre-line text-[17px] leading-[1.7] text-neutral-600 ${!expanded && long ? 'line-clamp-6' : ''}`}>
+      <p className={`whitespace-pre-line text-[17px] leading-[1.7] text-muted-foreground ${!expanded && long ? 'line-clamp-6' : ''}`}>
         {text}
       </p>
       {long && (

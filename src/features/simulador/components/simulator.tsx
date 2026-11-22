@@ -53,9 +53,9 @@ const PARAM_FIELDS: { key: keyof SimulationParamsConfig; label: string; suffix: 
 ]
 
 const secondaryButtonClassName =
-  'inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border-[0.5px] border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-60 sm:h-10'
+  'inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border-[0.5px] border-line bg-paper px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-canvas disabled:cursor-not-allowed disabled:opacity-60 sm:h-10'
 const smallInputClassName =
-  'w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-base text-neutral-900 outline-none focus:border-brand sm:text-sm'
+  'w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-base text-brand outline-none focus:border-brand sm:text-sm'
 
 function apiMessage(error: unknown) {
   const message = isAxiosError(error) ? error.response?.data?.message : undefined
@@ -64,10 +64,10 @@ function apiMessage(error: unknown) {
 
 function ResultCard({ label, value, hint, strong }: { label: string; value: string; hint?: string; strong?: boolean }) {
   return (
-    <div className={cn('rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4', strong && 'border-brand')}>
-      <p className="text-xs text-neutral-400">{label}</p>
-      <p className={cn('mt-1 text-xl font-semibold', strong ? 'text-brand' : 'text-neutral-900')}>{value}</p>
-      {hint && <p className="mt-1 text-xs text-neutral-400">{hint}</p>}
+    <div className={cn('rounded-[16px] border-[0.5px] border-line bg-paper p-4', strong && 'border-brand')}>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className={cn('mt-1 text-xl font-semibold', strong ? 'text-brand' : 'text-brand')}>{value}</p>
+      {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
     </div>
   )
 }
@@ -247,17 +247,17 @@ export function Simulator({
     <div className={cn('space-y-4', variant === 'page' && 'pb-20 lg:pb-0')}>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         {/* ---------- Entradas ---------- */}
-        <section className="space-y-4 rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4 sm:p-5">
+        <section className="space-y-4 rounded-[16px] border-[0.5px] border-line bg-paper p-4 sm:p-5">
           <div>
             <label htmlFor="sim-income" className={labelClassName}>
               Renda mensal
             </label>
             <MaskedInput control={control} name="income" mask={currencyMask} id="sim-income" placeholder="R$ 0,00" />
-            <p className="mt-1 text-xs text-neutral-400">Use a renda que será comprovada</p>
+            <p className="mt-1 text-xs text-muted-foreground">Use a renda que será comprovada</p>
           </div>
 
-          <div className="rounded-[12px] bg-neutral-100 p-3">
-            <label className="flex min-h-11 items-center justify-between gap-3 text-sm text-neutral-900">
+          <div className="rounded-[12px] bg-canvas p-3">
+            <label className="flex min-h-11 items-center justify-between gap-3 text-sm text-brand">
               Somar renda do cônjuge
               <Switch checked={sumSpouse} onCheckedChange={setSumSpouse} aria-label="Somar renda do cônjuge" />
             </label>
@@ -265,7 +265,7 @@ export function Simulator({
               <div className="mt-2">
                 <MaskedInput control={control} name="spouseIncome" mask={currencyMask} placeholder="R$ 0,00" />
                 {result && result.inputs.spouseIncome > 0 && (
-                  <p className="mt-1 text-xs text-neutral-600">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     Renda total: <strong>{formatCurrency(result.inputs.totalIncome)}</strong>
                   </p>
                 )}
@@ -288,23 +288,23 @@ export function Simulator({
             </div>
             <div className="sm:col-span-2 lg:col-span-1 xl:col-span-2">
               <label htmlFor="sim-subsidy" className={labelClassName}>
-                Subsídio estimado <span className="font-normal text-neutral-400">(opcional)</span>
+                Subsídio estimado <span className="font-normal text-muted-foreground">(opcional)</span>
               </label>
               <MaskedInput control={control} name="subsidy" mask={currencyMask} id="sim-subsidy" placeholder="R$ 0,00" />
             </div>
           </div>
 
-          <label className="flex min-h-11 items-center justify-between gap-3 text-sm text-neutral-900">
+          <label className="flex min-h-11 items-center justify-between gap-3 text-sm text-brand">
             Usar o saldo do FGTS
             <Switch checked={useFgts} onCheckedChange={setUseFgts} aria-label="Usar o saldo do FGTS" />
           </label>
 
-          <div className="border-t-[0.5px] border-neutral-200 pt-2">
+          <div className="border-t-[0.5px] border-line pt-2">
             <button
               type="button"
               onClick={() => setShowAdvanced((open) => !open)}
               aria-expanded={showAdvanced}
-              className="flex min-h-11 w-full items-center justify-between text-sm font-medium text-neutral-600"
+              className="flex min-h-11 w-full items-center justify-between text-sm font-medium text-muted-foreground"
             >
               Ajustes avançados
               <ChevronDown className={cn('h-4 w-4 transition-transform', showAdvanced && 'rotate-180')} />
@@ -326,9 +326,9 @@ export function Simulator({
                         }
                         className={smallInputClassName}
                       />
-                      <span className="w-4 text-sm text-neutral-400">{field.suffix}</span>
+                      <span className="w-4 text-sm text-muted-foreground">{field.suffix}</span>
                     </div>
-                    <p className={cn('mt-1 text-xs', paramErrors[field.key] ? 'text-danger' : 'text-neutral-400')}>
+                    <p className={cn('mt-1 text-xs', paramErrors[field.key] ? 'text-danger' : 'text-muted-foreground')}>
                       {paramErrors[field.key] ?? field.hint}
                     </p>
                   </div>
@@ -350,7 +350,7 @@ export function Simulator({
         {/* ---------- Resultado ---------- */}
         <div className={cn('space-y-4 transition-opacity', isTyping && result && 'opacity-70')}>
           {!result ? (
-            <div className="flex min-h-40 items-center justify-center rounded-[16px] border-[0.5px] border-dashed border-neutral-200 bg-white p-6 text-center text-sm text-neutral-400">
+            <div className="flex min-h-40 items-center justify-center rounded-[16px] border-[0.5px] border-dashed border-line bg-paper p-6 text-center text-sm text-muted-foreground">
               {simulation.isError && income > 0
                 ? (apiMessage(simulation.error) ?? 'Não foi possível calcular a simulação.')
                 : 'Informe a renda para ver a simulação.'}
@@ -366,10 +366,10 @@ export function Simulator({
                   hint={surplusHint}
                   strong
                 />
-                <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4">
-                  <p className="text-xs text-neutral-400">Entrada</p>
-                  <p className="mt-1 text-xl font-semibold text-neutral-900">{formatCurrency(result.downPayment.total)}</p>
-                  <dl className="mt-2 space-y-1 text-xs text-neutral-600">
+                <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-4">
+                  <p className="text-xs text-muted-foreground">Entrada</p>
+                  <p className="mt-1 text-xl font-semibold text-brand">{formatCurrency(result.downPayment.total)}</p>
+                  <dl className="mt-2 space-y-1 text-xs text-muted-foreground">
                     {[
                       ['FGTS', result.downPayment.fgts],
                       ['Recursos próprios', result.downPayment.ownResources],
@@ -380,7 +380,7 @@ export function Simulator({
                         <dd>{formatCurrency(Number(value))}</dd>
                       </div>
                     ))}
-                    <div className="flex justify-between gap-2 border-t-[0.5px] border-neutral-200 pt-1 font-semibold text-neutral-900">
+                    <div className="flex justify-between gap-2 border-t-[0.5px] border-line pt-1 font-semibold text-brand">
                       <dt>A complementar</dt>
                       <dd>{formatCurrency(result.downPayment.remaining)}</dd>
                     </div>
@@ -413,7 +413,7 @@ export function Simulator({
                     <button
                       type="button"
                       onClick={() => void openSummaryMessage(simulationSummary(result, true))}
-                      className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-[#25D366] px-4 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60 sm:h-10"
+                      className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-[#25D366] px-4 text-sm font-medium text-paper transition-opacity hover:opacity-90 disabled:opacity-60 sm:h-10"
                     >
                       <MessageCircle className="h-4 w-4" />
                       Enviar resumo no WhatsApp
@@ -434,7 +434,7 @@ export function Simulator({
                   <button
                     type="button"
                     onClick={registerAsLead}
-                    className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-medium text-white transition-colors hover:bg-brand-dark sm:h-10"
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-medium text-paper transition-colors hover:bg-ink sm:h-10"
                   >
                     <UserPlus className="h-4 w-4" />
                     Cadastrar como lead
@@ -448,7 +448,7 @@ export function Simulator({
             </>
           )}
 
-          <p className="flex items-start gap-2 text-xs text-neutral-400">
+          <p className="flex items-start gap-2 text-xs text-muted-foreground">
             <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             Estimativa para atendimento. Não é aprovação de crédito: valores, prazo, juros e subsídio dependem da
             análise do banco.
@@ -460,7 +460,7 @@ export function Simulator({
       {result && (
         <div
           className={cn(
-            'z-40 rounded-[12px] border-[0.5px] border-neutral-200 bg-white px-4 py-3 text-sm font-semibold text-neutral-900 shadow-md lg:hidden',
+            'z-40 rounded-[12px] border-[0.5px] border-line bg-paper px-4 py-3 text-sm font-semibold text-brand shadow-md lg:hidden',
             variant === 'page'
               ? 'fixed inset-x-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))]'
               : 'sticky bottom-0',

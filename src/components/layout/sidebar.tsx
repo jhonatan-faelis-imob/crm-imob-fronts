@@ -61,7 +61,7 @@ function SettingsGroup({ pathname, role, isHydrated }: { pathname: string; role?
         aria-controls="sidebar-settings"
         className={cn(
           'flex w-full items-center gap-3 rounded-[8px] px-3 py-2.5 text-sm font-medium transition-colors',
-          isActive ? 'bg-brand-bg text-brand' : 'text-neutral-600 hover:bg-neutral-100',
+          isActive ? 'bg-line text-brand' : 'text-muted-foreground hover:bg-canvas',
         )}
       >
         <Settings className="h-5 w-5" strokeWidth={2} />
@@ -76,7 +76,7 @@ function SettingsGroup({ pathname, role, isHydrated }: { pathname: string; role?
               href={href}
               className={cn(
                 'flex items-center gap-3 rounded-[8px] px-3 py-2 text-sm font-medium transition-colors',
-                isNavItemActive(pathname, href) ? 'bg-brand-bg text-brand' : 'text-neutral-600 hover:bg-neutral-100',
+                isNavItemActive(pathname, href) ? 'bg-line text-brand' : 'text-muted-foreground hover:bg-canvas',
               )}
             >
               <Icon className="h-4 w-4" strokeWidth={2} />
@@ -112,10 +112,10 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="hidden h-screen w-[240px] shrink-0 flex-col border-r-[0.5px] border-neutral-200 bg-white lg:flex">
+    <aside className="hidden h-screen w-[240px] shrink-0 flex-col border-r-[0.5px] border-line bg-paper lg:flex">
       <div className="flex h-16 items-center gap-2 px-6">
         <Home className="h-5 w-5 text-brand" strokeWidth={2.5} />
-        <span className="text-[20px] font-semibold text-neutral-900">Smart CRM</span>
+        <span className="text-[20px] font-semibold text-brand">Smart CRM</span>
       </div>
 
       <nav className="flex-1 space-y-1 px-3 py-2">
@@ -126,7 +126,7 @@ export function Sidebar() {
               key={href}
               href={href}
               className={`flex items-center gap-3 rounded-[8px] px-3 py-2.5 text-sm font-medium transition-colors ${
-                isActive ? 'bg-brand-bg text-brand' : 'text-neutral-600 hover:bg-neutral-100'
+                isActive ? 'bg-line text-brand' : 'text-muted-foreground hover:bg-canvas'
               }`}
             >
               <Icon className="h-5 w-5" strokeWidth={2} />
@@ -138,7 +138,7 @@ export function Sidebar() {
         <SettingsGroup pathname={pathname} role={user?.role} isHydrated={isHydrated} />
       </nav>
 
-      <div className="border-t-[0.5px] border-neutral-200 p-3">
+      <div className="border-t-[0.5px] border-line p-3">
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
@@ -146,24 +146,24 @@ export function Sidebar() {
                 type="button"
                 aria-label="Menu da conta"
                 className={cn(
-                  'flex w-full items-center gap-2 rounded-[8px] px-2 py-2 text-left transition-colors hover:bg-neutral-100',
-                  isNavItemActive(pathname, '/perfil') && 'bg-brand-bg',
+                  'flex w-full items-center gap-2 rounded-[8px] px-2 py-2 text-left transition-colors hover:bg-canvas',
+                  isNavItemActive(pathname, '/perfil') && 'bg-line',
                 )}
               />
             }
           >
             <Avatar>
-              <AvatarFallback className="bg-brand-bg text-brand">{getInitials(user?.name ?? '')}</AvatarFallback>
+              <AvatarFallback className="bg-line text-brand">{getInitials(user?.name ?? '')}</AvatarFallback>
             </Avatar>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-medium text-neutral-900">{user?.name}</span>
-              <span className="block truncate text-xs text-neutral-400">
+              <span className="block truncate text-sm font-medium text-brand">{user?.name}</span>
+              <span className="block truncate text-xs text-muted-foreground">
                 {user ? (roleLabels[user.role] ?? user.role) : ''}
               </span>
             </span>
-            <ChevronsUpDown className="h-4 w-4 shrink-0 text-neutral-400" />
+            <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="top" align="start" className="bg-white">
+          <DropdownMenuContent side="top" align="start" className="bg-paper">
             <DropdownMenuItem className="min-h-9" onClick={() => router.push('/perfil')}>
               <UserRound className="h-4 w-4" />
               Meu perfil

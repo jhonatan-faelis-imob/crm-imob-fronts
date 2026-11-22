@@ -18,16 +18,16 @@ export function TemplateCard({
   const type = templateTypeMeta(template.type)
 
   return (
-    <div className="flex flex-col rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5">
+    <div className="flex flex-col rounded-[16px] border-[0.5px] border-line bg-paper p-5">
       <div className="flex items-start justify-between gap-2">
-        <p className="min-w-0 break-words text-base font-medium text-neutral-900">{template.name}</p>
+        <p className="min-w-0 break-words text-base font-medium text-brand">{template.name}</p>
         {canManage && (
           <div className="-mr-3 -mt-3 flex shrink-0">
             <button
               type="button"
               onClick={onEdit}
               aria-label="Editar modelo"
-              className={`${iconButtonClassName} text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900`}
+              className={`${iconButtonClassName} text-muted-foreground hover:bg-canvas hover:text-brand`}
             >
               <Pencil className="h-4 w-4" />
             </button>
@@ -50,13 +50,13 @@ export function TemplateCard({
         >
           {type.label}
         </span>
-        <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-600">
+        <span className="rounded-full bg-canvas px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
           {template.isPublic ? 'Compartilhado' : 'Meu'}
         </span>
       </div>
 
-      <p className="mt-3 line-clamp-3 flex-1 break-words text-sm text-neutral-600">{template.content}</p>
-      <p className="mt-3 text-xs text-neutral-400">
+      <p className="mt-3 line-clamp-3 flex-1 break-words text-sm text-muted-foreground">{template.content}</p>
+      <p className="mt-3 text-xs text-muted-foreground">
         Usado {template.usageCount} {template.usageCount === 1 ? 'vez' : 'vezes'}
       </p>
     </div>

@@ -15,13 +15,13 @@ function Section({
   children: ReactNode
 }) {
   return (
-    <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5">
+    <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-5">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-neutral-900">{title}</h3>
+        <h3 className="text-sm font-semibold text-brand">{title}</h3>
         <button
           type="button"
           onClick={onEdit}
-          className="flex items-center gap-1 text-xs font-medium text-brand hover:text-brand-dark"
+          className="flex items-center gap-1 text-xs font-medium text-brand hover:text-brand"
         >
           <Pencil className="h-3.5 w-3.5" />
           Editar
@@ -35,8 +35,8 @@ function Section({
 function Field({ label, value }: { label: string; value?: string | null }) {
   return (
     <div>
-      <p className="text-xs text-neutral-400">{label}</p>
-      <p className="mt-0.5 text-neutral-900">{value || '—'}</p>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="mt-0.5 text-brand">{value || '—'}</p>
     </div>
   )
 }
@@ -104,7 +104,7 @@ export function RegistrationDataTab({ lead, onEdit }: { lead: Lead; onEdit: (tab
             />
           </>
         ) : (
-          <p className="col-span-full text-sm text-neutral-400">Nenhum preponente cadastrado.</p>
+          <p className="col-span-full text-sm text-muted-foreground">Nenhum preponente cadastrado.</p>
         )}
       </Section>
     </div>

@@ -46,8 +46,8 @@ function PickTeamDialog({
 
   return (
     <Dialog open={member !== null} onOpenChange={(open) => !open && close()}>
-      <DialogContent className="flex w-[calc(100%-2rem)] max-w-sm flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
-        <DialogHeader className="gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
+      <DialogContent className="flex w-[calc(100%-2rem)] max-w-sm flex-col gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
+        <DialogHeader className="gap-1 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14">
           <DialogTitle>Definir equipe</DialogTitle>
           <DialogDescription>{member?.name}</DialogDescription>
         </DialogHeader>
@@ -69,11 +69,11 @@ function PickTeamDialog({
             ))}
           </select>
         </div>
-        <DialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
+        <DialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
           <button
             type="button"
             onClick={close}
-            className="rounded-[8px] border-[1.5px] border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-600 hover:bg-neutral-100"
+            className="rounded-[8px] border-[1.5px] border-line px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-canvas"
           >
             Cancelar
           </button>
@@ -81,7 +81,7 @@ function PickTeamDialog({
             type="button"
             disabled={!teamId || updateMembers.isPending}
             onClick={save}
-            className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-60"
+            className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper hover:bg-ink disabled:opacity-60"
           >
             Salvar
           </button>
@@ -109,8 +109,8 @@ export function NoTeamSection({
   return (
     <section className="space-y-3">
       <div>
-        <h2 className="text-[20px] font-semibold text-neutral-900">Sem equipe</h2>
-        <p className="text-sm text-neutral-400">
+        <h2 className="text-[20px] font-semibold text-brand">Sem equipe</h2>
+        <p className="text-sm text-muted-foreground">
           {members.length === 1 ? '1 pessoa ainda não está' : `${members.length} pessoas ainda não estão`} em nenhuma
           equipe.
         </p>
@@ -122,13 +122,13 @@ export function NoTeamSection({
           return (
             <div
               key={member.id}
-              className="flex items-center gap-3 rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-3"
+              className="flex items-center gap-3 rounded-[16px] border-[0.5px] border-line bg-paper p-3"
             >
               <Avatar>
-                <AvatarFallback className="bg-brand-bg text-brand">{getInitials(member.name)}</AvatarFallback>
+                <AvatarFallback className="bg-line text-brand">{getInitials(member.name)}</AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-neutral-900">{member.name}</p>
+                <p className="truncate text-sm font-medium text-brand">{member.name}</p>
                 <span
                   className="mt-0.5 inline-block rounded-full px-2 py-0.5 text-[11px] font-medium"
                   style={{ backgroundColor: roleMeta.bg, color: roleMeta.text }}
@@ -140,7 +140,7 @@ export function NoTeamSection({
                 <button
                   type="button"
                   onClick={() => (teams.length === 0 ? onCreateTeam() : setPicking(member))}
-                  className="min-h-11 shrink-0 rounded-[8px] border-[0.5px] border-neutral-200 px-3 text-xs font-medium text-neutral-900 transition-colors hover:border-brand hover:text-brand"
+                  className="min-h-11 shrink-0 rounded-[8px] border-[0.5px] border-line px-3 text-xs font-medium text-brand transition-colors hover:border-brand hover:text-brand"
                 >
                   {teams.length === 0 ? 'Criar equipe' : 'Definir equipe'}
                 </button>

@@ -19,17 +19,17 @@ export function BrokerRankingTable({ data, isLoading }: { data: BrokerRankingEnt
   const sorted = [...data].sort((a, b) => (mode === 'vgv' ? b.vgv - a.vgv : b.unitsSold - a.unitsSold))
 
   return (
-    <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5 lg:p-6">
+    <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-5 lg:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-[20px] font-semibold text-neutral-900">Ranking de corretores</h2>
-        <div className="flex items-center gap-1 rounded-[8px] border-[0.5px] border-neutral-200 bg-white p-1">
+        <h2 className="text-[20px] font-semibold text-brand">Ranking de corretores</h2>
+        <div className="flex items-center gap-1 rounded-[8px] border-[0.5px] border-line bg-paper p-1">
           {MODE_OPTIONS.map((option) => (
             <button
               key={option.value}
               type="button"
               onClick={() => setMode(option.value)}
               className={`rounded-[6px] px-3 py-1.5 text-sm font-medium transition-colors ${
-                mode === option.value ? 'bg-brand-bg text-brand' : 'text-neutral-400 hover:bg-neutral-100'
+                mode === option.value ? 'bg-line text-brand' : 'text-muted-foreground hover:bg-canvas'
               }`}
             >
               {option.label}
@@ -52,7 +52,7 @@ export function BrokerRankingTable({ data, isLoading }: { data: BrokerRankingEnt
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[520px] border-collapse text-sm">
             <thead>
-              <tr className="border-b-[0.5px] border-neutral-200 text-left text-xs font-medium text-neutral-400">
+              <tr className="border-b-[0.5px] border-line text-left text-xs font-medium text-muted-foreground">
                 <th className="py-2 pr-3">Posição</th>
                 <th className="py-2 pr-3">Corretor</th>
                 <th className="py-2 pr-3 text-right">Unidades</th>
@@ -68,10 +68,10 @@ export function BrokerRankingTable({ data, isLoading }: { data: BrokerRankingEnt
                 return (
                   <tr
                     key={broker.id}
-                    className={`border-b-[0.5px] border-neutral-100 last:border-0 ${isFirst ? 'bg-[#FFFBEB]' : ''}`}
+                    className={`border-b-[0.5px] border-line last:border-0 ${isFirst ? 'bg-[#FFFBEB]' : ''}`}
                   >
                     <td className="py-3 pr-3">
-                      <span className="inline-flex items-center gap-1 font-medium text-neutral-900">
+                      <span className="inline-flex items-center gap-1 font-medium text-brand">
                         {isFirst && <Trophy className="h-4 w-4 text-amber-500" />}
                         {position}º
                       </span>
@@ -79,17 +79,17 @@ export function BrokerRankingTable({ data, isLoading }: { data: BrokerRankingEnt
                     <td className="py-3 pr-3">
                       <div className="flex items-center gap-2.5">
                         <Avatar size="sm">
-                          <AvatarFallback className="bg-brand-bg text-brand">{getInitials(broker.name)}</AvatarFallback>
+                          <AvatarFallback className="bg-line text-brand">{getInitials(broker.name)}</AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
-                          <p className="truncate font-medium text-neutral-900">{broker.name}</p>
-                          <p className="truncate text-xs text-neutral-400">{broker.teamName}</p>
+                          <p className="truncate font-medium text-brand">{broker.name}</p>
+                          <p className="truncate text-xs text-muted-foreground">{broker.teamName}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="py-3 pr-3 text-right font-medium text-neutral-900">{broker.unitsSold}</td>
-                    <td className="py-3 pr-3 text-right font-medium text-neutral-900">{formatCurrency(broker.vgv)}</td>
-                    <td className="hidden py-3 pr-3 text-right text-neutral-600 md:table-cell">
+                    <td className="py-3 pr-3 text-right font-medium text-brand">{broker.unitsSold}</td>
+                    <td className="py-3 pr-3 text-right font-medium text-brand">{formatCurrency(broker.vgv)}</td>
+                    <td className="hidden py-3 pr-3 text-right text-muted-foreground md:table-cell">
                       {formatCurrency(broker.commission)}
                     </td>
                   </tr>

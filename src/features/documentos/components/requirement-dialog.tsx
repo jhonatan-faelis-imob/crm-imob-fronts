@@ -24,8 +24,8 @@ const requirementSchema = z.object({
 type RequirementFormData = z.infer<typeof requirementSchema>
 
 const inputClassName =
-  'mt-1.5 w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-base text-neutral-900 outline-none transition-colors focus:border-brand'
-const labelClassName = 'text-[13px] font-medium text-neutral-900'
+  'mt-1.5 w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-base text-brand outline-none transition-colors focus:border-brand'
+const labelClassName = 'text-[13px] font-medium text-brand'
 
 export function RequirementDialog({
   open,
@@ -76,7 +76,7 @@ export function RequirementDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl border-[0.5px] border-neutral-200 bg-white ring-0 sm:max-w-lg">
+      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl border-[0.5px] border-line bg-paper ring-0 sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{requirement ? 'Editar documento' : 'Novo documento'}</DialogTitle>
         </DialogHeader>
@@ -91,7 +91,7 @@ export function RequirementDialog({
           </div>
           <div>
             <label htmlFor="req-description" className={labelClassName}>
-              Descrição <span className="font-normal text-neutral-400">(opcional)</span>
+              Descrição <span className="font-normal text-muted-foreground">(opcional)</span>
             </label>
             <textarea id="req-description" rows={2} className={`${inputClassName} resize-none`} {...register('description')} />
             {errors.description && <p className="mt-1 text-[12px] text-danger">{errors.description.message}</p>}
@@ -137,11 +137,11 @@ export function RequirementDialog({
           </div>
 
           <div className="flex flex-col gap-1 sm:flex-row sm:gap-6">
-            <label className="flex min-h-11 items-center gap-2.5 text-sm text-neutral-900">
+            <label className="flex min-h-11 items-center gap-2.5 text-sm text-brand">
               <input type="checkbox" className="h-4 w-4 accent-brand" {...register('required')} />
               Obrigatório
             </label>
-            <label className="flex min-h-11 items-center gap-2.5 text-sm text-neutral-900">
+            <label className="flex min-h-11 items-center gap-2.5 text-sm text-brand">
               <input type="checkbox" className="h-4 w-4 accent-brand" {...register('active')} />
               Ativo
             </label>
@@ -151,14 +151,14 @@ export function RequirementDialog({
             <button
               type="button"
               onClick={() => onOpenChange(false)}
-              className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-sm font-medium text-neutral-600 hover:bg-neutral-100 sm:h-10"
+              className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-sm font-medium text-muted-foreground hover:bg-canvas sm:h-10"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={save.isPending}
-              className="h-11 rounded-[8px] bg-brand px-4 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-70 sm:h-10"
+              className="h-11 rounded-[8px] bg-brand px-4 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:opacity-70 sm:h-10"
             >
               Salvar
             </button>

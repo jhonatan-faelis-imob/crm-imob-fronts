@@ -20,7 +20,7 @@ export const defaultLeadFilters: LeadFilters = {
 const ALL_STATUSES = [...STATUS_ORDER, ...STATUS_TERMINAL_ORDER]
 
 const selectClassName =
-  'rounded-[8px] border-[1.5px] border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-brand'
+  'rounded-[8px] border-[1.5px] border-line bg-paper px-3 py-2 text-sm text-brand outline-none focus:border-brand'
 
 export function FiltersBar({
   filters,
@@ -40,13 +40,13 @@ export function FiltersBar({
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
       <div className="relative flex-1 sm:min-w-[220px]">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
           type="text"
           value={filters.search}
           onChange={(event) => onChange({ ...filters, search: event.target.value })}
           placeholder="Buscar por nome ou telefone"
-          className="w-full rounded-[8px] border-[1.5px] border-neutral-200 bg-white py-2 pl-9 pr-3 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-brand"
+          className="w-full rounded-[8px] border-[1.5px] border-line bg-paper py-2 pl-9 pr-3 text-sm text-brand outline-none placeholder:text-muted-foreground focus:border-brand"
         />
       </div>
 
@@ -97,7 +97,7 @@ export function FiltersBar({
         <button
           type="button"
           onClick={() => onChange(defaultLeadFilters)}
-          className="flex items-center gap-1.5 rounded-[8px] px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-100"
+          className="flex items-center gap-1.5 rounded-[8px] px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-canvas"
         >
           <X className="h-4 w-4" />
           Limpar filtros

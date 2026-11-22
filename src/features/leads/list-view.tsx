@@ -26,10 +26,10 @@ export function LeadsListView({ leads }: { leads: Lead[] }) {
   })
 
   return (
-    <div className="overflow-x-auto rounded-[16px] border-[0.5px] border-neutral-200 bg-white">
+    <div className="overflow-x-auto rounded-[16px] border-[0.5px] border-line bg-paper">
       <table className="w-full min-w-[640px] text-left text-sm">
         <thead>
-          <tr className="border-b-[0.5px] border-neutral-200 text-xs font-medium text-neutral-400">
+          <tr className="border-b-[0.5px] border-line text-xs font-medium text-muted-foreground">
             <th className="px-4 py-3">Nome</th>
             <th className="px-4 py-3">Etapa</th>
             <th className="hidden px-4 py-3 md:table-cell">Origem</th>
@@ -46,11 +46,11 @@ export function LeadsListView({ leads }: { leads: Lead[] }) {
             return (
               <tr
                 key={lead.id}
-                className={`border-b-[0.5px] border-neutral-200 last:border-0 ${
-                  index % 2 === 1 ? 'bg-neutral-100/50' : 'bg-white'
+                className={`border-b-[0.5px] border-line last:border-0 ${
+                  index % 2 === 1 ? 'bg-canvas/50' : 'bg-paper'
                 }`}
               >
-                <td className="px-4 py-3 font-medium text-neutral-900">
+                <td className="px-4 py-3 font-medium text-brand">
                   <div className="flex flex-wrap items-center gap-1.5">
                     <Link href={`/leads/${lead.id}`} className="hover:text-brand hover:underline">
                       {lead.name}
@@ -65,14 +65,14 @@ export function LeadsListView({ leads }: { leads: Lead[] }) {
                     onSelect={(stage) => moveLead(lead, stage)}
                   />
                 </td>
-                <td className="hidden px-4 py-3 text-neutral-600 md:table-cell">{source.label}</td>
-                <td className="hidden px-4 py-3 text-neutral-600 md:table-cell">
+                <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">{source.label}</td>
+                <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">
                   {formatCurrency(lead.interestValue ?? 0)}
                 </td>
-                <td className="hidden px-4 py-3 text-neutral-600 md:table-cell">
+                <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">
                   {lead.ownerName}
                 </td>
-                <td className="hidden px-4 py-3 text-neutral-600 md:table-cell">
+                <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">
                   {formatLastContact(lead)}
                 </td>
                 <td className="px-4 py-3">
@@ -80,21 +80,21 @@ export function LeadsListView({ leads }: { leads: Lead[] }) {
                     <Link
                       href={`/leads/${lead.id}`}
                       aria-label="Ver lead"
-                      className="rounded-[8px] p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
+                      className="rounded-[8px] p-1.5 text-muted-foreground hover:bg-canvas hover:text-brand"
                     >
                       <Eye className="h-4 w-4" />
                     </Link>
                     <button
                       type="button"
                       aria-label="Editar lead"
-                      className="rounded-[8px] p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
+                      className="rounded-[8px] p-1.5 text-muted-foreground hover:bg-canvas hover:text-brand"
                     >
                       <Pencil className="h-4 w-4" />
                     </button>
                     <button
                       type="button"
                       aria-label="Nova tarefa"
-                      className="rounded-[8px] p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
+                      className="rounded-[8px] p-1.5 text-muted-foreground hover:bg-canvas hover:text-brand"
                     >
                       <ListTodo className="h-4 w-4" />
                     </button>

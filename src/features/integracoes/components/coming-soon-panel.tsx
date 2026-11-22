@@ -23,11 +23,11 @@ export function ComingSoonPanel({
       {item && (
         <>
           <section className="space-y-3">
-            <h3 className="text-sm font-semibold text-neutral-900">O que vai ser preciso</h3>
+            <h3 className="text-sm font-semibold text-brand">O que vai ser preciso</h3>
             <ul className="space-y-2">
               {item.requirements.map((requirement) => (
-                <li key={requirement} className="flex items-start gap-2 text-sm text-neutral-600">
-                  <Circle className="mt-0.5 h-4 w-4 shrink-0 text-neutral-400" />
+                <li key={requirement} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <Circle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                   {requirement}
                 </li>
               ))}

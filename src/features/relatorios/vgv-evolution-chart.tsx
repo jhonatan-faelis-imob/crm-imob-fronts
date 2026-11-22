@@ -28,10 +28,10 @@ function VgvTooltip({ active, payload, label }: TooltipContentProps) {
   if (!point) return null
 
   return (
-    <div className="rounded-[12px] border-[0.5px] border-neutral-200 bg-white p-3 shadow-lg">
-      <p className="text-xs font-medium text-neutral-400">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-neutral-900">{formatCurrency(point.vgv)}</p>
-      <p className="text-xs text-neutral-400">{point.units} unidades vendidas</p>
+    <div className="rounded-[12px] border-[0.5px] border-line bg-paper p-3 shadow-lg">
+      <p className="text-xs font-medium text-muted-foreground">{label}</p>
+      <p className="mt-1 text-sm font-semibold text-brand">{formatCurrency(point.vgv)}</p>
+      <p className="text-xs text-muted-foreground">{point.units} unidades vendidas</p>
     </div>
   )
 }
@@ -48,17 +48,17 @@ export function VgvEvolutionChart({
   onGranularityChange: (value: VgvGranularity) => void
 }) {
   return (
-    <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5 lg:p-6">
+    <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-5 lg:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-[20px] font-semibold text-neutral-900">Evolução do VGV</h2>
-        <div className="flex items-center gap-1 rounded-[8px] border-[0.5px] border-neutral-200 bg-white p-1">
+        <h2 className="text-[20px] font-semibold text-brand">Evolução do VGV</h2>
+        <div className="flex items-center gap-1 rounded-[8px] border-[0.5px] border-line bg-paper p-1">
           {GRANULARITY_OPTIONS.map((option) => (
             <button
               key={option.value}
               type="button"
               onClick={() => onGranularityChange(option.value)}
               className={`rounded-[6px] px-3 py-1.5 text-sm font-medium transition-colors ${
-                granularity === option.value ? 'bg-brand-bg text-brand' : 'text-neutral-400 hover:bg-neutral-100'
+                granularity === option.value ? 'bg-line text-brand' : 'text-muted-foreground hover:bg-canvas'
               }`}
             >
               {option.label}

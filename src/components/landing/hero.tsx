@@ -6,12 +6,12 @@ import { ButtonLink, Container } from './ui'
 
 export function Hero() {
   return (
-    <section data-hero className="bg-[#121212] pb-20 pt-16 text-white md:pb-28 md:pt-24">
+    <section data-hero className="bg-[#121212] pb-20 pt-16 text-paper md:pb-28 md:pt-24">
       <Container className="text-center">
         <p
           data-hero-seq
           style={motionVars({ d: 0 })}
-          className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-1.5 text-[13px] font-medium text-[#BDB9B4] sm:text-[14px]">
+          className="inline-flex items-center gap-2 rounded-full border border-paper/15 px-4 py-1.5 text-[13px] font-medium text-[#BDB9B4] sm:text-[14px]">
           <span className="lp-pulse h-2 w-2 shrink-0 rounded-full bg-[#FF385C]" aria-hidden="true" />
           CRM imobiliário com IA para lançamento e revenda
         </p>

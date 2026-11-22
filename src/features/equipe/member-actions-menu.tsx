@@ -31,7 +31,7 @@ export function MemberActionsMenu({
           <button
             type="button"
             aria-label="Mais opções"
-            className="flex size-9 shrink-0 items-center justify-center rounded-[8px] text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
+            className="flex size-9 shrink-0 items-center justify-center rounded-[8px] text-muted-foreground hover:bg-canvas hover:text-brand"
           />
         }
       >

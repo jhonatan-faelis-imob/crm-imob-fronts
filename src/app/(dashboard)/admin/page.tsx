@@ -60,9 +60,9 @@ export default function AdminPage() {
 
   if (!allowed) {
     return (
-      <div className="mx-auto flex max-w-md flex-col items-center gap-3 rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-8 text-center">
-        <ShieldCheck className="h-6 w-6 text-neutral-400" />
-        <p className="text-sm text-neutral-600">Esta área é restrita ao administrador do sistema.</p>
+      <div className="mx-auto flex max-w-md flex-col items-center gap-3 rounded-[16px] border-[0.5px] border-line bg-paper p-8 text-center">
+        <ShieldCheck className="h-6 w-6 text-muted-foreground" />
+        <p className="text-sm text-muted-foreground">Esta área é restrita ao administrador do sistema.</p>
       </div>
     )
   }
@@ -71,16 +71,16 @@ export default function AdminPage() {
     <div className="space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-medium text-neutral-400">Configurações</p>
-          <h1 className="text-[28px] font-semibold text-neutral-900">Administração</h1>
-          <p className="text-sm text-neutral-400">
+          <p className="text-xs font-medium text-muted-foreground">Configurações</p>
+          <h1 className="text-[28px] font-semibold text-brand">Administração</h1>
+          <p className="text-sm text-muted-foreground">
             {summary.data ? `${summary.data.total} imobiliárias` : 'Imobiliárias e assinaturas'}
           </p>
         </div>
         <div className="grid grid-cols-2 gap-2 sm:flex">
           <Link
             href="/admin/webhooks"
-            className="col-span-2 inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-900 hover:border-brand hover:text-brand sm:col-span-1"
+            className="col-span-2 inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-line bg-paper px-4 text-sm font-medium text-brand hover:border-brand hover:text-brand sm:col-span-1"
           >
             <Webhook className="h-4 w-4" />
             Webhooks
@@ -89,7 +89,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => recalculate.mutate()}
             disabled={recalculate.isPending}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-900 hover:border-brand hover:text-brand disabled:opacity-60"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-line bg-paper px-4 text-sm font-medium text-brand hover:border-brand hover:text-brand disabled:opacity-60"
           >
             <RefreshCw className={recalculate.isPending ? 'h-4 w-4 animate-spin' : 'h-4 w-4'} />
             Recalcular
@@ -97,7 +97,7 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => setCreating(true)}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-medium text-white hover:bg-brand-dark"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-medium text-paper hover:bg-ink"
           >
             <Plus className="h-4 w-4" />
             Nova imobiliária
@@ -109,7 +109,7 @@ export default function AdminPage() {
 
       <div className="flex flex-col gap-2 sm:flex-row">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="search"
             value={search}

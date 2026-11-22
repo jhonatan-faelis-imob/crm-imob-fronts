@@ -59,7 +59,7 @@ function PhotoPicker() {
         type="button"
         onClick={() => inputRef.current?.click()}
         aria-label="Selecionar foto de perfil"
-        className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-neutral-200 bg-neutral-100 text-neutral-400 transition-colors hover:border-brand hover:text-brand"
+        className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-line bg-canvas text-muted-foreground transition-colors hover:border-brand hover:text-brand"
       >
         {preview ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -86,9 +86,9 @@ function PhotoPicker() {
 }
 
 const secondaryButton =
-  'rounded-[8px] border-[1.5px] border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100'
+  'rounded-[8px] border-[1.5px] border-line px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-canvas'
 const primaryButton =
-  'rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-60'
+  'rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:opacity-60'
 
 function PasswordModeOption({
   checked,
@@ -106,7 +106,7 @@ function PasswordModeOption({
       aria-checked={checked}
       onClick={onSelect}
       className={`flex-1 rounded-[12px] border-[1.5px] px-3 py-2.5 text-left text-sm font-medium transition-colors ${
-        checked ? 'border-brand bg-brand-bg text-brand' : 'border-neutral-200 text-neutral-600 hover:border-brand'
+        checked ? 'border-brand bg-line text-brand' : 'border-line text-muted-foreground hover:border-brand'
       }`}
     >
       {label}
@@ -227,7 +227,7 @@ function NewMemberFormBody({
             />
           </div>
           {passwordMode === 'auto' && (
-            <p className="mt-1.5 text-xs text-neutral-400">A senha aparece uma única vez depois de criar.</p>
+            <p className="mt-1.5 text-xs text-muted-foreground">A senha aparece uma única vez depois de criar.</p>
           )}
         </div>
 
@@ -260,7 +260,7 @@ function NewMemberFormBody({
         )}
       </form>
 
-      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
+      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
         <button type="button" onClick={onCancel} className={secondaryButton}>
           Cancelar
         </button>
@@ -276,14 +276,14 @@ function TemporaryPasswordView({ user, onClose }: { user: CreatedUser & { tempor
   return (
     <>
       <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
-        <p className="text-sm text-neutral-600">
-          <span className="font-medium text-neutral-900">{user.name}</span> foi criado. Repasse o email e a senha
+        <p className="text-sm text-muted-foreground">
+          <span className="font-medium text-brand">{user.name}</span> foi criado. Repasse o email e a senha
           temporária abaixo.
         </p>
         <TemporaryPasswordBox password={user.temporaryPassword} />
-        <p className="text-xs text-neutral-400">Login: {user.email}</p>
+        <p className="text-xs text-muted-foreground">Login: {user.email}</p>
       </div>
-      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
+      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
         <button type="button" onClick={onClose} className={primaryButton}>
           Concluir
         </button>
@@ -326,8 +326,8 @@ export function NewMemberDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="flex max-h-[90vh] w-[calc(100%-2rem)] max-w-lg flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
-        <DialogHeader className="shrink-0 gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
+      <DialogContent className="flex max-h-[90vh] w-[calc(100%-2rem)] max-w-lg flex-col gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
+        <DialogHeader className="shrink-0 gap-1 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14">
           <DialogTitle>{created ? 'Membro criado' : 'Novo membro'}</DialogTitle>
           <DialogDescription>
             {created ? 'Guarde a senha antes de fechar.' : 'Equipe e senha podem ficar para depois.'}

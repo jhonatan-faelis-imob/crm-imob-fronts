@@ -33,20 +33,20 @@ export function PanelShell({
       <SheetContent
         side={isMobile ? 'bottom' : 'right'}
         className={cn(
-          'gap-0 bg-white p-0',
+          'gap-0 bg-paper p-0',
           isMobile ? 'h-[100dvh] max-h-[100dvh]' : 'w-full sm:max-w-lg',
         )}
       >
-        <SheetHeader className="gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
+        <SheetHeader className="gap-1 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14">
           <div className="flex flex-wrap items-center gap-2">
-            <SheetTitle className="text-lg font-semibold text-neutral-900">{title}</SheetTitle>
+            <SheetTitle className="text-lg font-semibold text-brand">{title}</SheetTitle>
             {status && <StatusBadge status={status} />}
           </div>
-          <SheetDescription className="text-sm text-neutral-400">{description}</SheetDescription>
+          <SheetDescription className="text-sm text-muted-foreground">{description}</SheetDescription>
         </SheetHeader>
         <div className="flex-1 space-y-6 overflow-y-auto p-4 sm:p-6">{children}</div>
         {footer && (
-          <div className="flex flex-col-reverse gap-2 border-t-[0.5px] border-neutral-200 p-4 sm:flex-row sm:justify-end sm:p-6">
+          <div className="flex flex-col-reverse gap-2 border-t-[0.5px] border-line p-4 sm:flex-row sm:justify-end sm:p-6">
             {footer}
           </div>
         )}
@@ -64,10 +64,10 @@ export function Step({ number, title, children, muted = false }: { number: numbe
   return (
     <section className={cn('space-y-3', muted && 'opacity-50')}>
       <div className="flex items-center gap-2">
-        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-bg text-xs font-semibold text-brand">
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-line text-xs font-semibold text-brand">
           {number}
         </span>
-        <h3 className="text-sm font-semibold text-neutral-900">{title}</h3>
+        <h3 className="text-sm font-semibold text-brand">{title}</h3>
       </div>
       <div className="space-y-3 pl-8">{children}</div>
     </section>
@@ -90,7 +90,7 @@ export function CopyButton({ getValue, label }: { getValue: () => string | Promi
       type="button"
       onClick={copy}
       aria-label={label}
-      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border-[1.5px] border-neutral-200 text-neutral-600 transition-colors hover:bg-neutral-100"
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border-[1.5px] border-line text-muted-foreground transition-colors hover:bg-canvas"
     >
       {copied ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
     </button>
@@ -102,7 +102,7 @@ export function Notice({ tone = 'info', children }: { tone?: 'info' | 'warning' 
     <p
       className={cn(
         'rounded-[12px] p-3 text-xs leading-relaxed',
-        tone === 'info' && 'bg-neutral-100 text-neutral-600',
+        tone === 'info' && 'bg-canvas text-muted-foreground',
         tone === 'warning' && 'bg-[#FFF7E0] text-[#B45309]',
         tone === 'danger' && 'bg-danger-bg text-danger',
       )}
