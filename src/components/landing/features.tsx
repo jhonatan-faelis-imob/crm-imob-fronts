@@ -40,7 +40,7 @@ const FEATURES: { icon: LucideIcon; title: string; text: string }[] = [
 
 export function Features() {
   return (
-    <section className="bg-white py-20 md:py-28">
+    <section className="bg-paper py-20 md:py-28">
       <Container>
         <div data-reveal className="max-w-[760px]">
           <Eyebrow>Tudo conectado</Eyebrow>

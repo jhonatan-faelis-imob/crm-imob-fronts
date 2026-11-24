@@ -52,13 +52,13 @@ export function TimelineTab({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4">
+      <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-4">
         <textarea
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
           placeholder="Registrar interação..."
           rows={2}
-          className="w-full resize-none rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-[15px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand"
+          className="w-full resize-none rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] text-brand outline-none transition-colors placeholder:text-muted-foreground focus:border-brand"
         />
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap gap-1.5">
@@ -73,8 +73,8 @@ export function TimelineTab({
                   onClick={() => setSelectedType(type)}
                   className={`flex items-center gap-1.5 rounded-full border-[1.5px] px-3 py-1.5 text-xs font-medium transition-colors ${
                     isSelected
-                      ? 'border-brand bg-brand-bg text-brand'
-                      : 'border-neutral-200 text-neutral-600 hover:border-neutral-400'
+                      ? 'border-brand bg-line text-brand'
+                      : 'border-line text-muted-foreground hover:border-line-strong'
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5" />
@@ -87,7 +87,7 @@ export function TimelineTab({
             type="button"
             onClick={handleSave}
             disabled={notes.trim() === '' || isSaving}
-            className="rounded-[8px] bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-[8px] bg-brand px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSaving ? 'Salvando...' : 'Salvar'}
           </button>
@@ -99,16 +99,16 @@ export function TimelineTab({
           if (entry.kind === 'stage_change') {
             return (
               <div key={entry.id} className="flex items-start gap-3">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-600">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-canvas text-muted-foreground">
                   <ArrowRightLeft className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 flex-1 pt-1.5">
-                  <p className="text-sm text-neutral-600">
+                  <p className="text-sm text-muted-foreground">
                     Movido de{' '}
-                    <span className="font-medium text-neutral-900">{STATUS_META[entry.fromStatus].label}</span> →{' '}
-                    <span className="font-medium text-neutral-900">{STATUS_META[entry.toStatus].label}</span>
+                    <span className="font-medium text-brand">{STATUS_META[entry.fromStatus].label}</span> →{' '}
+                    <span className="font-medium text-brand">{STATUS_META[entry.toStatus].label}</span>
                   </p>
-                  <p className="mt-0.5 text-xs text-neutral-400">
+                  <p className="mt-0.5 text-xs text-muted-foreground">
                     {entry.userName} · {formatRelativeTime(entry.occurredAt)}
                   </p>
                 </div>
@@ -122,7 +122,7 @@ export function TimelineTab({
           return (
             <div
               key={entry.id}
-              className="group flex items-start gap-3 rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4 transition-colors hover:border-brand"
+              className="group flex items-start gap-3 rounded-[16px] border-[0.5px] border-line bg-paper p-4 transition-colors hover:border-brand"
             >
               <span
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
@@ -132,9 +132,9 @@ export function TimelineTab({
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-medium text-neutral-900">
+                  <p className="text-sm font-medium text-brand">
                     {entry.userName}{' '}
-                    <span className="font-normal text-neutral-400" title={formatDateTimeBR(entry.occurredAt)}>
+                    <span className="font-normal text-muted-foreground" title={formatDateTimeBR(entry.occurredAt)}>
                       · {formatRelativeTime(entry.occurredAt)}
                     </span>
                   </p>
@@ -142,7 +142,7 @@ export function TimelineTab({
                     <button
                       type="button"
                       aria-label="Editar interação"
-                      className="rounded-[6px] p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
+                      className="rounded-[6px] p-1 text-muted-foreground hover:bg-canvas hover:text-brand"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
@@ -150,20 +150,20 @@ export function TimelineTab({
                       type="button"
                       aria-label="Excluir interação"
                       onClick={() => onDelete(entry.id)}
-                      className="rounded-[6px] p-1 text-neutral-400 hover:bg-[#FFEBEE] hover:text-danger"
+                      className="rounded-[6px] p-1 text-muted-foreground hover:bg-[#FFEBEE] hover:text-danger"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </div>
-                <p className="mt-1 break-words text-sm text-neutral-600">{entry.notes}</p>
+                <p className="mt-1 break-words text-sm text-muted-foreground">{entry.notes}</p>
               </div>
             </div>
           )
         })}
 
         {entries.length === 0 && (
-          <p className="rounded-[16px] border-[0.5px] border-dashed border-neutral-200 p-6 text-center text-sm text-neutral-400">
+          <p className="rounded-[16px] border-[0.5px] border-dashed border-line p-6 text-center text-sm text-muted-foreground">
             Nenhuma interação registrada ainda.
           </p>
         )}

@@ -24,13 +24,13 @@ export function TemporaryPasswordBox({ password }: { password: string }) {
         Senha temporária
       </p>
       <div className="mt-2 flex items-center gap-2">
-        <code className="min-w-0 flex-1 select-all break-all rounded-[8px] bg-white px-3 py-2 font-mono text-[15px] text-neutral-900">
+        <code className="min-w-0 flex-1 select-all break-all rounded-[8px] bg-paper px-3 py-2 font-mono text-[15px] text-brand">
           {password}
         </code>
         <button
           type="button"
           onClick={copy}
-          className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-[8px] border-[1.5px] border-neutral-200 bg-white px-3 py-2 text-sm font-medium text-neutral-900 transition-colors hover:border-brand hover:text-brand"
+          className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-[8px] border-[1.5px] border-line bg-paper px-3 py-2 text-sm font-medium text-brand transition-colors hover:border-brand hover:text-brand"
         >
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           {copied ? 'Copiada' : 'Copiar'}

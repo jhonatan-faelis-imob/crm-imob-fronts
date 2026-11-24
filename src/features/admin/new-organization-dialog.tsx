@@ -61,7 +61,7 @@ function toInput(values: FormValues): NewOrganizationInput {
 }
 
 function SectionTitle({ children }: { children: string }) {
-  return <h3 className="pt-2 text-[13px] font-semibold uppercase tracking-wide text-neutral-400">{children}</h3>
+  return <h3 className="pt-2 text-[13px] font-semibold uppercase tracking-wide text-muted-foreground">{children}</h3>
 }
 
 function NewOrganizationForm({ onCancel, onCreated }: { onCancel: () => void; onCreated: (result: CreatedOrganization) => void }) {
@@ -180,7 +180,7 @@ function NewOrganizationForm({ onCancel, onCreated }: { onCancel: () => void; on
             </FormField>
           )}
         </div>
-        <p className="text-xs text-neutral-400">
+        <p className="text-xs text-muted-foreground">
           Valor em branco usa a tabela ({formatMoney(tablePrice)}). Fim do teste em branco: 14 dias a partir de hoje.
         </p>
 
@@ -221,11 +221,11 @@ function NewOrganizationForm({ onCancel, onCreated }: { onCancel: () => void; on
         )}
       </form>
 
-      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
+      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
         <button
           type="button"
           onClick={onCancel}
-          className="min-h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-600 hover:bg-neutral-100"
+          className="min-h-11 rounded-[8px] border-[1.5px] border-line px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-canvas"
         >
           Cancelar
         </button>
@@ -233,7 +233,7 @@ function NewOrganizationForm({ onCancel, onCreated }: { onCancel: () => void; on
           type="button"
           disabled={create.isPending}
           onClick={handleSubmit((values) => create.mutate(toInput(values)))}
-          className="min-h-11 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-60"
+          className="min-h-11 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper hover:bg-ink disabled:opacity-60"
         >
           {create.isPending ? 'Criando...' : 'Criar imobiliária'}
         </button>
@@ -260,8 +260,8 @@ export function NewOrganizationDialog({ open, onOpenChange }: { open: boolean; o
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="flex max-h-[92vh] w-[calc(100%-1rem)] max-w-xl flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
-        <DialogHeader className="shrink-0 gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
+      <DialogContent className="flex max-h-[92vh] w-[calc(100%-1rem)] max-w-xl flex-col gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
+        <DialogHeader className="shrink-0 gap-1 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14">
           <DialogTitle>{created ? 'Imobiliária criada' : 'Nova imobiliária'}</DialogTitle>
           <DialogDescription>
             {created ? 'Repasse o e-mail e a senha ao diretor.' : 'Cria a imobiliária e o primeiro diretor de uma vez.'}
@@ -271,17 +271,17 @@ export function NewOrganizationDialog({ open, onOpenChange }: { open: boolean; o
         {open && created?.temporaryPassword && (
           <>
             <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
-              <p className="text-sm text-neutral-600">
-                <span className="font-medium text-neutral-900">{created.organization.name}</span> está pronta. Login do
-                diretor: <span className="font-medium text-neutral-900">{created.director.email}</span>
+              <p className="text-sm text-muted-foreground">
+                <span className="font-medium text-brand">{created.organization.name}</span> está pronta. Login do
+                diretor: <span className="font-medium text-brand">{created.director.email}</span>
               </p>
               <TemporaryPasswordBox password={created.temporaryPassword} />
             </div>
-            <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
+            <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
               <button
                 type="button"
                 onClick={() => handleOpenChange(false)}
-                className="min-h-11 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-dark"
+                className="min-h-11 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper hover:bg-ink"
               >
                 Concluir
               </button>

@@ -29,11 +29,11 @@ export function SimulationProperties({
   const total = counts.cabe + counts.quase
 
   return (
-    <section className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4 sm:p-5">
+    <section className="rounded-[16px] border-[0.5px] border-line bg-paper p-4 sm:p-5">
       <div className="flex items-baseline justify-between gap-2">
-        <h3 className="text-sm font-semibold text-neutral-900">Imóveis que cabem</h3>
+        <h3 className="text-sm font-semibold text-brand">Imóveis que cabem</h3>
         {total > 0 && (
-          <span className="text-xs text-neutral-400">
+          <span className="text-xs text-muted-foreground">
             {counts.cabe} cabem · {counts.quase} quase
             {total > items.length && ` · mostrando ${items.length}`}
           </span>
@@ -41,11 +41,11 @@ export function SimulationProperties({
       </div>
 
       {items.length === 0 ? (
-        <p className="mt-3 rounded-[12px] bg-neutral-100 p-3 text-sm text-neutral-400">
+        <p className="mt-3 rounded-[12px] bg-canvas p-3 text-sm text-muted-foreground">
           Nenhum imóvel cadastrado cabe nessa faixa
         </p>
       ) : (
-        <ul className="mt-2 divide-y-[0.5px] divide-neutral-200">
+        <ul className="mt-2 divide-y-[0.5px] divide-line">
           {items.map((property) => {
             const fit = FIT_META[property.fit]
             const isLinked = linkedIds.has(property.id)
@@ -54,7 +54,7 @@ export function SimulationProperties({
               <li key={property.id} className="flex items-start gap-3 py-3">
                 <Link href={`/empreendimentos?abrir=${property.id}`} className="group min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <p className="break-words text-sm font-medium text-neutral-900 group-hover:text-brand">
+                    <p className="break-words text-sm font-medium text-brand group-hover:text-brand">
                       {propertyLabel(property.title, property.code)}
                     </p>
                     <span
@@ -64,20 +64,20 @@ export function SimulationProperties({
                       {fit.label}
                     </span>
                     {property.incomeMatch && (
-                      <span className="rounded-full bg-brand-bg px-2 py-0.5 text-[11px] font-medium text-brand">
+                      <span className="rounded-full bg-line px-2 py-0.5 text-[11px] font-medium text-brand">
                         Renda ideal
                       </span>
                     )}
                   </div>
                   {place && (
-                    <p className="mt-0.5 flex items-center gap-1 text-xs text-neutral-400">
+                    <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
                       <MapPin className="h-3 w-3" />
                       {place}
                     </p>
                   )}
-                  <p className="mt-1 text-xs text-neutral-600">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     {property.priceLabel === 'a partir de' ? 'a partir de ' : ''}
-                    <span className="font-semibold text-neutral-900">{formatCurrency(property.referencePrice)}</span>
+                    <span className="font-semibold text-brand">{formatCurrency(property.referencePrice)}</span>
                     {' · '}
                     {property.downRemaining > 0
                       ? `Entrada a complementar: ${formatCurrency(property.downRemaining)}`
@@ -95,7 +95,7 @@ export function SimulationProperties({
                       type="button"
                       onClick={() => onLink(property)}
                       disabled={linkingId === property.id}
-                      className="inline-flex h-11 shrink-0 items-center gap-1 rounded-[8px] border-[0.5px] border-neutral-200 px-3 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-100 disabled:opacity-60 sm:h-9"
+                      className="inline-flex h-11 shrink-0 items-center gap-1 rounded-[8px] border-[0.5px] border-line px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-canvas disabled:opacity-60 sm:h-9"
                     >
                       <Link2 className="h-3.5 w-3.5" />
                       Vincular

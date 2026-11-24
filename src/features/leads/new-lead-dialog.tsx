@@ -40,7 +40,7 @@ const TABS = [
   { key: 'preponents', label: 'Preponentes' },
 ] as const
 
-const navButtonClassName = 'size-11 rounded-[8px] border-[1.5px] border-neutral-200 text-neutral-600 sm:size-10'
+const navButtonClassName = 'size-11 rounded-[8px] border-[1.5px] border-line text-muted-foreground sm:size-10'
 
 // Owns the form state (useForm + activeTab). Mounted fresh via a `key` on the parent
 // every time the dialog opens (or targets a different lead/tab), so state always starts
@@ -115,7 +115,7 @@ function LeadFormBody({
 
   return (
     <>
-      <div className="flex shrink-0 gap-1 overflow-x-auto border-b-[0.5px] border-neutral-200 px-4 sm:px-6">
+      <div className="flex shrink-0 gap-1 overflow-x-auto border-b-[0.5px] border-line px-4 sm:px-6">
         {TABS.map((tab, index) => (
           <button
             key={tab.key}
@@ -124,7 +124,7 @@ function LeadFormBody({
             className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
               activeTab === index
                 ? 'border-brand text-brand'
-                : 'border-transparent text-neutral-400 hover:text-neutral-600'
+                : 'border-transparent text-muted-foreground hover:text-muted-foreground'
             }`}
           >
             {index + 1}. {tab.label}
@@ -146,14 +146,14 @@ function LeadFormBody({
         </form>
       </FormProvider>
 
-      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row items-center justify-between gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:justify-between sm:p-6">
+      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row items-center justify-between gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:justify-between sm:p-6">
         <Button
           type="button"
           variant="ghost"
           onClick={onCancel}
           disabled={isSubmitting}
           aria-label="Cancelar"
-          className="h-11 min-w-11 rounded-[8px] border-[0.5px] border-neutral-200 px-3 text-neutral-600 sm:h-10"
+          className="h-11 min-w-11 rounded-[8px] border-[0.5px] border-line px-3 text-muted-foreground sm:h-10"
         >
           <X className="min-[360px]:hidden" />
           <span className="hidden min-[360px]:inline">Cancelar</span>
@@ -196,7 +196,7 @@ function LeadFormBody({
                 type="button"
                 onClick={handleSubmit(onSubmit, onInvalid)}
                 disabled={!canSave || isSubmitting}
-                className="h-11 rounded-[8px] bg-brand px-4 text-white hover:bg-brand-dark sm:h-10"
+                className="h-11 rounded-[8px] bg-brand px-4 text-paper hover:bg-ink sm:h-10"
               >
                 {isSubmitting ? 'Salvando...' : 'Salvar'}
               </Button>
@@ -246,7 +246,7 @@ export function NewLeadDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="grid-cols-none flex w-[calc(100%-2rem)] max-w-2xl flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0 sm:max-w-2xl max-h-[90vh]">
+      <DialogContent className="grid-cols-none flex w-[calc(100%-2rem)] max-w-2xl flex-col gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0 sm:max-w-2xl max-h-[90vh]">
         <DialogHeader className="shrink-0 gap-1 p-4 pr-12 sm:p-6 sm:pr-14 sm:pb-4">
           <DialogTitle>{lead ? `Editar lead — ${lead.name}` : 'Novo lead'}</DialogTitle>
           <DialogDescription>
@@ -268,18 +268,18 @@ export function NewLeadDialog({
       </DialogContent>
 
       <AlertDialog open={isDiscardDialogOpen} onOpenChange={setIsDiscardDialogOpen}>
-        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
+        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
           <AlertDialogHeader className="p-4 sm:p-6">
             <AlertDialogTitle>Descartar alterações?</AlertDialogTitle>
             <AlertDialogDescription>As alterações feitas neste lead serão perdidas.</AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
-            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-neutral-600 sm:h-10">
+          <AlertDialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
+            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-muted-foreground sm:h-10">
               Continuar editando
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDiscard}
-              className="h-11 rounded-[8px] bg-danger px-4 text-white hover:bg-danger hover:opacity-90 sm:h-10"
+              className="h-11 rounded-[8px] bg-danger px-4 text-paper hover:bg-danger hover:opacity-90 sm:h-10"
             >
               Descartar
             </AlertDialogAction>

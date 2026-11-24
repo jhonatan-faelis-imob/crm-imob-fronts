@@ -36,26 +36,26 @@ export default function AssinaturaRetornoPage() {
   if (confirmed && !confirmedSeen) setConfirmedSeen(true)
 
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-4 rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-6 text-center sm:p-8">
+    <div className="mx-auto flex max-w-md flex-col items-center gap-4 rounded-[16px] border-[0.5px] border-line bg-paper p-6 text-center sm:p-8">
       {confirmed ? (
         <>
           <CheckCircle2 className="h-10 w-10 text-success" />
-          <h1 className="text-[22px] font-semibold text-neutral-900">Pagamento confirmado</h1>
-          <p className="text-sm text-neutral-600">Sua assinatura está ativa. Obrigado!</p>
+          <h1 className="text-[22px] font-semibold text-brand">Pagamento confirmado</h1>
+          <p className="text-sm text-muted-foreground">Sua assinatura está ativa. Obrigado!</p>
         </>
       ) : (
         <>
           {timedOut ? (
-            <Clock className="h-10 w-10 text-neutral-400" />
+            <Clock className="h-10 w-10 text-muted-foreground" />
           ) : (
             <Loader2 className="h-10 w-10 animate-spin text-brand" />
           )}
-          <h1 className="text-[22px] font-semibold text-neutral-900">Estamos confirmando seu pagamento</h1>
-          <p className="text-sm text-neutral-600">
+          <h1 className="text-[22px] font-semibold text-brand">Estamos confirmando seu pagamento</h1>
+          <p className="text-sm text-muted-foreground">
             A confirmação pode levar alguns minutos. Você pode fechar esta página.
           </p>
           {timedOut && (
-            <p className="text-xs text-neutral-400">
+            <p className="text-xs text-muted-foreground">
               Ainda não recebemos a confirmação. Ela aparece sozinha na página da assinatura assim que chegar.
             </p>
           )}
@@ -63,7 +63,7 @@ export default function AssinaturaRetornoPage() {
       )}
       <Link
         href="/assinatura"
-        className="inline-flex min-h-11 items-center justify-center rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-sm font-medium text-neutral-900 hover:border-brand hover:text-brand"
+        className="inline-flex min-h-11 items-center justify-center rounded-[8px] border-[1.5px] border-line px-4 text-sm font-medium text-brand hover:border-brand hover:text-brand"
       >
         Ver assinatura
       </Link>

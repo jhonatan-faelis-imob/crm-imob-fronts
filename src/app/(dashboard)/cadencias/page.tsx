@@ -49,7 +49,7 @@ function StageHeader({ stage }: { stage: CadenceStage }) {
   return (
     <div className="flex min-w-0 items-center gap-2.5">
       <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: stage.color }} />
-      <h2 className="truncate text-base font-semibold text-neutral-900">{stage.name}</h2>
+      <h2 className="truncate text-base font-semibold text-brand">{stage.name}</h2>
       <span
         className="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium"
         style={{ backgroundColor: `${stage.color}26`, color: stage.color }}
@@ -229,14 +229,14 @@ export default function CadenciasPage() {
       <div>
         <Link
           href="/leads"
-          className="inline-flex min-h-11 items-center gap-1.5 text-sm text-neutral-400 hover:text-neutral-900"
+          className="inline-flex min-h-11 items-center gap-1.5 text-sm text-muted-foreground hover:text-brand"
         >
           <ArrowLeft className="h-4 w-4" />
           Leads
         </Link>
-        <p className="text-xs font-medium text-neutral-400">Configurações</p>
-        <h1 className="text-[28px] font-semibold text-neutral-900">Cadências</h1>
-        <p className="mt-1 max-w-2xl text-sm text-neutral-400">
+        <p className="text-xs font-medium text-muted-foreground">Configurações</p>
+        <h1 className="text-[28px] font-semibold text-brand">Cadências</h1>
+        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
           Quando um lead entra numa etapa, o sistema cria estas tarefas para o corretor responsável. Quando o lead
           sai, as pendentes são canceladas. Tarefas criadas por você nunca são alteradas.
         </p>
@@ -249,7 +249,7 @@ export default function CadenciasPage() {
           ))}
         </div>
       ) : isError ? (
-        <p className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-6 text-center text-sm text-danger">
+        <p className="rounded-[16px] border-[0.5px] border-line bg-paper p-6 text-center text-sm text-danger">
           Não foi possível carregar as cadências.
         </p>
       ) : !stages || stages.length === 0 ? (
@@ -264,15 +264,15 @@ export default function CadenciasPage() {
             <Accordion.Item
               key={stage.id}
               value={stage.id}
-              className="overflow-hidden rounded-[16px] border-[0.5px] border-neutral-200 bg-white"
+              className="overflow-hidden rounded-[16px] border-[0.5px] border-line bg-paper"
             >
               <Accordion.Header>
                 <Accordion.Trigger className="group flex min-h-14 w-full items-center justify-between gap-3 px-4 text-left">
                   <StageHeader stage={stage} />
-                  <ChevronDown className="h-4 w-4 shrink-0 text-neutral-400 transition-transform group-data-[panel-open]:rotate-180" />
+                  <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-data-[panel-open]:rotate-180" />
                 </Accordion.Trigger>
               </Accordion.Header>
-              <Accordion.Panel className="border-t-[0.5px] border-neutral-200 px-4 pb-4 pt-1">
+              <Accordion.Panel className="border-t-[0.5px] border-line px-4 pb-4 pt-1">
                 {stageSteps(stage)}
               </Accordion.Panel>
             </Accordion.Item>
@@ -283,7 +283,7 @@ export default function CadenciasPage() {
           {stages.map((stage) => (
             <section
               key={stage.id}
-              className="overflow-hidden rounded-[16px] border-[0.5px] border-neutral-200 bg-white"
+              className="overflow-hidden rounded-[16px] border-[0.5px] border-line bg-paper"
             >
               <div className="h-1" style={{ backgroundColor: stage.color }} />
               <div className="p-5">
@@ -311,7 +311,7 @@ export default function CadenciasPage() {
           if (!open) setDeleting(null)
         }}
       >
-        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
+        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
           <AlertDialogHeader className="p-4 sm:p-6">
             <AlertDialogTitle>Excluir passo?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -321,8 +321,8 @@ export default function CadenciasPage() {
                 ' Este é o último passo: sem nenhum passo, os padrão voltam na próxima abertura. Para desligar a cadência, desative os passos.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="mx-0 mb-0 flex-col-reverse gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:flex-row sm:justify-end sm:p-6">
-            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-neutral-600 sm:h-10">
+          <AlertDialogFooter className="mx-0 mb-0 flex-col-reverse gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:flex-row sm:justify-end sm:p-6">
+            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-muted-foreground sm:h-10">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
@@ -330,7 +330,7 @@ export default function CadenciasPage() {
                 if (deleting) removeStep.mutate(deleting)
               }}
               disabled={removeStep.isPending}
-              className="h-11 rounded-[8px] bg-danger px-4 text-white hover:bg-danger hover:opacity-90 sm:h-10"
+              className="h-11 rounded-[8px] bg-danger px-4 text-paper hover:bg-danger hover:opacity-90 sm:h-10"
             >
               Sim, excluir
             </AlertDialogAction>
@@ -344,7 +344,7 @@ export default function CadenciasPage() {
           if (!open && !applyExisting.isPending) setApplying(null)
         }}
       >
-        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
+        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
           <AlertDialogHeader className="p-4 sm:p-6">
             <AlertDialogTitle>Aplicar aos leads de {applying?.stage.name}?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -357,10 +357,10 @@ export default function CadenciasPage() {
               Leads que já têm a tarefa pendente de um passo não recebem outra.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="mx-0 mb-0 flex-col-reverse gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:flex-row sm:justify-end sm:p-6">
+          <AlertDialogFooter className="mx-0 mb-0 flex-col-reverse gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:flex-row sm:justify-end sm:p-6">
             <AlertDialogCancel
               disabled={applyExisting.isPending}
-              className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-neutral-600 sm:h-10"
+              className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-muted-foreground sm:h-10"
             >
               Cancelar
             </AlertDialogCancel>
@@ -369,7 +369,7 @@ export default function CadenciasPage() {
                 if (applying) applyExisting.mutate(applying.stage)
               }}
               disabled={applyExisting.isPending}
-              className="h-11 rounded-[8px] bg-brand px-4 text-white hover:bg-brand-dark sm:h-10"
+              className="h-11 rounded-[8px] bg-brand px-4 text-paper hover:bg-ink sm:h-10"
             >
               Criar tarefas
             </AlertDialogAction>

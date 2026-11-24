@@ -30,7 +30,7 @@ import { ChecklistItemDialog, type ChecklistItemFormData } from './checklist-ite
 import { ChecklistRow } from './checklist-row'
 
 const secondaryButtonClassName =
-  'inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border-[0.5px] border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-60 sm:h-10'
+  'inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border-[0.5px] border-line bg-paper px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-canvas disabled:cursor-not-allowed disabled:opacity-60 sm:h-10'
 
 const BULK_ACTIONS: { status: ChecklistStatus; label: string }[] = [
   { status: 'recebido', label: 'Recebido' },
@@ -109,7 +109,7 @@ export function DocumentsTab({ lead }: { lead: WhatsAppLead }) {
 
   if (query.isError || !query.data) {
     return (
-      <p className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-6 text-center text-sm text-danger">
+      <p className="rounded-[16px] border-[0.5px] border-line bg-paper p-6 text-center text-sm text-danger">
         Não foi possível carregar o checklist.
       </p>
     )
@@ -125,7 +125,7 @@ export function DocumentsTab({ lead }: { lead: WhatsAppLead }) {
       type="button"
       onClick={() => void askDocuments()}
       disabled={!hasPending}
-      className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-[#25D366] px-4 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:h-10"
+      className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-[#25D366] px-4 text-sm font-medium text-paper transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:h-10"
     >
       <Send className="h-4 w-4" />
       Pedir documentos pendentes
@@ -134,9 +134,9 @@ export function DocumentsTab({ lead }: { lead: WhatsAppLead }) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4 sm:p-5">
+      <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-4 sm:p-5">
         <div className="flex items-baseline justify-between gap-2">
-          <p className="text-sm font-semibold text-neutral-900">
+          <p className="text-sm font-semibold text-brand">
             {summary.requiredTotal > 0
               ? `${summary.requiredApproved} de ${summary.requiredTotal} obrigatórios aprovados`
               : 'Nenhum documento obrigatório'}
@@ -144,7 +144,7 @@ export function DocumentsTab({ lead }: { lead: WhatsAppLead }) {
           {summary.percent !== null && <span className="text-sm font-semibold text-brand">{summary.percent}%</span>}
         </div>
         <ProgressBar value={summary.percent ?? 0} className="mt-2" />
-        <p className="mt-2 text-xs text-neutral-400">
+        <p className="mt-2 text-xs text-muted-foreground">
           {summary.counts.aprovado} aprovados · {summary.counts.recebido} recebidos · {pendingCount} pendentes
         </p>
 
@@ -168,7 +168,7 @@ export function DocumentsTab({ lead }: { lead: WhatsAppLead }) {
             </button>
           )}
         </div>
-        {!hasPending && <p className="mt-2 text-xs text-neutral-400 sm:hidden">Nenhum documento pendente.</p>}
+        {!hasPending && <p className="mt-2 text-xs text-muted-foreground sm:hidden">Nenhum documento pendente.</p>}
       </div>
 
       {items.length === 0 ? (
@@ -179,9 +179,9 @@ export function DocumentsTab({ lead }: { lead: WhatsAppLead }) {
         />
       ) : (
         groups.map((group) => (
-          <section key={group.key} className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white px-3 py-2 sm:px-4">
-            <h3 className="px-1 pt-2 text-xs font-medium uppercase tracking-wide text-neutral-400">{group.title}</h3>
-            <ul className="divide-y-[0.5px] divide-neutral-200">
+          <section key={group.key} className="rounded-[16px] border-[0.5px] border-line bg-paper px-3 py-2 sm:px-4">
+            <h3 className="px-1 pt-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">{group.title}</h3>
+            <ul className="divide-y-[0.5px] divide-line">
               {group.items.map((item) => (
                 <ChecklistRow
                   key={item.id}
@@ -200,7 +200,7 @@ export function DocumentsTab({ lead }: { lead: WhatsAppLead }) {
       )}
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-neutral-400">
+        <p className="text-xs text-muted-foreground">
           Este checklist vale só para este cliente. A lista padrão fica em Configurações → Documentos.
         </p>
         <button
@@ -216,8 +216,8 @@ export function DocumentsTab({ lead }: { lead: WhatsAppLead }) {
 
       {isSelecting && (
         // Fica acima da barra inferior do celular (h-16)
-        <div className="sticky bottom-20 z-10 flex flex-wrap items-center gap-2 rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-3 shadow-md lg:bottom-4">
-          <span className="mr-auto text-sm font-medium text-neutral-900">
+        <div className="sticky bottom-20 z-10 flex flex-wrap items-center gap-2 rounded-[16px] border-[0.5px] border-line bg-paper p-3 shadow-md lg:bottom-4">
+          <span className="mr-auto text-sm font-medium text-brand">
             {selected.size} {selected.size === 1 ? 'selecionado' : 'selecionados'}
           </span>
           {BULK_ACTIONS.map((action) => (
@@ -229,7 +229,7 @@ export function DocumentsTab({ lead }: { lead: WhatsAppLead }) {
                 bulkUpdate.mutate({ ids: Array.from(selected), status: action.status })
                 exitSelection()
               }}
-              className="h-11 rounded-[8px] bg-brand px-3 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-50 sm:h-10"
+              className="h-11 rounded-[8px] bg-brand px-3 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:opacity-50 sm:h-10"
             >
               {action.label}
             </button>
@@ -238,7 +238,7 @@ export function DocumentsTab({ lead }: { lead: WhatsAppLead }) {
             type="button"
             onClick={exitSelection}
             aria-label="Sair da seleção"
-            className="flex h-11 w-11 items-center justify-center rounded-[8px] text-neutral-400 hover:bg-neutral-100 sm:h-10 sm:w-10"
+            className="flex h-11 w-11 items-center justify-center rounded-[8px] text-muted-foreground hover:bg-canvas sm:h-10 sm:w-10"
           >
             <X className="h-4 w-4" />
           </button>
@@ -264,15 +264,15 @@ export function DocumentsTab({ lead }: { lead: WhatsAppLead }) {
           if (!open) setDeleting(null)
         }}
       >
-        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
+        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
           <AlertDialogHeader className="p-4 sm:p-6">
             <AlertDialogTitle>Excluir documento?</AlertDialogTitle>
             <AlertDialogDescription>
               <strong>&quot;{deleting?.name}&quot;</strong> sai do checklist deste cliente. Essa ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="mx-0 mb-0 flex-col-reverse gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:flex-row sm:justify-end sm:p-6">
-            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-neutral-600 sm:h-10">
+          <AlertDialogFooter className="mx-0 mb-0 flex-col-reverse gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:flex-row sm:justify-end sm:p-6">
+            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-muted-foreground sm:h-10">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
@@ -280,7 +280,7 @@ export function DocumentsTab({ lead }: { lead: WhatsAppLead }) {
                 if (deleting) removeItem.mutate(deleting.id)
                 setDeleting(null)
               }}
-              className="h-11 rounded-[8px] bg-danger px-4 text-white hover:bg-danger hover:opacity-90 sm:h-10"
+              className="h-11 rounded-[8px] bg-danger px-4 text-paper hover:bg-danger hover:opacity-90 sm:h-10"
             >
               Sim, excluir
             </AlertDialogAction>

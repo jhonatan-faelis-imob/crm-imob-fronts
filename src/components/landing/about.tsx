@@ -26,7 +26,7 @@ const PILLARS: { icon: LucideIcon; title: string; text: string }[] = [
 
 export function About() {
   return (
-    <section id="produto" className="scroll-mt-[72px] bg-white py-20 md:py-28">
+    <section id="produto" className="scroll-mt-[72px] bg-paper py-20 md:py-28">
       <Container className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
         <div data-reveal>
           <Eyebrow>O que é o Smart CRM?</Eyebrow>
@@ -40,7 +40,7 @@ export function About() {
         <ul data-reveal-stagger="80" className="grid gap-4 sm:grid-cols-2">
           {PILLARS.map(({ icon: Icon, title, text }) => (
             <li key={title} data-stagger-item className="lp-lift rounded-[16px] bg-[#F7F5F3] p-6">
-              <span className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-white">
+              <span className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-paper">
                 <Icon className="lp-tilt h-5 w-5 text-[#C8104A]" aria-hidden="true" />
               </span>
               <h3 className="mt-4 text-[18px] font-bold">{title}</h3>

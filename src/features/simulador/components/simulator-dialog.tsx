@@ -26,7 +26,7 @@ export function SimulatorDialog({
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent side="bottom" className="h-[100dvh] max-h-[100dvh] gap-0 overflow-y-auto rounded-none bg-[#F7F5F3] p-0">
-          <SheetHeader className="sticky top-0 z-10 border-b-[0.5px] border-neutral-200 bg-white p-4 pr-12">
+          <SheetHeader className="sticky top-0 z-10 border-b-[0.5px] border-line bg-paper p-4 pr-12">
             <SheetTitle className="truncate">{title}</SheetTitle>
           </SheetHeader>
           <div className="p-4">{body}</div>
@@ -37,7 +37,7 @@ export function SimulatorDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-5xl overflow-y-auto rounded-2xl border-[0.5px] border-neutral-200 bg-[#F7F5F3] p-4 ring-0 sm:max-w-5xl sm:p-6">
+      <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-5xl overflow-y-auto rounded-2xl border-[0.5px] border-line bg-[#F7F5F3] p-4 ring-0 sm:max-w-5xl sm:p-6">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>

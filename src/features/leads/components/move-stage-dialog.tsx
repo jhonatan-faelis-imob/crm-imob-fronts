@@ -25,8 +25,8 @@ export function MoveStageDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[calc(100%-2rem)] max-w-sm rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
-        <DialogHeader className="gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-sm rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
+        <DialogHeader className="gap-1 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14">
           <DialogTitle>Mover lead</DialogTitle>
           <DialogDescription>Selecione a nova etapa do funil.</DialogDescription>
         </DialogHeader>

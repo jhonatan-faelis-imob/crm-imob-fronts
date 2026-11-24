@@ -80,7 +80,7 @@ export function BottomNav() {
 
   return (
     <>
-      <nav className="fixed inset-x-0 bottom-0 z-50 flex h-16 items-center justify-around border-t-[0.5px] border-neutral-200 bg-white pb-[env(safe-area-inset-bottom)] lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-50 flex h-16 items-center justify-around border-t-[0.5px] border-line bg-paper pb-[env(safe-area-inset-bottom)] lg:hidden">
         <NavLink
           href="/dashboard"
           label="Dashboard"
@@ -98,7 +98,7 @@ export function BottomNav() {
           type="button"
           onClick={() => setActiveSheet('create')}
           aria-label="Criar novo"
-          className="-mt-2 flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-brand text-white shadow-[0_4px_16px_rgba(255,56,92,0.35)]"
+          className="-mt-2 flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-brand text-paper shadow-[0_4px_16px_rgba(255,56,92,0.35)]"
         >
           <Plus size={24} strokeWidth={2.5} />
         </button>
@@ -116,9 +116,9 @@ export function BottomNav() {
           aria-label="Menu"
           className="relative flex flex-1 flex-col items-center justify-center gap-1 py-2.5"
         >
-          <MenuIcon size={22} strokeWidth={2} className={isMenuActive ? 'text-brand' : 'text-neutral-400'} />
+          <MenuIcon size={22} strokeWidth={2} className={isMenuActive ? 'text-brand' : 'text-muted-foreground'} />
           <MyDayBadge className="absolute left-1/2 top-1 ml-1" />
-          <span className={cn('text-[10px]', isMenuActive ? 'font-semibold text-brand' : 'text-neutral-400')}>
+          <span className={cn('text-[10px]', isMenuActive ? 'font-semibold text-brand' : 'text-muted-foreground')}>
             Menu
           </span>
         </button>
@@ -132,25 +132,25 @@ export function BottomNav() {
             onClick={() => handleNavigate(item.href)}
             className="flex w-full items-center gap-3.5 border-b-[0.5px] border-[#F0F0F0] py-3.5 text-left"
           >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-bg text-brand">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-line text-brand">
               <item.icon size={20} strokeWidth={2} />
             </span>
             <span className="min-w-0">
-              <span className="block text-[15px] font-medium text-neutral-900">{item.label}</span>
-              <span className="block text-xs text-neutral-400">{item.description}</span>
+              <span className="block text-[15px] font-medium text-brand">{item.label}</span>
+              <span className="block text-xs text-muted-foreground">{item.description}</span>
             </span>
           </button>
         ))}
       </BottomSheet>
 
       <BottomSheet open={activeSheet === 'menu'} onClose={closeSheet} title="Navegação">
-        <p className="px-0.5 pb-2 text-xs text-neutral-400">Navegação</p>
+        <p className="px-0.5 pb-2 text-xs text-muted-foreground">Navegação</p>
         {menuNavItems.map((item) => (
           <button
             key={item.href}
             type="button"
             onClick={() => handleNavigate(item.href)}
-            className="flex w-full items-center gap-3.5 border-b-[0.5px] border-[#F0F0F0] py-3.5 text-left text-[15px] font-medium text-neutral-900"
+            className="flex w-full items-center gap-3.5 border-b-[0.5px] border-[#F0F0F0] py-3.5 text-left text-[15px] font-medium text-brand"
           >
             <item.icon size={20} strokeWidth={2} />
             {item.label}
@@ -166,7 +166,7 @@ export function BottomNav() {
               aria-controls="menu-settings"
               className={cn(
                 'flex min-h-11 w-full items-center gap-3.5 py-3.5 text-left text-[15px] font-medium',
-                settings.isActive ? 'text-brand' : 'text-neutral-900',
+                settings.isActive ? 'text-brand' : 'text-brand',
               )}
             >
               <Settings size={20} strokeWidth={2} />
@@ -182,7 +182,7 @@ export function BottomNav() {
                     onClick={() => handleNavigate(item.href)}
                     className={cn(
                       'flex min-h-11 w-full items-center gap-3 rounded-[8px] px-3 text-left text-[15px] font-medium',
-                      isNavItemActive(pathname, item.href) ? 'bg-brand-bg text-brand' : 'text-neutral-900',
+                      isNavItemActive(pathname, item.href) ? 'bg-line text-brand' : 'text-brand',
                     )}
                   >
                     <item.icon size={18} strokeWidth={2} />
@@ -198,7 +198,7 @@ export function BottomNav() {
           onClick={() => handleNavigate('/perfil')}
           className={cn(
             'flex min-h-11 w-full items-center gap-3.5 border-b-[0.5px] border-[#F0F0F0] py-3.5 text-left text-[15px] font-medium',
-            isNavItemActive(pathname, '/perfil') ? 'text-brand' : 'text-neutral-900',
+            isNavItemActive(pathname, '/perfil') ? 'text-brand' : 'text-brand',
           )}
         >
           <UserRound size={20} strokeWidth={2} />
@@ -230,8 +230,8 @@ function NavLink({
 }) {
   return (
     <Link href={href} aria-label={label} className="flex flex-1 flex-col items-center justify-center gap-1 py-2.5">
-      <Icon size={22} strokeWidth={2} className={isActive ? 'text-brand' : 'text-neutral-400'} />
-      <span className={cn('text-[10px]', isActive ? 'font-semibold text-brand' : 'text-neutral-400')}>{label}</span>
+      <Icon size={22} strokeWidth={2} className={isActive ? 'text-brand' : 'text-muted-foreground'} />
+      <span className={cn('text-[10px]', isActive ? 'font-semibold text-brand' : 'text-muted-foreground')}>{label}</span>
     </Link>
   )
 }
@@ -250,13 +250,13 @@ function BottomSheet({
   return (
     <SheetPrimitive.Root open={open} onOpenChange={(next) => !next && onClose()}>
       <SheetPrimitive.Portal>
-        <SheetPrimitive.Backdrop className="fixed inset-0 z-[100] bg-black/40 transition-opacity duration-300 ease-in-out data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden" />
-        <SheetPrimitive.Popup className="fixed inset-x-0 bottom-0 z-[101] rounded-t-[20px] bg-white px-6 pt-3 pb-8 outline-none transition-transform duration-300 ease-in-out data-ending-style:translate-y-full data-starting-style:translate-y-full lg:hidden">
-          <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-neutral-200" />
+        <SheetPrimitive.Backdrop className="fixed inset-0 z-[100] bg-ink/40 transition-opacity duration-300 ease-in-out data-ending-style:opacity-0 data-starting-style:opacity-0 lg:hidden" />
+        <SheetPrimitive.Popup className="fixed inset-x-0 bottom-0 z-[101] rounded-t-[20px] bg-paper px-6 pt-3 pb-8 outline-none transition-transform duration-300 ease-in-out data-ending-style:translate-y-full data-starting-style:translate-y-full lg:hidden">
+          <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-line" />
           <SheetPrimitive.Title className="sr-only">{title}</SheetPrimitive.Title>
           <SheetPrimitive.Close
             aria-label="Fechar"
-            className="absolute right-4 top-3 flex h-8 w-8 items-center justify-center rounded-full text-neutral-400"
+            className="absolute right-4 top-3 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground"
           >
             <XIcon size={18} />
           </SheetPrimitive.Close>

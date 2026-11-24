@@ -19,7 +19,7 @@ function PlanCard({ plan }: { plan: Plan }) {
       data-stagger-item={dark ? 'up-lg' : ''}
       style={motionVars({ i: ENTRY_ORDER.indexOf(plan.id) })}
       className={`relative flex flex-col rounded-[20px] p-7 sm:p-8 ${
-        dark ? 'bg-[#121212] text-white' : 'lp-lift border border-[#E6E2DD] bg-white text-[#1C1B1A]'
+        dark ? 'bg-[#121212] text-paper' : 'lp-lift border border-[#E6E2DD] bg-paper text-[#1C1B1A]'
       }`}
     >
       {dark && (
@@ -39,7 +39,7 @@ function PlanCard({ plan }: { plan: Plan }) {
       <p className={`mt-1 min-h-[22px] text-[14px] ${dark ? 'text-[#BDB9B4]' : 'text-[#6B6762]'}`}>
         {plan.extraLabel ?? <span className="sr-only">Sem usuários adicionais</span>}
       </p>
-      <ul className={`mt-6 space-y-3 border-t pt-6 ${dark ? 'border-white/15' : 'border-[#E6E2DD]'}`}>
+      <ul className={`mt-6 space-y-3 border-t pt-6 ${dark ? 'border-paper/15' : 'border-[#E6E2DD]'}`}>
         {[...PLAN_FEATURES, ...plan.extras].map((feature) => (
           <li key={feature} className="flex gap-2.5 text-[15px]">
             <Check
@@ -47,7 +47,7 @@ function PlanCard({ plan }: { plan: Plan }) {
               strokeWidth={3}
               aria-hidden="true"
             />
-            <span className={dark ? 'text-white' : 'text-[#1C1B1A]'}>{feature}</span>
+            <span className={dark ? 'text-paper' : 'text-[#1C1B1A]'}>{feature}</span>
           </li>
         ))}
       </ul>

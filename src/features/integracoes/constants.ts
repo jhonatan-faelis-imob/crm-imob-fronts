@@ -32,7 +32,7 @@ export const PROVIDER_ICON: Record<IntegrationProvider, LucideIcon> = {
 }
 
 export const STATUS_META: Record<IntegrationStatus, { label: string; className: string }> = {
-  desativada: { label: 'Desativada', className: 'bg-neutral-100 text-neutral-600' },
+  desativada: { label: 'Desativada', className: 'bg-canvas text-muted-foreground' },
   aguardando: { label: 'Aguardando', className: 'bg-[#FFF7E0] text-[#B45309]' },
   ativa: { label: 'Ativa', className: 'bg-[#E8F5E9] text-success' },
   erro: { label: 'Erro', className: 'bg-danger-bg text-danger' },
@@ -41,7 +41,7 @@ export const STATUS_META: Record<IntegrationStatus, { label: string; className: 
 
 export const EVENT_STATUS_META: Record<IntegrationEventStatus, { label: string; className: string }> = {
   ok: { label: 'OK', className: 'bg-[#E8F5E9] text-success' },
-  ignorado: { label: 'Ignorado', className: 'bg-neutral-100 text-neutral-600' },
+  ignorado: { label: 'Ignorado', className: 'bg-canvas text-muted-foreground' },
   erro: { label: 'Erro', className: 'bg-danger-bg text-danger' },
   teste: { label: 'Teste', className: 'bg-[#EBF5FF] text-[#0070F3]' },
 }

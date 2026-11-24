@@ -30,8 +30,8 @@ export default function LeadPage() {
 
   if (isError || !apiLead) {
     return (
-      <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-8 text-center">
-        <p className="text-sm font-medium text-neutral-900">Lead não encontrado.</p>
+      <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-8 text-center">
+        <p className="text-sm font-medium text-brand">Lead não encontrado.</p>
       </div>
     )
   }

@@ -65,8 +65,8 @@ function taskToFormValues(task: Task): NewTaskFormValues {
 }
 
 const inputClassName =
-  'w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-[15px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand'
-const labelClassName = 'mb-1.5 block text-[13px] font-medium text-neutral-900'
+  'w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] text-brand outline-none transition-colors placeholder:text-muted-foreground focus:border-brand'
+const labelClassName = 'mb-1.5 block text-[13px] font-medium text-brand'
 const errorClassName = 'mt-1 text-[12px] text-danger'
 
 // Montado com `key={task?.id ?? 'new'}` (em NewTaskDialog) sempre que o dialog abre, para
@@ -105,7 +105,7 @@ function TaskFormBody({
         <div>
           <label htmlFor="task-description" className={labelClassName}>
             Descrição
-            <span className="font-normal text-neutral-400"> (opcional)</span>
+            <span className="font-normal text-muted-foreground"> (opcional)</span>
           </label>
           <textarea
             id="task-description"
@@ -152,18 +152,18 @@ function TaskFormBody({
         </div>
       </form>
 
-      <DialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
+      <DialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-[8px] border-[1.5px] border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-600"
+          className="rounded-[8px] border-[1.5px] border-line px-4 py-2.5 text-sm font-medium text-muted-foreground"
         >
           Cancelar
         </button>
         <button
           type="button"
           onClick={handleSubmit(onSubmit)}
-          className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+          className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink"
         >
           {submitLabel}
         </button>
@@ -187,8 +187,8 @@ export function NewTaskDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[calc(100%-2rem)] max-w-md rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
-        <DialogHeader className="gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-md rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
+        <DialogHeader className="gap-1 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14">
           <DialogTitle>{isEditing ? 'Editar tarefa' : 'Nova tarefa'}</DialogTitle>
           <DialogDescription>
             {isEditing ? 'Atualize os dados da tarefa.' : 'Agende uma nova tarefa para este lead.'}

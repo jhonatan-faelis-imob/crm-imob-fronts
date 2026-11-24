@@ -35,7 +35,7 @@ function ReadOnlyField({ id, label, value }: { id: string; label: string; value:
       <label htmlFor={id} className={labelClassName}>
         {label}
       </label>
-      <input id={id} value={value} readOnly disabled className={`${inputClassName} bg-neutral-100 text-neutral-600`} />
+      <input id={id} value={value} readOnly disabled className={`${inputClassName} bg-canvas text-muted-foreground`} />
     </div>
   )
 }
@@ -85,19 +85,19 @@ export function ProfileForm({ profile }: { profile: Profile }) {
   }
 
   return (
-    <section className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white">
-      <div className="border-b-[0.5px] border-neutral-200 p-4 sm:p-6">
-        <h2 className="text-[18px] font-semibold text-neutral-900">Meus dados</h2>
+    <section className="rounded-[16px] border-[0.5px] border-line bg-paper">
+      <div className="border-b-[0.5px] border-line p-4 sm:p-6">
+        <h2 className="text-[18px] font-semibold text-brand">Meus dados</h2>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4 p-4 sm:p-6">
         <div className="flex items-center gap-3">
           <Avatar className="size-14">
-            <AvatarFallback className="bg-brand-bg text-lg text-brand">{getInitials(profile.name)}</AvatarFallback>
+            <AvatarFallback className="bg-line text-lg text-brand">{getInitials(profile.name)}</AvatarFallback>
           </Avatar>
           <div className="min-w-0">
-            <p className="truncate text-[16px] font-semibold text-neutral-900">{profile.name}</p>
-            <p className="truncate text-sm text-neutral-400">
+            <p className="truncate text-[16px] font-semibold text-brand">{profile.name}</p>
+            <p className="truncate text-sm text-muted-foreground">
               {roleLabel(profile.role)}
               {profile.teamName ? ` · ${profile.teamName}` : ''} · {profile.organizationName}
             </p>
@@ -129,7 +129,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
           <ReadOnlyField id="profile-email" label="E-mail" value={profile.email} />
           <ReadOnlyField id="profile-role" label="Cargo" value={roleLabel(profile.role)} />
         </div>
-        <p className="text-xs text-neutral-400">Para alterar e-mail ou cargo, fale com um gestor.</p>
+        <p className="text-xs text-muted-foreground">Para alterar e-mail ou cargo, fale com um gestor.</p>
 
         {errors.root?.message && (
           <p role="alert" className="rounded-[12px] bg-danger/10 px-3 py-2 text-sm text-danger">
@@ -141,7 +141,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
           <button
             type="submit"
             disabled={!isDirty || save.isPending}
-            className="min-h-11 w-full rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-60 sm:w-auto"
+            className="min-h-11 w-full rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:opacity-60 sm:w-auto"
           >
             {save.isPending ? 'Salvando...' : 'Salvar dados'}
           </button>

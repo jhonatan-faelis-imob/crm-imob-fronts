@@ -119,9 +119,9 @@ export default function DocumentosPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-medium text-neutral-400">Configurações</p>
-          <h1 className="text-[28px] font-semibold text-neutral-900">Documentos</h1>
-          <p className="mt-1 max-w-2xl text-sm text-neutral-400">
+          <p className="text-xs font-medium text-muted-foreground">Configurações</p>
+          <h1 className="text-[28px] font-semibold text-brand">Documentos</h1>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
             Esta é a lista padrão. Cada cliente recebe uma cópia na primeira vez que o checklist é aberto. Mudanças
             aqui só chegam a clientes que já têm checklist pelo botão ‘Sincronizar’.
           </p>
@@ -129,7 +129,7 @@ export default function DocumentosPage() {
         <button
           type="button"
           onClick={() => setDialog({ requirement: null, holder: 'titular', session: Date.now() })}
-          className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+          className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-medium text-paper transition-colors hover:bg-ink"
         >
           <Plus className="h-4 w-4" />
           Novo documento
@@ -142,7 +142,7 @@ export default function DocumentosPage() {
           <Skeleton className="h-36 rounded-[16px]" />
         </div>
       ) : isError ? (
-        <p className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-6 text-center text-sm text-danger">
+        <p className="rounded-[16px] border-[0.5px] border-line bg-paper p-6 text-center text-sm text-danger">
           Não foi possível carregar a lista de documentos.
         </p>
       ) : all.length === 0 ? (
@@ -154,21 +154,21 @@ export default function DocumentosPage() {
         />
       ) : (
         groups.map((group) => (
-          <section key={group.value} className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4 sm:p-5">
+          <section key={group.value} className="rounded-[16px] border-[0.5px] border-line bg-paper p-4 sm:p-5">
             <div className="flex items-center justify-between gap-2">
-              <h2 className="text-base font-semibold text-neutral-900">{group.label}</h2>
-              <span className="text-xs text-neutral-400">
+              <h2 className="text-base font-semibold text-brand">{group.label}</h2>
+              <span className="text-xs text-muted-foreground">
                 {group.items.filter((item) => item.active).length} ativos
               </span>
             </div>
             {group.value === 'conjuge' && (
-              <p className="mt-1 text-xs text-neutral-400">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Só entram no checklist de clientes casados, em união estável ou com cônjuge informado.
               </p>
             )}
             <div className="mt-2">
               {group.items.length === 0 ? (
-                <p className="rounded-[12px] bg-neutral-100 p-3 text-sm text-neutral-400">Nenhum documento neste grupo.</p>
+                <p className="rounded-[12px] bg-canvas p-3 text-sm text-muted-foreground">Nenhum documento neste grupo.</p>
               ) : (
                 <RequirementList
                   requirements={group.items}
@@ -181,7 +181,7 @@ export default function DocumentosPage() {
             <button
               type="button"
               onClick={() => setDialog({ requirement: null, holder: group.value, session: Date.now() })}
-              className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border-[0.5px] border-neutral-200 px-4 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 sm:h-10 sm:w-auto"
+              className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-[8px] border-[0.5px] border-line px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-canvas sm:h-10 sm:w-auto"
             >
               <Plus className="h-4 w-4" />
               Adicionar em {group.label}
@@ -208,7 +208,7 @@ export default function DocumentosPage() {
           if (!open) setDeactivating(null)
         }}
       >
-        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
+        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
           <AlertDialogHeader className="p-4 sm:p-6">
             <AlertDialogTitle>Desativar documento?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -216,8 +216,8 @@ export default function DocumentosPage() {
               tem o item no checklist continua com ele.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="mx-0 mb-0 flex-col-reverse gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:flex-row sm:justify-end sm:p-6">
-            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-neutral-600 sm:h-10">
+          <AlertDialogFooter className="mx-0 mb-0 flex-col-reverse gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:flex-row sm:justify-end sm:p-6">
+            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-muted-foreground sm:h-10">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
@@ -225,7 +225,7 @@ export default function DocumentosPage() {
                 if (deactivating) setActive.mutate({ requirement: deactivating, active: false })
               }}
               disabled={setActive.isPending}
-              className="h-11 rounded-[8px] bg-danger px-4 text-white hover:bg-danger hover:opacity-90 sm:h-10"
+              className="h-11 rounded-[8px] bg-danger px-4 text-paper hover:bg-danger hover:opacity-90 sm:h-10"
             >
               Desativar
             </AlertDialogAction>

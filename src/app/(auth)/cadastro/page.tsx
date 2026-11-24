@@ -126,15 +126,15 @@ export default function CadastroPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col bg-page lg:flex-row">
-      <div className="hidden bg-brand p-12 text-white lg:flex lg:w-1/2 lg:flex-col">
+    <main className="flex min-h-screen flex-col bg-canvas lg:flex-row">
+      <div className="hidden bg-brand p-12 text-paper lg:flex lg:w-1/2 lg:flex-col">
         <span className="text-xl font-semibold">Smart CRM</span>
 
         <div className="flex flex-1 flex-col items-start justify-center">
           <h1 className="max-w-md text-[32px] font-semibold leading-tight">
             14 dias grátis, sem cartão de crédito
           </h1>
-          <p className="mt-3 max-w-sm text-base text-white/80">
+          <p className="mt-3 max-w-sm text-base text-paper/80">
             Cadastre sua imobiliária, monte sua equipe e centralize todo o funil de vendas em um só
             lugar.
           </p>
@@ -142,8 +142,8 @@ export default function CadastroPage() {
       </div>
 
       <div className="flex flex-1 items-center justify-center p-4 sm:p-6 lg:w-1/2 lg:p-12">
-        <div className="w-full max-w-sm rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-8">
-          <div className="mb-8 text-center text-xl font-semibold text-neutral-900 lg:hidden">
+        <div className="w-full max-w-sm rounded-[16px] border-[0.5px] border-line bg-paper p-8">
+          <div className="mb-8 text-center text-xl font-semibold text-brand lg:hidden">
             CRM <span className="text-brand">Imob</span>
           </div>
 
@@ -153,34 +153,34 @@ export default function CadastroPage() {
                 <div
                   className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-colors ${
                     index < step
-                      ? 'bg-brand text-white'
+                      ? 'bg-brand text-paper'
                       : index === step
-                        ? 'bg-brand-bg text-brand ring-1 ring-brand'
-                        : 'bg-neutral-100 text-neutral-400'
+                        ? 'bg-line text-brand ring-1 ring-brand'
+                        : 'bg-canvas text-muted-foreground'
                   }`}
                 >
                   {index < step ? <Check className="h-3.5 w-3.5" /> : index + 1}
                 </div>
                 <span
                   className={`text-xs font-medium ${
-                    index <= step ? 'text-neutral-900' : 'text-neutral-400'
+                    index <= step ? 'text-brand' : 'text-muted-foreground'
                   }`}
                 >
                   {item.label}
                 </span>
                 {index < STEPS.length - 1 && (
                   <div
-                    className={`h-px flex-1 ${index < step ? 'bg-brand' : 'bg-neutral-200'}`}
+                    className={`h-px flex-1 ${index < step ? 'bg-brand' : 'bg-line'}`}
                   />
                 )}
               </div>
             ))}
           </div>
 
-          <h2 className="mt-6 text-[20px] font-semibold text-neutral-900">
+          <h2 className="mt-6 text-[20px] font-semibold text-brand">
             {step === 0 ? 'Dados da imobiliária' : 'Dados do diretor'}
           </h2>
-          <p className="mt-1 text-sm text-neutral-400">
+          <p className="mt-1 text-sm text-muted-foreground">
             {step === 0
               ? 'Como sua imobiliária vai aparecer no sistema'
               : 'Você será o administrador principal da conta'}
@@ -196,18 +196,18 @@ export default function CadastroPage() {
             {step === 0 ? (
               <>
                 <div>
-                  <label htmlFor="orgName" className="mb-1.5 block text-[13px] font-medium text-neutral-900">
+                  <label htmlFor="orgName" className="mb-1.5 block text-[13px] font-medium text-brand">
                     Nome da imobiliária
                   </label>
                   <div className="relative">
-                    <Building2 className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-neutral-400" />
+                    <Building2 className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-muted-foreground" />
                     <input
                       id="orgName"
                       type="text"
                       autoComplete="organization"
                       placeholder="Imobiliária Alpha"
                       aria-invalid={!!errors.org?.orgName}
-                      className="w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white py-2.5 pl-10 pr-3 text-[15px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand"
+                      className="w-full rounded-[12px] border-[1.5px] border-line bg-paper py-2.5 pl-10 pr-3 text-[15px] text-brand outline-none transition-colors placeholder:text-muted-foreground focus:border-brand"
                       {...register('org.orgName')}
                     />
                   </div>
@@ -217,7 +217,7 @@ export default function CadastroPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="slug" className="mb-1.5 block text-[13px] font-medium text-neutral-900">
+                  <label htmlFor="slug" className="mb-1.5 block text-[13px] font-medium text-brand">
                     Slug
                   </label>
                   <input
@@ -225,10 +225,10 @@ export default function CadastroPage() {
                     type="text"
                     placeholder="imobiliaria-alpha"
                     aria-invalid={!!errors.org?.slug}
-                    className="w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-[15px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand"
+                    className="w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] text-brand outline-none transition-colors placeholder:text-muted-foreground focus:border-brand"
                     {...register('org.slug', { onChange: () => setSlugTouched(true) })}
                   />
-                  <p className="mt-1 text-[12px] text-neutral-400">
+                  <p className="mt-1 text-[12px] text-muted-foreground">
                     Identifica sua imobiliária no sistema. Gerado automaticamente, mas você pode
                     editar.
                   </p>
@@ -238,7 +238,7 @@ export default function CadastroPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="document" className="mb-1.5 block text-[13px] font-medium text-neutral-900">
+                  <label htmlFor="document" className="mb-1.5 block text-[13px] font-medium text-brand">
                     CPF ou CNPJ
                   </label>
                   <MaskedInput
@@ -247,21 +247,21 @@ export default function CadastroPage() {
                     mask={documentMask}
                     id="document"
                     placeholder="000.000.000-00"
-                    className="w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-[15px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand"
+                    className="w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] text-brand outline-none transition-colors placeholder:text-muted-foreground focus:border-brand"
                   />
                   {errors.org?.document && (
                     <p className="mt-1 text-[12px] text-danger">{errors.org.document.message}</p>
                   )}
                 </div>
 
-                <p className="rounded-[12px] bg-brand-bg px-3 py-2.5 text-center text-[13px] font-medium text-brand">
+                <p className="rounded-[12px] bg-line px-3 py-2.5 text-center text-[13px] font-medium text-brand">
                   14 dias grátis, sem cartão de crédito
                 </p>
 
                 <button
                   type="button"
                   onClick={goToStep2}
-                  className="flex w-full items-center justify-center gap-2 rounded-[8px] bg-brand py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+                  className="flex w-full items-center justify-center gap-2 rounded-[8px] bg-brand py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink"
                 >
                   Próximo
                 </button>
@@ -269,18 +269,18 @@ export default function CadastroPage() {
             ) : (
               <>
                 <div>
-                  <label htmlFor="name" className="mb-1.5 block text-[13px] font-medium text-neutral-900">
+                  <label htmlFor="name" className="mb-1.5 block text-[13px] font-medium text-brand">
                     Nome completo
                   </label>
                   <div className="relative">
-                    <User className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-neutral-400" />
+                    <User className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-muted-foreground" />
                     <input
                       id="name"
                       type="text"
                       autoComplete="name"
                       placeholder="Seu nome completo"
                       aria-invalid={!!errors.director?.name}
-                      className="w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white py-2.5 pl-10 pr-3 text-[15px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand"
+                      className="w-full rounded-[12px] border-[1.5px] border-line bg-paper py-2.5 pl-10 pr-3 text-[15px] text-brand outline-none transition-colors placeholder:text-muted-foreground focus:border-brand"
                       {...register('director.name')}
                     />
                   </div>
@@ -290,18 +290,18 @@ export default function CadastroPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="mb-1.5 block text-[13px] font-medium text-neutral-900">
+                  <label htmlFor="email" className="mb-1.5 block text-[13px] font-medium text-brand">
                     Email
                   </label>
                   <div className="relative">
-                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-neutral-400" />
+                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-muted-foreground" />
                     <input
                       id="email"
                       type="email"
                       autoComplete="email"
                       placeholder="voce@imobiliaria.com"
                       aria-invalid={!!errors.director?.email}
-                      className="w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white py-2.5 pl-10 pr-3 text-[15px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand"
+                      className="w-full rounded-[12px] border-[1.5px] border-line bg-paper py-2.5 pl-10 pr-3 text-[15px] text-brand outline-none transition-colors placeholder:text-muted-foreground focus:border-brand"
                       {...register('director.email')}
                     />
                   </div>
@@ -311,18 +311,18 @@ export default function CadastroPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="mb-1.5 block text-[13px] font-medium text-neutral-900">
+                  <label htmlFor="phone" className="mb-1.5 block text-[13px] font-medium text-brand">
                     Telefone
                   </label>
                   <div className="relative">
-                    <Phone className="pointer-events-none absolute left-3 top-1/2 z-10 h-[18px] w-[18px] -translate-y-1/2 text-neutral-400" />
+                    <Phone className="pointer-events-none absolute left-3 top-1/2 z-10 h-[18px] w-[18px] -translate-y-1/2 text-muted-foreground" />
                     <MaskedInput
                       control={control}
                       name="director.phone"
                       mask={phoneMask}
                       id="phone"
                       placeholder="(11) 99999-9999"
-                      className="w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white py-2.5 pl-10 pr-3 text-[15px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand"
+                      className="w-full rounded-[12px] border-[1.5px] border-line bg-paper py-2.5 pl-10 pr-3 text-[15px] text-brand outline-none transition-colors placeholder:text-muted-foreground focus:border-brand"
                     />
                   </div>
                   {errors.director?.phone && (
@@ -331,25 +331,25 @@ export default function CadastroPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="password" className="mb-1.5 block text-[13px] font-medium text-neutral-900">
+                  <label htmlFor="password" className="mb-1.5 block text-[13px] font-medium text-brand">
                     Senha
                   </label>
                   <div className="relative">
-                    <Lock className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-neutral-400" />
+                    <Lock className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-muted-foreground" />
                     <input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
                       autoComplete="new-password"
                       placeholder="••••••••"
                       aria-invalid={!!errors.director?.password}
-                      className="w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white py-2.5 pl-10 pr-10 text-[15px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand"
+                      className="w-full rounded-[12px] border-[1.5px] border-line bg-paper py-2.5 pl-10 pr-10 text-[15px] text-brand outline-none transition-colors placeholder:text-muted-foreground focus:border-brand"
                       {...register('director.password')}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
                       aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
                     >
                       {showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
                     </button>
@@ -362,26 +362,26 @@ export default function CadastroPage() {
                 <div>
                   <label
                     htmlFor="confirmPassword"
-                    className="mb-1.5 block text-[13px] font-medium text-neutral-900"
+                    className="mb-1.5 block text-[13px] font-medium text-brand"
                   >
                     Confirmar senha
                   </label>
                   <div className="relative">
-                    <Lock className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-neutral-400" />
+                    <Lock className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-muted-foreground" />
                     <input
                       id="confirmPassword"
                       type={showConfirmPassword ? 'text' : 'password'}
                       autoComplete="new-password"
                       placeholder="••••••••"
                       aria-invalid={!!errors.director?.confirmPassword}
-                      className="w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white py-2.5 pl-10 pr-10 text-[15px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand"
+                      className="w-full rounded-[12px] border-[1.5px] border-line bg-paper py-2.5 pl-10 pr-10 text-[15px] text-brand outline-none transition-colors placeholder:text-muted-foreground focus:border-brand"
                       {...register('director.confirmPassword')}
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword((prev) => !prev)}
                       aria-label={showConfirmPassword ? 'Ocultar senha' : 'Mostrar senha'}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
                     >
                       {showConfirmPassword ? (
                         <EyeOff className="h-[18px] w-[18px]" />
@@ -398,7 +398,7 @@ export default function CadastroPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="acceptedTerms" className="flex min-h-11 items-start gap-3 text-[13px] text-neutral-600">
+                  <label htmlFor="acceptedTerms" className="flex min-h-11 items-start gap-3 text-[13px] text-muted-foreground">
                     <input
                       id="acceptedTerms"
                       type="checkbox"
@@ -407,11 +407,11 @@ export default function CadastroPage() {
                     />
                     <span>
                       Li e aceito os{' '}
-                      <a href={LINKS.terms} target="_blank" rel="noopener noreferrer" className="font-medium text-brand hover:text-brand-dark">
+                      <a href={LINKS.terms} target="_blank" rel="noopener noreferrer" className="font-medium text-brand hover:text-brand">
                         Termos de Uso
                       </a>{' '}
                       e a{' '}
-                      <a href={LINKS.privacy} target="_blank" rel="noopener noreferrer" className="font-medium text-brand hover:text-brand-dark">
+                      <a href={LINKS.privacy} target="_blank" rel="noopener noreferrer" className="font-medium text-brand hover:text-brand">
                         Política de Privacidade
                       </a>
                     </span>
@@ -423,14 +423,14 @@ export default function CadastroPage() {
                   <button
                     type="button"
                     onClick={() => setStep(0)}
-                    className="rounded-[8px] border-[1.5px] border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100"
+                    className="rounded-[8px] border-[1.5px] border-line px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-canvas"
                   >
                     Voltar
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting || !acceptedTerms}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-[8px] bg-brand py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-70"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-[8px] bg-brand py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
                     Criar conta
@@ -441,9 +441,9 @@ export default function CadastroPage() {
           </form>
 
           <div className="mt-4 text-center">
-            <p className="text-sm text-neutral-400">
+            <p className="text-sm text-muted-foreground">
               Já tem conta?{' '}
-              <Link href="/login" className="font-medium text-brand hover:text-brand-dark">
+              <Link href="/login" className="font-medium text-brand hover:text-brand">
                 Entrar
               </Link>
             </p>

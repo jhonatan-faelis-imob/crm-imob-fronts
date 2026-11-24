@@ -32,14 +32,14 @@ export function DevelopmentCard({
 
   return (
     // Botão invisível cobre o card (abre o "Ver imóvel"); os controles ficam por cima (z-[2])
-    <div className="group relative flex flex-col gap-4 rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4 transition-colors hover:border-brand sm:flex-row">
+    <div className="group relative flex flex-col gap-4 rounded-[16px] border-[0.5px] border-line bg-paper p-4 transition-colors hover:border-brand sm:flex-row">
       <button
         type="button"
         onClick={onView}
         aria-label={`Ver imóvel: ${development.title}`}
         className="absolute inset-0 z-[1] rounded-[16px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
       />
-      <div className="flex h-40 shrink-0 items-center justify-center rounded-[12px] bg-brand-bg sm:h-auto sm:w-48">
+      <div className="flex h-40 shrink-0 items-center justify-center rounded-[12px] bg-line sm:h-auto sm:w-48">
         <Building2 className="h-10 w-10 text-brand" strokeWidth={1.5} />
       </div>
 
@@ -47,10 +47,10 @@ export function DevelopmentCard({
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <div className="flex min-w-0 items-center gap-2">
-              <p className="truncate text-[16px] font-semibold text-neutral-900">{development.title}</p>
+              <p className="truncate text-[16px] font-semibold text-brand">{development.title}</p>
               <CodeChip code={development.code} className="shrink-0" />
             </div>
-            <p className="mt-0.5 text-[13px] text-neutral-400">
+            <p className="mt-0.5 text-[13px] text-muted-foreground">
               {development.city}
               {development.neighborhood ? ` · ${development.neighborhood}` : ''}
             </p>
@@ -61,7 +61,7 @@ export function DevelopmentCard({
               type="button"
               onClick={onView}
               aria-label="Ver imóvel"
-              className="flex h-9 w-9 items-center justify-center rounded-[8px] text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
+              className="flex h-9 w-9 items-center justify-center rounded-[8px] text-muted-foreground hover:bg-canvas hover:text-brand"
             >
               <Eye className="h-4 w-4" />
             </button>
@@ -71,7 +71,7 @@ export function DevelopmentCard({
                   <button
                     type="button"
                     aria-label="Mais opções"
-                    className="flex h-9 w-9 items-center justify-center rounded-[8px] text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
+                    className="flex h-9 w-9 items-center justify-center rounded-[8px] text-muted-foreground hover:bg-canvas hover:text-brand"
                   />
                 }
               >
@@ -89,32 +89,32 @@ export function DevelopmentCard({
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2">
-          <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-600">
+          <span className="rounded-full bg-canvas px-2.5 py-1 text-xs font-medium text-muted-foreground">
             {totalUnits} unidades
           </span>
           {development.startingPrice !== undefined && (
-            <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-600">
+            <span className="rounded-full bg-canvas px-2.5 py-1 text-xs font-medium text-muted-foreground">
               A partir de {formatCurrency(development.startingPrice)}
             </span>
           )}
           {development.minIncome !== undefined && development.maxIncome !== undefined && (
-            <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-600">
+            <span className="rounded-full bg-canvas px-2.5 py-1 text-xs font-medium text-muted-foreground">
               Renda {formatCurrency(development.minIncome)} – {formatCurrency(development.maxIncome)}
             </span>
           )}
         </div>
 
         <div className="mt-3">
-          <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-100">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-canvas">
             <div className="h-full rounded-full bg-brand" style={{ width: `${progress}%` }} />
           </div>
-          <p className="mt-1.5 text-xs text-neutral-400">
+          <p className="mt-1.5 text-xs text-muted-foreground">
             {soldUnits} de {totalUnits} unidades vendidas
           </p>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t-[0.5px] border-neutral-200 pt-3">
-          <p className="text-xs text-neutral-400">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t-[0.5px] border-line pt-3">
+          <p className="text-xs text-muted-foreground">
             {development.ownerName} · Cadastrado em {formatDate(development.createdAt)}
           </p>
           <span

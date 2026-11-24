@@ -42,24 +42,24 @@ export function FeaturesPicker({
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="relative min-w-0 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Buscar característica"
             aria-label="Buscar característica"
-            className="w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white py-2.5 pl-9 pr-3 text-[16px] text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-brand sm:text-[15px]"
+            className="w-full rounded-[12px] border-[1.5px] border-line bg-paper py-2.5 pl-9 pr-3 text-[16px] text-brand outline-none placeholder:text-muted-foreground focus:border-brand sm:text-[15px]"
           />
         </div>
-        <span className="text-xs text-neutral-400">
+        <span className="text-xs text-muted-foreground">
           {value.length}/{max} marcadas
         </span>
       </div>
 
-      <div className="flex max-h-64 flex-wrap gap-1.5 overflow-y-auto rounded-[12px] bg-neutral-100 p-2">
+      <div className="flex max-h-64 flex-wrap gap-1.5 overflow-y-auto rounded-[12px] bg-canvas p-2">
         {options.length === 0 ? (
-          <p className="px-1 py-1.5 text-sm text-neutral-400">Nenhuma característica encontrada</p>
+          <p className="px-1 py-1.5 text-sm text-muted-foreground">Nenhuma característica encontrada</p>
         ) : (
           options.map((feature) => {
             const isSelected = selected.has(feature.value)
@@ -73,8 +73,8 @@ export function FeaturesPicker({
                 onClick={() => toggle(feature.value)}
                 className={`inline-flex min-h-9 items-center gap-1 rounded-full border-[1px] px-3 text-[13px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                   isSelected
-                    ? 'border-brand bg-brand-bg text-brand'
-                    : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400'
+                    ? 'border-brand bg-line text-brand'
+                    : 'border-line bg-paper text-muted-foreground hover:border-line-strong'
                 }`}
               >
                 {isSelected && <Check className="h-3.5 w-3.5" />}

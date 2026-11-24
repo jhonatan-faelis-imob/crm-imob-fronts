@@ -236,7 +236,7 @@ export function StageMoveProvider({ children }: { children: ReactNode }) {
           if (!nextOpen) answerLeaveWon({ proceed: false })
         }}
       >
-        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
+        <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
           <AlertDialogHeader className="p-4 sm:p-6">
             <AlertDialogTitle>Lead com venda registrada</AlertDialogTitle>
             <AlertDialogDescription>
@@ -246,22 +246,22 @@ export function StageMoveProvider({ children }: { children: ReactNode }) {
                 : 'Ela continuará contando nas metas e no ranking. Só um coordenador pode cancelar a venda.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="mx-0 mb-0 flex-col gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:flex-col sm:p-6">
+          <AlertDialogFooter className="mx-0 mb-0 flex-col gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:flex-col sm:p-6">
             {canCancelSale && (
               <AlertDialogAction
                 onClick={() => answerLeaveWon({ proceed: true, cancelSaleId: leaveWon?.sale.id })}
-                className="h-11 w-full rounded-[8px] bg-danger px-4 text-white hover:bg-danger hover:opacity-90 sm:h-10"
+                className="h-11 w-full rounded-[8px] bg-danger px-4 text-paper hover:bg-danger hover:opacity-90 sm:h-10"
               >
                 Cancelar a venda e mover
               </AlertDialogAction>
             )}
             <AlertDialogAction
               onClick={() => answerLeaveWon({ proceed: true })}
-              className="h-11 w-full rounded-[8px] bg-brand px-4 text-white hover:bg-brand-dark sm:h-10"
+              className="h-11 w-full rounded-[8px] bg-brand px-4 text-paper hover:bg-ink sm:h-10"
             >
               Manter a venda e mover
             </AlertDialogAction>
-            <AlertDialogCancel className="h-11 w-full rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-neutral-600 sm:h-10">
+            <AlertDialogCancel className="h-11 w-full rounded-[8px] border-[1.5px] border-line px-4 text-muted-foreground sm:h-10">
               Voltar
             </AlertDialogCancel>
           </AlertDialogFooter>

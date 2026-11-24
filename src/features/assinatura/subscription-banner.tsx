@@ -22,7 +22,7 @@ export function SubscriptionBanner() {
   const blocked = data.warningLevel === 'bloqueio'
   const isDirector = role === 'diretor'
   const Icon = blocked ? Lock : AlertTriangle
-  const linkClassName = cn('shrink-0 font-semibold underline underline-offset-2', blocked ? 'text-white' : 'text-warning')
+  const linkClassName = cn('shrink-0 font-semibold underline underline-offset-2', blocked ? 'text-paper' : 'text-warning')
 
   let action: { href: string; label: string; external: boolean } | null = null
   if (isDirector && data.status === 'teste' && !data.hasSubscription) action = { href: '/assinatura', label: 'Assinar agora', external: false }
@@ -39,7 +39,7 @@ export function SubscriptionBanner() {
       role="status"
       className={cn(
         'flex shrink-0 items-start gap-2 px-4 py-2.5 text-sm sm:items-center',
-        blocked ? 'bg-danger text-white' : 'bg-warning/15 text-warning',
+        blocked ? 'bg-danger text-paper' : 'bg-warning/15 text-warning',
       )}
     >
       <Icon className="mt-0.5 h-4 w-4 shrink-0 sm:mt-0" />

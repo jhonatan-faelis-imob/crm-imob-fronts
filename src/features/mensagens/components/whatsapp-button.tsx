@@ -17,10 +17,10 @@ const PICKER_TITLE = 'Enviar WhatsApp'
 
 const TRIGGER_CLASS_NAME = {
   primary:
-    'inline-flex h-11 items-center gap-2 rounded-[8px] bg-[#25D366] px-4 text-sm font-medium text-white transition-opacity hover:opacity-90',
+    'inline-flex h-11 items-center gap-2 rounded-[8px] bg-[#25D366] px-4 text-sm font-medium text-paper transition-opacity hover:opacity-90',
   compact:
-    'flex min-h-9 items-center gap-1 rounded-[8px] bg-[#25D366] px-2.5 py-1 text-xs font-medium text-white transition-opacity hover:opacity-90',
-  icon: 'inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-[8px] bg-[#25D366] text-sm font-medium text-white transition-opacity hover:opacity-90 sm:px-3',
+    'flex min-h-9 items-center gap-1 rounded-[8px] bg-[#25D366] px-2.5 py-1 text-xs font-medium text-paper transition-opacity hover:opacity-90',
+  icon: 'inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-[8px] bg-[#25D366] text-sm font-medium text-paper transition-opacity hover:opacity-90 sm:px-3',
 }
 
 // Cada prévia remonta o modal com o texto novo. O texto é montado no navegador (renderTemplateLocal):
@@ -100,7 +100,7 @@ export function WhatsAppButton({
           <PopoverTrigger render={<button type="button" className={TRIGGER_CLASS_NAME[variant]} />}>
             {label}
           </PopoverTrigger>
-          <PopoverContent align="end" className="flex max-h-[420px] w-80 flex-col bg-white">
+          <PopoverContent align="end" className="flex max-h-[420px] w-80 flex-col bg-paper">
             {picker}
           </PopoverContent>
         </Popover>
@@ -153,7 +153,7 @@ export function WhatsAppPickerDialog({
         </PickerSheet>
       ) : (
         <Dialog open={open} onOpenChange={onOpenChange}>
-          <DialogContent className="flex max-h-[70vh] flex-col rounded-2xl border-[0.5px] border-neutral-200 bg-white ring-0">
+          <DialogContent className="flex max-h-[70vh] flex-col rounded-2xl border-[0.5px] border-line bg-paper ring-0">
             <DialogHeader>
               <DialogTitle>{PICKER_TITLE}</DialogTitle>
             </DialogHeader>
@@ -186,7 +186,7 @@ function PickerSheet({
 }) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="max-h-[85vh] gap-2 rounded-t-[20px] bg-white pb-4">
+      <SheetContent side="bottom" className="max-h-[85vh] gap-2 rounded-t-[20px] bg-paper pb-4">
         <SheetHeader className="pb-0">
           <SheetTitle>{PICKER_TITLE}</SheetTitle>
         </SheetHeader>

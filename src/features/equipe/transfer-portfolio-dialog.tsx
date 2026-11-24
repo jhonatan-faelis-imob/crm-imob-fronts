@@ -54,8 +54,8 @@ export function TransferPortfolioDialog({
 
   return (
     <Dialog open={member !== null} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="flex max-h-[90vh] w-[calc(100%-2rem)] max-w-md flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
-        <DialogHeader className="gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
+      <DialogContent className="flex max-h-[90vh] w-[calc(100%-2rem)] max-w-md flex-col gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
+        <DialogHeader className="gap-1 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14">
           <DialogTitle>Transferir carteira</DialogTitle>
           <DialogDescription>{member?.name}</DialogDescription>
         </DialogHeader>
@@ -64,9 +64,9 @@ export function TransferPortfolioDialog({
           {portfolio.isLoading && <Skeleton className="h-5 w-3/4" />}
           {portfolio.isError && <p className="text-sm text-danger">Não consegui carregar a carteira. Tente de novo.</p>}
           {summary && (
-            <p className="rounded-[12px] bg-neutral-100 p-3 text-sm font-medium text-neutral-900">{portfolioText(summary)}</p>
+            <p className="rounded-[12px] bg-canvas p-3 text-sm font-medium text-brand">{portfolioText(summary)}</p>
           )}
-          {empty && <p className="text-sm text-neutral-400">Não há nada para transferir.</p>}
+          {empty && <p className="text-sm text-muted-foreground">Não há nada para transferir.</p>}
           {summary && !empty && (
             <>
               <TransferFields
@@ -79,18 +79,18 @@ export function TransferPortfolioDialog({
                 onSkippedChange={setSkipped}
                 placeholder="Escolha quem recebe"
               />
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-muted-foreground">
                 Metas e vendas já registradas continuam no nome de {member?.name}.
               </p>
             </>
           )}
         </div>
 
-        <DialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
+        <DialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
           <button
             type="button"
             onClick={onClose}
-            className="min-h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-sm font-medium text-neutral-600 hover:bg-neutral-100"
+            className="min-h-11 rounded-[8px] border-[1.5px] border-line px-4 text-sm font-medium text-muted-foreground hover:bg-canvas"
           >
             Cancelar
           </button>
@@ -98,7 +98,7 @@ export function TransferPortfolioDialog({
             type="button"
             disabled={!receiver || kinds.length === 0 || transfer.isPending}
             onClick={save}
-            className="min-h-11 rounded-[8px] bg-brand px-4 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-60"
+            className="min-h-11 rounded-[8px] bg-brand px-4 text-sm font-medium text-paper hover:bg-ink disabled:opacity-60"
           >
             {transfer.isPending ? 'Transferindo...' : 'Transferir'}
           </button>

@@ -139,7 +139,7 @@ export default function RelatoriosPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <h1 className="text-[28px] font-semibold text-neutral-900">Relatórios</h1>
+        <h1 className="text-[28px] font-semibold text-brand">Relatórios</h1>
         <PeriodSelector
           filter={periodFilter}
           onChange={setPeriodFilter}

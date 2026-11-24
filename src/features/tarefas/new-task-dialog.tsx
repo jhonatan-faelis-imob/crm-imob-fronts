@@ -77,8 +77,8 @@ function taskToFormValues(task: Task): NewTaskFormValues {
 }
 
 const inputClassName =
-  'w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-[15px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand'
-const labelClassName = 'mb-1.5 block text-[13px] font-medium text-neutral-900'
+  'w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] text-brand outline-none transition-colors placeholder:text-muted-foreground focus:border-brand'
+const labelClassName = 'mb-1.5 block text-[13px] font-medium text-brand'
 const errorClassName = 'mt-1 text-[12px] text-danger'
 
 function TypePicker({ value, onChange }: { value: TaskType; onChange: (type: TaskType) => void }) {
@@ -95,8 +95,8 @@ function TypePicker({ value, onChange }: { value: TaskType; onChange: (type: Tas
             onClick={() => onChange(type)}
             className={`flex items-center gap-1.5 rounded-full border-[1.5px] px-3 py-1.5 text-xs font-medium transition-colors ${
               isSelected
-                ? 'border-brand bg-brand-bg text-brand'
-                : 'border-neutral-200 text-neutral-600 hover:border-neutral-400'
+                ? 'border-brand bg-line text-brand'
+                : 'border-line text-muted-foreground hover:border-line-strong'
             }`}
           >
             <Icon className="h-3.5 w-3.5" />
@@ -121,8 +121,8 @@ function PriorityPicker({ value, onChange }: { value: TaskPriority; onChange: (p
             onClick={() => onChange(priority)}
             className={`flex-1 rounded-[8px] border-[1.5px] px-3 py-2 text-sm font-medium transition-colors ${
               isSelected
-                ? 'border-brand bg-brand-bg text-brand'
-                : 'border-neutral-200 text-neutral-600 hover:border-neutral-400'
+                ? 'border-brand bg-line text-brand'
+                : 'border-line text-muted-foreground hover:border-line-strong'
             }`}
           >
             {meta.label}
@@ -167,15 +167,15 @@ function LeadSearchSelect({ control, leads }: { control: Control<NewTaskFormValu
                   setQuery('')
                 }}
                 aria-label="Remover lead vinculado"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-900"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-brand"
               >
                 <X className="h-4 w-4" />
               </button>
             )}
             {isOpen && !selectedLead && (
-              <div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-[12px] border-[1.5px] border-neutral-200 bg-white p-1 shadow-lg">
+              <div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-[12px] border-[1.5px] border-line bg-paper p-1 shadow-lg">
                 {results.length === 0 && (
-                  <p className="px-3 py-2 text-sm text-neutral-400">Nenhum lead encontrado</p>
+                  <p className="px-3 py-2 text-sm text-muted-foreground">Nenhum lead encontrado</p>
                 )}
                 {results.map((lead) => (
                   <button
@@ -186,7 +186,7 @@ function LeadSearchSelect({ control, leads }: { control: Control<NewTaskFormValu
                       setQuery('')
                       setIsOpen(false)
                     }}
-                    className="block w-full rounded-[8px] px-3 py-2 text-left text-sm text-neutral-900 hover:bg-neutral-100"
+                    className="block w-full rounded-[8px] px-3 py-2 text-left text-sm text-brand hover:bg-canvas"
                   >
                     {lead.name}
                   </button>
@@ -307,13 +307,13 @@ function NewTaskFormBody({
           <textarea id="new-task-description" rows={3} className={inputClassName} {...register('description')} />
         </div>
 
-        <label className="flex items-center gap-2 text-[13px] font-medium text-neutral-900">
+        <label className="flex items-center gap-2 text-[13px] font-medium text-brand">
           <input type="checkbox" className="h-4 w-4 accent-brand" {...register('hasNextTask')} />
           Ao concluir, criar próxima tarefa automaticamente
         </label>
 
         {hasNextTask && (
-          <div className="space-y-4 rounded-[12px] bg-neutral-100 p-3">
+          <div className="space-y-4 rounded-[12px] bg-canvas p-3">
             <div>
               <label className={labelClassName}>Tipo da próxima tarefa</label>
               <Controller
@@ -344,18 +344,18 @@ function NewTaskFormBody({
         )}
       </form>
 
-      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
+      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-end gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-[8px] border-[1.5px] border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-600"
+          className="rounded-[8px] border-[1.5px] border-line px-4 py-2.5 text-sm font-medium text-muted-foreground"
         >
           Cancelar
         </button>
         <button
           type="button"
           onClick={handleSubmit(onSubmit)}
-          className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+          className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink"
         >
           {submitLabel}
         </button>
@@ -383,8 +383,8 @@ export function NewTaskDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] w-[calc(100%-2rem)] max-w-lg flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
-        <DialogHeader className="shrink-0 gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
+      <DialogContent className="flex max-h-[90vh] w-[calc(100%-2rem)] max-w-lg flex-col gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
+        <DialogHeader className="shrink-0 gap-1 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14">
           <DialogTitle>{isEditing ? 'Editar tarefa' : 'Nova tarefa'}</DialogTitle>
           <DialogDescription>
             {isEditing ? 'Atualize os dados da tarefa.' : 'Cadastre uma nova tarefa de follow-up.'}

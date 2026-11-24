@@ -64,11 +64,11 @@ function HierarchyNodeItem({ node }: { node: HierarchyNode }) {
       {node.kind === 'member' ? (
         <div className="flex items-center gap-2 py-1">
           <Avatar size="sm">
-            <AvatarFallback className="bg-brand-bg text-xs text-brand">{getInitials(node.member.name)}</AvatarFallback>
+            <AvatarFallback className="bg-line text-xs text-brand">{getInitials(node.member.name)}</AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-neutral-900">{node.member.name}</p>
-            {node.note && <p className="truncate text-[11px] text-neutral-400">{node.note}</p>}
+            <p className="truncate text-sm font-medium text-brand">{node.member.name}</p>
+            {node.note && <p className="truncate text-[11px] text-muted-foreground">{node.note}</p>}
           </div>
           <span
             className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium"
@@ -79,16 +79,16 @@ function HierarchyNodeItem({ node }: { node: HierarchyNode }) {
         </div>
       ) : (
         <div className="flex items-center gap-2 py-1">
-          <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
+          <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-canvas text-muted-foreground">
             <UsersRound className="h-3.5 w-3.5" />
           </div>
-          <p className="min-w-0 flex-1 truncate text-sm font-medium text-neutral-900">{node.title}</p>
-          <span className="shrink-0 text-[11px] text-neutral-400">{node.subtitle}</span>
+          <p className="min-w-0 flex-1 truncate text-sm font-medium text-brand">{node.title}</p>
+          <span className="shrink-0 text-[11px] text-muted-foreground">{node.subtitle}</span>
         </div>
       )}
 
       {node.children.length > 0 && (
-        <ul className="ml-3 space-y-0.5 border-l-[1.5px] border-neutral-200 pl-4">
+        <ul className="ml-3 space-y-0.5 border-l-[1.5px] border-line pl-4">
           {node.children.map((child) => (
             <HierarchyNodeItem key={child.key} node={child} />
           ))}
@@ -100,7 +100,7 @@ function HierarchyNodeItem({ node }: { node: HierarchyNode }) {
 
 export function HierarchyTree({ nodes }: { nodes: HierarchyNode[] }) {
   if (nodes.length === 0) {
-    return <p className="text-sm text-neutral-400">Ninguém cadastrado ainda.</p>
+    return <p className="text-sm text-muted-foreground">Ninguém cadastrado ainda.</p>
   }
 
   return (

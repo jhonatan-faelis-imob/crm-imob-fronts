@@ -190,8 +190,8 @@ export function TabBasicInfo({ brokers }: { brokers: BrokerOption[] }) {
         </FormField>
       </FieldGrid>
 
-      <div className="border-t-[0.5px] border-neutral-200 pt-4">
-        <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-neutral-900">
+      <div className="border-t-[0.5px] border-line pt-4">
+        <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-brand">
           <DollarSign className="h-4 w-4 text-brand" />
           Informações financeiras
         </p>
@@ -237,22 +237,22 @@ export function TabBasicInfo({ brokers }: { brokers: BrokerOption[] }) {
           </FormField>
         </FieldGrid>
 
-        <label className="mt-4 flex items-center gap-2 text-[13px] font-medium text-neutral-900">
+        <label className="mt-4 flex items-center gap-2 text-[13px] font-medium text-brand">
           <input type="checkbox" className="h-4 w-4 accent-brand" {...register('basic.hasClt3Years')} />
           Possui mais de 3 anos de registro CLT
         </label>
       </div>
 
-      <div className="flex flex-wrap items-center gap-6 border-t-[0.5px] border-neutral-200 pt-4">
-        <label className="flex items-center gap-2 text-[13px] font-medium text-neutral-900">
+      <div className="flex flex-wrap items-center gap-6 border-t-[0.5px] border-line pt-4">
+        <label className="flex items-center gap-2 text-[13px] font-medium text-brand">
           <input type="checkbox" className="h-4 w-4 accent-brand" {...register('basic.isInvestor')} />
           Investidor
         </label>
-        <label className="flex items-center gap-2 text-[13px] font-medium text-neutral-900">
+        <label className="flex items-center gap-2 text-[13px] font-medium text-brand">
           <input type="checkbox" className="h-4 w-4 accent-brand" {...register('basic.isInterested')} />
           Cliente interessado
         </label>
-        <label className="flex items-center gap-2 text-[13px] font-medium text-neutral-900">
+        <label className="flex items-center gap-2 text-[13px] font-medium text-brand">
           <input type="checkbox" className="h-4 w-4 accent-brand" {...register('basic.isOwner')} />
           Proprietário
         </label>

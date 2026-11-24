@@ -152,11 +152,11 @@ function EditForm({ organization }: { organization: AdminOrganizationDetail }) {
           <input id="edit-trial" type="date" className={inputClassName} {...register('trialEndsAt')} />
         </FormField>
       </div>
-      <p className="text-xs text-neutral-400">
+      <p className="text-xs text-muted-foreground">
         Tabela para este plano e assentos: {formatMoney(tablePrice)}. Usuários ativos agora: {organization.activeUsers}.
       </p>
 
-      <h4 className="pt-2 text-[13px] font-semibold uppercase tracking-wide text-neutral-400">Cobrança</h4>
+      <h4 className="pt-2 text-[13px] font-semibold uppercase tracking-wide text-muted-foreground">Cobrança</h4>
       <BillingInfoFields register={register} control={control} errors={errors} idPrefix="edit-billing" />
 
       <div>
@@ -174,7 +174,7 @@ function EditForm({ organization }: { organization: AdminOrganizationDetail }) {
       <button
         type="submit"
         disabled={!isDirty || save.isPending}
-        className="min-h-11 w-full rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-60"
+        className="min-h-11 w-full rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper hover:bg-ink disabled:opacity-60"
       >
         {save.isPending ? 'Salvando...' : 'Salvar alterações'}
       </button>
@@ -198,8 +198,8 @@ function roleLabel(role: string) {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="space-y-3 rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4">
-      <h3 className="text-[15px] font-semibold text-neutral-900">{title}</h3>
+    <section className="space-y-3 rounded-[16px] border-[0.5px] border-line bg-paper p-4">
+      <h3 className="text-[15px] font-semibold text-brand">{title}</h3>
       {children}
     </section>
   )
@@ -214,7 +214,7 @@ export function OrganizationSheet({ organizationId, onClose }: { organizationId:
   return (
     <Sheet open={organizationId !== null} onOpenChange={(open) => !open && onClose()}>
       <SheetContent side="right" className="w-full gap-0 overflow-y-auto bg-[#F7F5F3] p-0 sm:max-w-lg">
-        <SheetHeader className="border-b-[0.5px] border-neutral-200 bg-white p-4 pr-12 sm:p-6 sm:pr-14">
+        <SheetHeader className="border-b-[0.5px] border-line bg-paper p-4 pr-12 sm:p-6 sm:pr-14">
           <SheetTitle>{organization?.name ?? 'Imobiliária'}</SheetTitle>
           <SheetDescription>
             {organization
@@ -241,7 +241,7 @@ export function OrganizationSheet({ organizationId, onClose }: { organizationId:
               >
                 {STATUS_META[organization.subscriptionStatus]?.label ?? organization.subscriptionStatus}
               </span>
-              <span className="text-sm text-neutral-600">
+              <span className="text-sm text-muted-foreground">
                 {organization.planName} · {formatMoney(organization.monthlyPrice)}
               </span>
             </div>
@@ -250,7 +250,7 @@ export function OrganizationSheet({ organizationId, onClose }: { organizationId:
               <button
                 type="button"
                 onClick={() => setPaying(true)}
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] bg-brand px-3 text-sm font-medium text-white hover:bg-brand-dark"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] bg-brand px-3 text-sm font-medium text-paper hover:bg-ink"
               >
                 <Wallet className="h-4 w-4" />
                 Registrar pagamento
@@ -286,18 +286,18 @@ export function OrganizationSheet({ organizationId, onClose }: { organizationId:
             </Section>
 
             <Section title={`Usuários (${organization.users.length})`}>
-              <ul className="divide-y-[0.5px] divide-neutral-200">
+              <ul className="divide-y-[0.5px] divide-line">
                 {organization.users.map((user) => (
                   <li key={user.id} className="flex items-center gap-2 py-2 text-sm">
                     <div className="min-w-0 flex-1">
-                      <p className={cn('truncate font-medium', user.active ? 'text-neutral-900' : 'text-neutral-400 line-through')}>
+                      <p className={cn('truncate font-medium', user.active ? 'text-brand' : 'text-muted-foreground line-through')}>
                         {user.name}
                       </p>
-                      <p className="truncate text-xs text-neutral-400">
+                      <p className="truncate text-xs text-muted-foreground">
                         {user.email} · último acesso {formatDateTime(user.lastLogin)}
                       </p>
                     </div>
-                    <span className="shrink-0 text-xs text-neutral-600">{roleLabel(user.role)}</span>
+                    <span className="shrink-0 text-xs text-muted-foreground">{roleLabel(user.role)}</span>
                   </li>
                 ))}
               </ul>
@@ -305,18 +305,18 @@ export function OrganizationSheet({ organizationId, onClose }: { organizationId:
 
             <Section title="Histórico">
               {organization.billingEvents.length === 0 ? (
-                <p className="text-sm text-neutral-400">Nenhum evento ainda.</p>
+                <p className="text-sm text-muted-foreground">Nenhum evento ainda.</p>
               ) : (
                 <ol className="space-y-3">
                   {organization.billingEvents.map((event) => (
-                    <li key={event.id} className="border-l-[1.5px] border-neutral-200 pl-3 text-sm">
-                      <p className="text-neutral-900">
-                        <span className="mr-1.5 rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-600">
+                    <li key={event.id} className="border-l-[1.5px] border-line pl-3 text-sm">
+                      <p className="text-brand">
+                        <span className="mr-1.5 rounded-full bg-canvas px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                           {EVENT_LABEL[event.kind] ?? event.kind}
                         </span>
                         {event.description}
                       </p>
-                      <p className="mt-0.5 text-xs text-neutral-400">
+                      <p className="mt-0.5 text-xs text-muted-foreground">
                         {formatDateTime(event.createdAt)} · {event.createdBy ?? 'sistema'}
                       </p>
                     </li>

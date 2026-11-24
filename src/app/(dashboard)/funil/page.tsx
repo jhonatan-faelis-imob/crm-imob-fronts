@@ -81,19 +81,19 @@ export default function FunilPage() {
     <div>
       <Link
         href="/leads"
-        className="inline-flex min-h-11 items-center gap-1.5 text-sm text-neutral-400 hover:text-neutral-900"
+        className="inline-flex min-h-11 items-center gap-1.5 text-sm text-muted-foreground hover:text-brand"
       >
         <ArrowLeft className="h-4 w-4" />
         Leads
       </Link>
-      <p className="text-xs font-medium text-neutral-400">Configurações</p>
+      <p className="text-xs font-medium text-muted-foreground">Configurações</p>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-[28px] font-semibold text-neutral-900">Etapas do funil</h1>
-          <p className="mt-1 max-w-2xl text-sm text-neutral-400">
+          <h1 className="text-[28px] font-semibold text-brand">Etapas do funil</h1>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
             Esta é a ordem das colunas do Kanban. As etapas marcadas como padrão podem ser renomeadas, mas não
             excluídas. Cada etapa pode ter tarefas automáticas em{' '}
-            <Link href="/cadencias" className="font-medium text-brand hover:text-brand-dark">
+            <Link href="/cadencias" className="font-medium text-brand hover:text-brand">
               Cadências
             </Link>
             .
@@ -103,7 +103,7 @@ export default function FunilPage() {
           <button
             type="button"
             onClick={() => openForm(null)}
-            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-medium text-white hover:bg-brand-dark sm:h-10"
+            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-medium text-paper hover:bg-ink sm:h-10"
           >
             <Plus className="h-4 w-4" />
             Nova etapa
@@ -146,7 +146,7 @@ export default function FunilPage() {
           ))}
         </div>
       ) : isError ? (
-        <p className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-6 text-center text-sm text-danger">
+        <p className="rounded-[16px] border-[0.5px] border-line bg-paper p-6 text-center text-sm text-danger">
           Não foi possível carregar as etapas.
         </p>
       ) : stages.length === 0 ? (

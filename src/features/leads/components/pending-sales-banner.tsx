@@ -34,14 +34,14 @@ export function PendingSalesBanner() {
   }
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-[12px] border-[0.5px] border-neutral-200 bg-[#FFF3E0] px-4 py-2.5">
+    <div className="flex items-center justify-between gap-3 rounded-[12px] border-[0.5px] border-line bg-[#FFF3E0] px-4 py-2.5">
       <p className="text-sm font-medium text-warning">
         {count} {count === 1 ? 'lead em Ganho sem venda registrada' : 'leads em Ganho sem venda registrada'}
       </p>
       <button
         type="button"
         onClick={handleRegularize}
-        className="shrink-0 rounded-[8px] border-[1.5px] border-warning px-3 py-1.5 text-sm font-medium text-warning transition-colors hover:bg-white"
+        className="shrink-0 rounded-[8px] border-[1.5px] border-warning px-3 py-1.5 text-sm font-medium text-warning transition-colors hover:bg-paper"
       >
         Regularizar
       </button>

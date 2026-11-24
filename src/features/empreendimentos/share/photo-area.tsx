@@ -42,7 +42,7 @@ export function PhotoArea({
         </div>
       )}
       {photos.length > 1 && (
-        <span className="absolute bottom-3 right-3 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white">
+        <span className="absolute bottom-3 right-3 rounded-full bg-ink/60 px-2.5 py-1 text-xs font-medium text-paper">
           {photos.length} fotos
         </span>
       )}

@@ -62,14 +62,14 @@ export function TaskCalendarView({
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row">
-      <div className="flex-1 rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4 sm:p-5">
+      <div className="flex-1 rounded-[16px] border-[0.5px] border-line bg-paper p-4 sm:p-5">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-base font-semibold capitalize text-neutral-900">{monthLabel}</h2>
+          <h2 className="text-base font-semibold capitalize text-brand">{monthLabel}</h2>
           <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={goToToday}
-              className="rounded-[8px] border-[1.5px] border-neutral-200 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:border-brand hover:text-brand"
+              className="rounded-[8px] border-[1.5px] border-line px-3 py-1.5 text-xs font-medium text-muted-foreground hover:border-brand hover:text-brand"
             >
               Hoje
             </button>
@@ -77,7 +77,7 @@ export function TaskCalendarView({
               type="button"
               aria-label="Mês anterior"
               onClick={() => goToMonth(-1)}
-              className="rounded-[8px] p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
+              className="rounded-[8px] p-1.5 text-muted-foreground hover:bg-canvas hover:text-brand"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -85,14 +85,14 @@ export function TaskCalendarView({
               type="button"
               aria-label="Próximo mês"
               onClick={() => goToMonth(1)}
-              className="rounded-[8px] p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
+              className="rounded-[8px] p-1.5 text-muted-foreground hover:bg-canvas hover:text-brand"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-7 gap-1 text-center text-xs font-medium text-neutral-400">
+        <div className="mt-4 grid grid-cols-7 gap-1 text-center text-xs font-medium text-muted-foreground">
           {WEEKDAY_LABELS.map((label) => (
             <div key={label} className="py-1">
               {label}
@@ -118,14 +118,14 @@ export function TaskCalendarView({
                 type="button"
                 onClick={() => setSelectedDay(day)}
                 className={`min-h-[92px] rounded-[10px] border-[0.5px] p-1.5 text-left align-top transition-colors ${
-                  isSelected ? 'border-brand' : 'border-neutral-200'
-                } ${hasOverdue ? 'bg-[#FFF5F5]' : 'bg-white hover:bg-neutral-100'} ${
+                  isSelected ? 'border-brand' : 'border-line'
+                } ${hasOverdue ? 'bg-[#FFF5F5]' : 'bg-paper hover:bg-canvas'} ${
                   isCurrentMonth ? '' : 'opacity-40'
                 }`}
               >
                 <span
                   className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
-                    isTodayCell ? 'bg-brand text-white' : 'text-neutral-900'
+                    isTodayCell ? 'bg-brand text-paper' : 'text-brand'
                   }`}
                 >
                   {day.getDate()}
@@ -154,7 +154,7 @@ export function TaskCalendarView({
                         event.stopPropagation()
                         setSelectedDay(day)
                       }}
-                      className="block text-[10px] font-medium text-neutral-400 hover:text-brand"
+                      className="block text-[10px] font-medium text-muted-foreground hover:text-brand"
                     >
                       +{hiddenCount} mais
                     </span>
@@ -167,13 +167,13 @@ export function TaskCalendarView({
       </div>
 
       {selectedDay && (
-        <div className="shrink-0 rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-4 sm:p-5 lg:w-80">
+        <div className="shrink-0 rounded-[16px] border-[0.5px] border-line bg-paper p-4 sm:p-5 lg:w-80">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="text-sm font-semibold text-neutral-900">{formatGroupDate(selectedDay)}</h3>
+            <h3 className="text-sm font-semibold text-brand">{formatGroupDate(selectedDay)}</h3>
             <button
               type="button"
               onClick={() => setSelectedDay(null)}
-              className="text-xs font-medium text-neutral-400 hover:text-neutral-900"
+              className="text-xs font-medium text-muted-foreground hover:text-brand"
             >
               Fechar
             </button>
@@ -193,7 +193,7 @@ export function TaskCalendarView({
               />
             ))}
             {selectedDayTasks.length === 0 && (
-              <p className="text-sm text-neutral-400">Nenhuma tarefa neste dia.</p>
+              <p className="text-sm text-muted-foreground">Nenhuma tarefa neste dia.</p>
             )}
           </div>
         </div>

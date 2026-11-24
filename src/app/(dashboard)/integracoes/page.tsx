@@ -50,9 +50,9 @@ export default function IntegracoesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-medium text-neutral-400">Configurações</p>
-        <h1 className="text-[28px] font-semibold text-neutral-900">Integrações</h1>
-        <p className="mt-1 max-w-2xl text-sm text-neutral-400">
+        <p className="text-xs font-medium text-muted-foreground">Configurações</p>
+        <h1 className="text-[28px] font-semibold text-brand">Integrações</h1>
+        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
           Conecte o CRM aos canais de onde vêm os seus leads e configure a inteligência artificial.
         </p>
       </div>
@@ -70,7 +70,7 @@ export default function IntegracoesPage() {
           ))}
         </div>
       ) : isError || !items ? (
-        <p className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-6 text-center text-sm text-danger">
+        <p className="rounded-[16px] border-[0.5px] border-line bg-paper p-6 text-center text-sm text-danger">
           Não foi possível carregar as integrações.
         </p>
       ) : (
@@ -79,7 +79,7 @@ export default function IntegracoesPage() {
           if (!groupItems.length) return null
           return (
             <section key={group.value} className="space-y-3">
-              <h2 className="text-base font-semibold text-neutral-900">{group.label}</h2>
+              <h2 className="text-base font-semibold text-brand">{group.label}</h2>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {groupItems.map((item) => (
                   <IntegrationCard key={item.provider} item={item} onOpen={() => open(item)} />

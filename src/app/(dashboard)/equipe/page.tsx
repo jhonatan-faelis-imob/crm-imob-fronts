@@ -156,9 +156,9 @@ export default function EquipePage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs font-medium text-neutral-400">Configurações</p>
-          <h1 className="text-[28px] font-semibold text-neutral-900">Equipe</h1>
-          <p className="mt-1 text-sm text-neutral-400">
+          <p className="text-xs font-medium text-muted-foreground">Configurações</p>
+          <h1 className="text-[28px] font-semibold text-brand">Equipe</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             {isLoading ? 'Carregando...' : `${members.length} membros · ${teams.length} equipes`}
           </p>
         </div>
@@ -167,7 +167,7 @@ export default function EquipePage() {
           <button
             type="button"
             onClick={() => setIsHierarchyOpen(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-900 transition-colors hover:border-brand hover:text-brand"
+            className="inline-flex items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-line px-4 py-2.5 text-sm font-medium text-brand transition-colors hover:border-brand hover:text-brand"
           >
             <Network className="h-4 w-4" />
             Ver hierarquia
@@ -176,7 +176,7 @@ export default function EquipePage() {
             <button
               type="button"
               onClick={() => setIsNewTeamOpen(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-neutral-900 transition-colors hover:border-brand hover:text-brand"
+              className="inline-flex items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-line bg-paper px-4 py-2.5 text-sm font-medium text-brand transition-colors hover:border-brand hover:text-brand"
             >
               <Plus className="h-4 w-4" />
               Nova equipe
@@ -186,7 +186,7 @@ export default function EquipePage() {
             <button
               type="button"
               onClick={() => setIsNewMemberOpen(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+              className="inline-flex items-center justify-center gap-2 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink"
             >
               <Plus className="h-4 w-4" />
               Novo membro

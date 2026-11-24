@@ -57,14 +57,14 @@ export function SubscribePanel({ billing }: { billing: BillingMe }) {
       <PlanPicker plans={plans} value={choice} onChange={setChoice} activeUsers={billing.seatsUsed} />
 
       <fieldset>
-        <legend className="mb-2 text-sm font-medium text-neutral-900">Forma de pagamento</legend>
+        <legend className="mb-2 text-sm font-medium text-brand">Forma de pagamento</legend>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           {BILLING_TYPE_OPTIONS.map((option) => (
             <label
               key={option.value}
               className={cn(
                 'flex min-h-11 cursor-pointer flex-col rounded-[12px] border-[1.5px] px-3 py-2.5 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-brand',
-                billingType === option.value ? 'border-brand bg-brand-bg' : 'border-neutral-200 bg-white',
+                billingType === option.value ? 'border-brand bg-line' : 'border-line bg-paper',
               )}
             >
               <input
@@ -75,8 +75,8 @@ export function SubscribePanel({ billing }: { billing: BillingMe }) {
                 onChange={() => setBillingType(option.value)}
                 className="sr-only"
               />
-              <span className="text-sm font-medium text-neutral-900">{option.label}</span>
-              <span className="text-xs text-neutral-400">{option.hint}</span>
+              <span className="text-sm font-medium text-brand">{option.label}</span>
+              <span className="text-xs text-muted-foreground">{option.hint}</span>
             </label>
           ))}
         </div>
@@ -92,26 +92,26 @@ export function SubscribePanel({ billing }: { billing: BillingMe }) {
         type="button"
         onClick={start}
         disabled={subscribe.isPending || blockedBySeats}
-        className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-[15px] font-semibold text-white hover:bg-brand-dark disabled:opacity-60"
+        className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[8px] bg-brand px-4 text-[15px] font-semibold text-paper hover:bg-ink disabled:opacity-60"
       >
         <CreditCard className="h-4 w-4" />
         {subscribe.isPending ? 'Abrindo o pagamento...' : 'Assinar'}
       </button>
-      <p className="text-center text-xs text-neutral-400">
+      <p className="text-center text-xs text-muted-foreground">
         Ao assinar, você concorda com os{' '}
-        <a href="/termos" target="_blank" rel="noopener noreferrer" className="font-medium text-brand hover:text-brand-dark">
+        <a href="/termos" target="_blank" rel="noopener noreferrer" className="font-medium text-brand hover:text-brand">
           Termos de Uso
         </a>
         .
       </p>
-      <p className="flex items-center justify-center gap-1.5 text-center text-xs text-neutral-400">
+      <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
         <Lock className="h-3.5 w-3.5" />
         Pagamento no ambiente seguro do Asaas. Seus dados de cartão não passam pelo Smart CRM.
       </p>
 
       <Dialog open={askBillingInfo} onOpenChange={setAskBillingInfo}>
-        <DialogContent className="flex max-h-[92vh] w-[calc(100%-1rem)] max-w-lg flex-col gap-0 overflow-y-auto rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
-          <DialogHeader className="gap-1 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
+        <DialogContent className="flex max-h-[92vh] w-[calc(100%-1rem)] max-w-lg flex-col gap-0 overflow-y-auto rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
+          <DialogHeader className="gap-1 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14">
             <DialogTitle>Dados de cobrança</DialogTitle>
             <DialogDescription>Usados pelo Asaas para emitir a cobrança.</DialogDescription>
           </DialogHeader>

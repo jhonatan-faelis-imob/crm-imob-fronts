@@ -14,9 +14,9 @@ function IncomeTooltip({ active, payload }: TooltipContentProps) {
   if (!point) return null
 
   return (
-    <div className="rounded-[12px] border-[0.5px] border-neutral-200 bg-white p-3 shadow-lg">
-      <p className="text-xs font-medium text-neutral-900">{point.label}</p>
-      <p className="mt-1 text-sm font-semibold text-neutral-900">{point.count} clientes</p>
+    <div className="rounded-[12px] border-[0.5px] border-line bg-paper p-3 shadow-lg">
+      <p className="text-xs font-medium text-brand">{point.label}</p>
+      <p className="mt-1 text-sm font-semibold text-brand">{point.count} clientes</p>
     </div>
   )
 }
@@ -25,8 +25,8 @@ export function IncomeDistributionChart({ data, isLoading }: { data: IncomeBrack
   const hasData = data.some((entry) => entry.count > 0)
 
   return (
-    <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5 lg:p-6">
-      <h2 className="text-[20px] font-semibold text-neutral-900">Distribuição por faixa de renda</h2>
+    <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-5 lg:p-6">
+      <h2 className="text-[20px] font-semibold text-brand">Distribuição por faixa de renda</h2>
 
       {isLoading ? (
         <Skeleton className="mt-4 h-64 w-full rounded-[12px]" />

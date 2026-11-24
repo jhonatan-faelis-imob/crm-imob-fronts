@@ -39,11 +39,11 @@ export function TagsInput<TFieldValues extends FieldValues>({
 
         return (
           <div>
-            <div className="flex flex-wrap items-center gap-2 rounded-[12px] border-[1.5px] border-neutral-200 bg-white p-2 focus-within:border-brand">
+            <div className="flex flex-wrap items-center gap-2 rounded-[12px] border-[1.5px] border-line bg-paper p-2 focus-within:border-brand">
               {tags.map((tag) => (
                 <span
                   key={tag}
-                  className="flex items-center gap-1 rounded-full bg-brand-bg px-2.5 py-1 text-xs font-medium text-brand"
+                  className="flex items-center gap-1 rounded-full bg-line px-2.5 py-1 text-xs font-medium text-brand"
                 >
                   {tag}
                   <button
@@ -68,7 +68,7 @@ export function TagsInput<TFieldValues extends FieldValues>({
                 }}
                 onBlur={field.onBlur}
                 placeholder={tags.length === 0 ? placeholder : ''}
-                className="min-w-[120px] flex-1 border-none bg-transparent text-[15px] text-neutral-900 outline-none placeholder:text-neutral-400"
+                className="min-w-[120px] flex-1 border-none bg-transparent text-[15px] text-brand outline-none placeholder:text-muted-foreground"
               />
             </div>
 
@@ -79,7 +79,7 @@ export function TagsInput<TFieldValues extends FieldValues>({
                     key={suggestion}
                     type="button"
                     onClick={() => addTag(suggestion)}
-                    className="rounded-full border-[0.5px] border-neutral-200 px-2.5 py-1 text-xs font-medium text-neutral-600 transition-colors hover:border-brand hover:text-brand"
+                    className="rounded-full border-[0.5px] border-line px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-brand hover:text-brand"
                   >
                     + {suggestion}
                   </button>

@@ -20,7 +20,7 @@ export function MyDayBadge({ className }: { className?: string }) {
     <span
       aria-label={`${count} para fazer agora`}
       className={cn(
-        'flex h-5 min-w-5 items-center justify-center rounded-full bg-danger px-1 text-[11px] font-semibold text-white',
+        'flex h-5 min-w-5 items-center justify-center rounded-full bg-danger px-1 text-[11px] font-semibold text-paper',
         className,
       )}
     >

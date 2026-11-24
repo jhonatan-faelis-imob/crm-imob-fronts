@@ -12,7 +12,7 @@ const WEEKDAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']
 const RECENT_DAYS = 7
 
 const arrowClassName =
-  'flex h-11 w-11 items-center justify-center rounded-[8px] text-neutral-600 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40'
+  'flex h-11 w-11 items-center justify-center rounded-[8px] text-muted-foreground transition-colors hover:bg-canvas disabled:cursor-not-allowed disabled:opacity-40'
 
 function monthsBetween(start: string, end: string) {
   const months: string[] = []
@@ -70,22 +70,22 @@ export function GoalRecordsSection({
   const { leadingBlanks, days } = daysOfMonth(month)
 
   return (
-    <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5 lg:p-6">
-      <h2 className="text-[20px] font-semibold text-neutral-900">Seus registros</h2>
+    <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-5 lg:p-6">
+      <h2 className="text-[20px] font-semibold text-brand">Seus registros</h2>
 
       {isError ? (
-        <p className="mt-3 text-sm text-neutral-400">Não foi possível carregar seus registros.</p>
+        <p className="mt-3 text-sm text-muted-foreground">Não foi possível carregar seus registros.</p>
       ) : (
         <>
           {missingRecently.length > 0 && (
-            <div className="mt-3 flex items-center justify-between gap-3 rounded-[12px] bg-neutral-100 py-1 pl-3 pr-1">
-              <p className="text-[13px] text-neutral-600">
+            <div className="mt-3 flex items-center justify-between gap-3 rounded-[12px] bg-canvas py-1 pl-3 pr-1">
+              <p className="text-[13px] text-muted-foreground">
                 Você tem {missingRecently.length} {missingRecently.length === 1 ? 'dia' : 'dias'} sem registro
               </p>
               <button
                 type="button"
                 onClick={() => onSelectDay(missingRecently[0])}
-                className="h-11 shrink-0 rounded-[8px] px-3 text-sm font-medium text-brand transition-colors hover:bg-brand-bg"
+                className="h-11 shrink-0 rounded-[8px] px-3 text-sm font-medium text-brand transition-colors hover:bg-line"
               >
                 Preencher
               </button>
@@ -103,7 +103,7 @@ export function GoalRecordsSection({
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
-              <p className="text-sm font-medium text-neutral-900">{formatMonthLabel(month)}</p>
+              <p className="text-sm font-medium text-brand">{formatMonthLabel(month)}</p>
               <button
                 type="button"
                 aria-label="Próximo mês"
@@ -117,7 +117,7 @@ export function GoalRecordsSection({
 
             <div className="mt-1 grid grid-cols-7 gap-1">
               {WEEKDAYS.map((weekday, index) => (
-                <span key={index} className="text-center text-[11px] font-medium text-neutral-400">
+                <span key={index} className="text-center text-[11px] font-medium text-muted-foreground">
                   {weekday}
                 </span>
               ))}
@@ -128,7 +128,7 @@ export function GoalRecordsSection({
                 const label = Number(day.slice(8))
                 if (day < start || day > end) {
                   return (
-                    <span key={day} className="flex h-11 items-center justify-center text-[13px] text-neutral-200">
+                    <span key={day} className="flex h-11 items-center justify-center text-[13px] text-line-strong">
                       {label}
                     </span>
                   )
@@ -143,7 +143,7 @@ export function GoalRecordsSection({
                     aria-current={day === today ? 'date' : undefined}
                     onClick={() => onSelectDay(day)}
                     className={`relative flex h-11 items-center justify-center rounded-[8px] text-[13px] font-medium transition-opacity hover:opacity-80 ${
-                      hasEntry ? 'bg-[#E8F5E9] text-success' : 'bg-neutral-100 text-neutral-400'
+                      hasEntry ? 'bg-[#E8F5E9] text-success' : 'bg-canvas text-muted-foreground'
                     } ${day === today ? 'ring-[1.5px] ring-brand' : ''}`}
                   >
                     {label}

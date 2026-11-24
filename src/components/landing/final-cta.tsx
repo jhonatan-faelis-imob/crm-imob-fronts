@@ -4,9 +4,9 @@ import { ButtonLink, Container } from './ui'
 
 export function FinalCta() {
   return (
-    <section className="bg-white pb-20 md:pb-28">
+    <section className="bg-paper pb-20 md:pb-28">
       <Container>
-        <div data-reveal="scale" className="rounded-[28px] bg-[#121212] px-6 py-16 text-center text-white sm:px-12 md:py-20">
+        <div data-reveal="scale" className="rounded-[28px] bg-[#121212] px-6 py-16 text-center text-paper sm:px-12 md:py-20">
           <h2 className="mx-auto max-w-[820px] text-[clamp(32px,4vw,48px)] font-extrabold leading-[1.1] tracking-[-0.03em]">
             Seu próximo cliente já está no funil. {/* Só opacity: a frase quebra linha, então não recebe transform */}
             <span style={motionVars({ d: 150, anim: 'lp-fade', dur: 700 })} className="lp-in text-[#FF385C]">

@@ -198,7 +198,7 @@ function TabGeneral({
             type="button"
             onClick={handleAutoComplete}
             disabled={isLoading}
-            className="shrink-0 rounded-[8px] border-[1.5px] border-neutral-200 px-3 text-sm font-medium text-neutral-600 transition-colors hover:border-brand hover:text-brand disabled:cursor-not-allowed disabled:opacity-60"
+            className="shrink-0 rounded-[8px] border-[1.5px] border-line px-3 text-sm font-medium text-muted-foreground transition-colors hover:border-brand hover:text-brand disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isLoading ? 'Buscando...' : 'Auto completar'}
           </button>
@@ -404,8 +404,8 @@ export function NewDevelopmentDialog({
         onOpenChange(nextOpen)
       }}
     >
-      <DialogContent className="grid-cols-none flex w-[calc(100%-2rem)] max-w-2xl flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0 sm:max-w-2xl max-h-[90vh]">
-        <DialogHeader className="shrink-0 gap-3 border-b-[0.5px] border-neutral-200 p-4 pr-12 sm:p-6 sm:pr-14">
+      <DialogContent className="grid-cols-none flex w-[calc(100%-2rem)] max-w-2xl flex-col gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0 sm:max-w-2xl max-h-[90vh]">
+        <DialogHeader className="shrink-0 gap-3 border-b-[0.5px] border-line p-4 pr-12 sm:p-6 sm:pr-14">
           <div>
             <DialogTitle>{isEditing ? 'Editar empreendimento' : 'Novo empreendimento'}</DialogTitle>
             <DialogDescription>
@@ -422,7 +422,7 @@ export function NewDevelopmentDialog({
                 className={`shrink-0 whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
                   activeTab === index
                     ? 'border-brand text-brand'
-                    : 'border-transparent text-neutral-400 hover:text-neutral-600'
+                    : 'border-transparent text-muted-foreground hover:text-muted-foreground'
                 }`}
               >
                 {index + 1}. {tab.label}
@@ -442,12 +442,12 @@ export function NewDevelopmentDialog({
           </form>
         </FormProvider>
 
-        <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-between gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
+        <DialogFooter className="mx-0 mb-0 shrink-0 flex-row justify-between gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
           <button
             type="button"
             onClick={() => goToTab(activeTab - 1)}
             disabled={activeTab === 0}
-            className="rounded-[8px] border-[1.5px] border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-[8px] border-[1.5px] border-line px-4 py-2.5 text-sm font-medium text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
             Anterior
           </button>
@@ -456,7 +456,7 @@ export function NewDevelopmentDialog({
             <button
               type="button"
               onClick={() => goToTab(activeTab + 1)}
-              className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+              className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink"
             >
               Próximo
             </button>
@@ -465,7 +465,7 @@ export function NewDevelopmentDialog({
               type="button"
               onClick={handleSubmit(onSubmit, onInvalid)}
               disabled={isSaving}
-              className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-70"
+              className="rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:cursor-not-allowed disabled:opacity-70"
             >
               {isSaving ? 'Salvando...' : 'Salvar empreendimento'}
             </button>

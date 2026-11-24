@@ -35,11 +35,11 @@ export function PropertyCard({
         aria-label={`Ver imóvel: ${property.title}`}
         className="absolute inset-0 z-[1] rounded-[16px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
       />
-      <div className="relative aspect-[4/3] overflow-hidden rounded-[16px] bg-page">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-[16px] bg-canvas">
         <div className="flex h-full w-full items-center justify-center transition-transform duration-200 group-hover:scale-[1.01]">
-          <Home className="h-10 w-10 text-neutral-400" strokeWidth={1.5} />
+          <Home className="h-10 w-10 text-muted-foreground" strokeWidth={1.5} />
         </div>
-        <CodeChip code={property.code} className="absolute bottom-3 left-3 z-[2] bg-white/90" />
+        <CodeChip code={property.code} className="absolute bottom-3 left-3 z-[2] bg-paper/90" />
         <span
           className="absolute left-3 top-3 z-[2] rounded-full px-2.5 py-1 text-xs font-medium"
           style={{ backgroundColor: status.bg, color: status.text }}
@@ -52,7 +52,7 @@ export function PropertyCard({
             type="button"
             onClick={onView}
             aria-label="Ver imóvel"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-neutral-600 hover:bg-white"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-paper/90 text-muted-foreground hover:bg-paper"
           >
             <Eye className="h-4 w-4" />
           </button>
@@ -62,7 +62,7 @@ export function PropertyCard({
                 <button
                   type="button"
                   aria-label="Mais opções"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-neutral-600 hover:bg-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-paper/90 text-muted-foreground hover:bg-paper"
                 />
               }
             >
@@ -80,14 +80,14 @@ export function PropertyCard({
       </div>
 
       <div className="mt-2.5 space-y-1">
-        <p className="truncate text-sm font-semibold text-neutral-900">{property.title}</p>
+        <p className="truncate text-sm font-semibold text-brand">{property.title}</p>
 
-        <p className="truncate text-[13px] text-neutral-400">
+        <p className="truncate text-[13px] text-muted-foreground">
           {property.neighborhood ? `${property.neighborhood} · ` : ''}
           {property.city}
         </p>
 
-        <div className="flex items-center gap-3 text-[13px] text-neutral-400">
+        <div className="flex items-center gap-3 text-[13px] text-muted-foreground">
           <span className="flex items-center gap-1">
             <BedDouble className="h-3.5 w-3.5" />
             {property.bedrooms ?? 0}
@@ -102,8 +102,8 @@ export function PropertyCard({
           </span>
         </div>
 
-        <p className="text-sm font-semibold text-neutral-900">{formatCurrency(property.price ?? 0)}</p>
-        <p className="text-xs text-neutral-400">{property.ownerName}</p>
+        <p className="text-sm font-semibold text-brand">{formatCurrency(property.price ?? 0)}</p>
+        <p className="text-xs text-muted-foreground">{property.ownerName}</p>
         <div className="relative z-[2] w-fit">
           <PortalChip property={property} onOpen={onOpenPortal} />
         </div>

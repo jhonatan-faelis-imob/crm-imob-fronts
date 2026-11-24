@@ -4,7 +4,7 @@ import { Container, Eyebrow, SectionTitle } from './ui'
 
 export function Faq() {
   return (
-    <section id="faq" className="scroll-mt-[72px] bg-white py-20 md:py-28">
+    <section id="faq" className="scroll-mt-[72px] bg-paper py-20 md:py-28">
       <Container className="max-w-[860px]">
         <div data-reveal className="text-center">
           <Eyebrow>Perguntas frequentes</Eyebrow>

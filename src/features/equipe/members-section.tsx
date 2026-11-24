@@ -35,12 +35,12 @@ export function MembersSection({
 
   return (
     <section className="space-y-4">
-      <h2 className="text-[20px] font-semibold text-neutral-900">Membros</h2>
+      <h2 className="text-[20px] font-semibold text-brand">Membros</h2>
 
       <MembersFiltersBar filters={filters} teams={teams} onChange={onFiltersChange} />
 
       {filteredMembers.length === 0 ? (
-        <p className="rounded-[16px] border-[0.5px] border-dashed border-neutral-200 p-8 text-center text-sm text-neutral-400">
+        <p className="rounded-[16px] border-[0.5px] border-dashed border-line p-8 text-center text-sm text-muted-foreground">
           Nenhum membro encontrado com os filtros atuais.
         </p>
       ) : (

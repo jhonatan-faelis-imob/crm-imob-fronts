@@ -31,10 +31,10 @@ export function GoalSelector({
             type="button"
             onClick={() => onSelect(goal.id)}
             className={`shrink-0 rounded-[12px] border-[1.5px] px-4 py-2.5 text-left transition-colors ${
-              isSelected ? 'border-brand bg-brand-bg' : 'border-neutral-200 bg-white hover:border-neutral-300'
+              isSelected ? 'border-brand bg-line' : 'border-line bg-paper hover:border-line-strong'
             }`}
           >
-            <p className={`max-w-[180px] truncate text-sm font-medium ${isSelected ? 'text-brand' : 'text-neutral-900'}`}>
+            <p className={`max-w-[180px] truncate text-sm font-medium ${isSelected ? 'text-brand' : 'text-brand'}`}>
               {goal.title}
             </p>
             <div className="mt-1 flex items-center gap-1.5">
@@ -44,7 +44,7 @@ export function GoalSelector({
               >
                 {GOAL_SCOPE_META[scope]}
               </span>
-              <span className="text-[11px] text-neutral-400">{formatPeriodRange(goal)}</span>
+              <span className="text-[11px] text-muted-foreground">{formatPeriodRange(goal)}</span>
             </div>
           </button>
         )

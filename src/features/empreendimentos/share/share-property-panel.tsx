@@ -29,7 +29,7 @@ interface LeadOption {
 }
 
 const inputClassName =
-  'w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-[16px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand'
+  'w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[16px] text-brand outline-none transition-colors placeholder:text-muted-foreground focus:border-brand'
 
 const RECIPIENTS: { value: Recipient; label: string }[] = [
   { value: 'lead', label: 'Lead do CRM' },
@@ -56,7 +56,7 @@ function LeadSearch({ onSelect }: { onSelect: (lead: LeadOption) => void }) {
 
   return (
     <div className="relative">
-      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
       <input
         type="search"
         value={term}
@@ -66,21 +66,21 @@ function LeadSearch({ onSelect }: { onSelect: (lead: LeadOption) => void }) {
         autoComplete="off"
         className={`${inputClassName} pl-9`}
       />
-      {isFetching && <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-neutral-400" />}
+      {isFetching && <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />}
       {enabled && !isFetching && (
-        <div className="mt-1 max-h-56 overflow-y-auto rounded-[12px] border-[0.5px] border-neutral-200 bg-white p-1">
+        <div className="mt-1 max-h-56 overflow-y-auto rounded-[12px] border-[0.5px] border-line bg-paper p-1">
           {results.length === 0 ? (
-            <p className="px-3 py-2.5 text-sm text-neutral-400">Nenhum lead encontrado</p>
+            <p className="px-3 py-2.5 text-sm text-muted-foreground">Nenhum lead encontrado</p>
           ) : (
             results.map((lead) => (
               <button
                 key={lead.id}
                 type="button"
                 onClick={() => onSelect(lead)}
-                className="flex min-h-11 w-full flex-col items-start justify-center rounded-[8px] px-3 py-1.5 text-left hover:bg-neutral-100"
+                className="flex min-h-11 w-full flex-col items-start justify-center rounded-[8px] px-3 py-1.5 text-left hover:bg-canvas"
               >
-                <span className="text-sm font-medium text-neutral-900">{lead.name}</span>
-                <span className="text-xs text-neutral-400">{lead.phone}</span>
+                <span className="text-sm font-medium text-brand">{lead.name}</span>
+                <span className="text-xs text-muted-foreground">{lead.phone}</span>
               </button>
             ))
           )}
@@ -226,7 +226,7 @@ function PanelBody({ property, onDone }: { property: Property; onDone: () => voi
       )}
 
       <section className="space-y-2">
-        <p className="text-[13px] font-medium text-neutral-900">Para quem</p>
+        <p className="text-[13px] font-medium text-brand">Para quem</p>
         <div role="radiogroup" aria-label="Para quem" className="grid grid-cols-3 gap-1.5">
           {RECIPIENTS.map((option) => (
             <button
@@ -240,8 +240,8 @@ function PanelBody({ property, onDone }: { property: Property; onDone: () => voi
               }}
               className={`min-h-11 rounded-[8px] border-[1.5px] px-2 text-[13px] font-medium transition-colors ${
                 recipient === option.value
-                  ? 'border-brand bg-brand-bg text-brand'
-                  : 'border-neutral-200 text-neutral-600 hover:border-neutral-400'
+                  ? 'border-brand bg-line text-brand'
+                  : 'border-line text-muted-foreground hover:border-line-strong'
               }`}
             >
               {option.label}
@@ -251,10 +251,10 @@ function PanelBody({ property, onDone }: { property: Property; onDone: () => voi
 
         {recipient === 'lead' &&
           (lead ? (
-            <div className="space-y-2 rounded-[12px] border-[1.5px] border-neutral-200 p-3">
+            <div className="space-y-2 rounded-[12px] border-[1.5px] border-line p-3">
               <div className="flex items-center justify-between gap-2">
-                <span className="flex min-w-0 items-center gap-2 text-sm font-medium text-neutral-900">
-                  <UserRound className="h-4 w-4 shrink-0 text-neutral-400" />
+                <span className="flex min-w-0 items-center gap-2 text-sm font-medium text-brand">
+                  <UserRound className="h-4 w-4 shrink-0 text-muted-foreground" />
                   <span className="truncate">{lead.name}</span>
                 </span>
                 <button
@@ -265,7 +265,7 @@ function PanelBody({ property, onDone }: { property: Property; onDone: () => voi
                     resetMessage()
                   }}
                   aria-label="Trocar lead"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] text-neutral-400 hover:bg-neutral-100"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] text-muted-foreground hover:bg-canvas"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -283,7 +283,7 @@ function PanelBody({ property, onDone }: { property: Property; onDone: () => voi
                       aria-checked={usePhone2 === option.second}
                       onClick={() => setUsePhone2(option.second)}
                       className={`min-h-10 rounded-[8px] border-[1.5px] px-3 text-[13px] ${
-                        usePhone2 === option.second ? 'border-brand text-brand' : 'border-neutral-200 text-neutral-600'
+                        usePhone2 === option.second ? 'border-brand text-brand' : 'border-line text-muted-foreground'
                       }`}
                     >
                       {option.label}
@@ -291,9 +291,9 @@ function PanelBody({ property, onDone }: { property: Property; onDone: () => voi
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-neutral-400">{lead.phone}</p>
+                <p className="text-xs text-muted-foreground">{lead.phone}</p>
               )}
-              <label className="flex min-h-10 items-center gap-2 text-sm text-neutral-600">
+              <label className="flex min-h-10 items-center gap-2 text-sm text-muted-foreground">
                 <input
                   type="checkbox"
                   checked={linkToLead}
@@ -326,8 +326,8 @@ function PanelBody({ property, onDone }: { property: Property; onDone: () => voi
         )}
       </section>
 
-      <label className="flex min-h-11 items-center justify-between gap-3 rounded-[12px] border-[0.5px] border-neutral-200 px-3">
-        <span className="text-sm font-medium text-neutral-900">Mostrar valor</span>
+      <label className="flex min-h-11 items-center justify-between gap-3 rounded-[12px] border-[0.5px] border-line px-3">
+        <span className="text-sm font-medium text-brand">Mostrar valor</span>
         <Switch
           checked={showPrice}
           onCheckedChange={(checked: boolean) => {
@@ -340,7 +340,7 @@ function PanelBody({ property, onDone }: { property: Property; onDone: () => voi
 
       <section className="space-y-1.5">
         <div className="flex items-center justify-between gap-2">
-          <label htmlFor="share-message" className="text-[13px] font-medium text-neutral-900">
+          <label htmlFor="share-message" className="text-[13px] font-medium text-brand">
             Mensagem
           </label>
           {editedMessage !== null && (
@@ -350,7 +350,7 @@ function PanelBody({ property, onDone }: { property: Property; onDone: () => voi
           )}
         </div>
         {waitingLead ? (
-          <p className="rounded-[12px] bg-neutral-100 p-3 text-sm text-neutral-400">Escolha o lead para montar a mensagem.</p>
+          <p className="rounded-[12px] bg-canvas p-3 text-sm text-muted-foreground">Escolha o lead para montar a mensagem.</p>
         ) : link.isError ? (
           <p className="rounded-[12px] bg-[#FFEBEE] p-3 text-sm text-danger">
             {apiErrorDetails(link.error).message ?? 'Não foi possível gerar o link.'}
@@ -363,7 +363,7 @@ function PanelBody({ property, onDone }: { property: Property; onDone: () => voi
             disabled={!share}
             placeholder={share ? undefined : 'Gerando o link…'}
             onChange={(event) => setEditedMessage(event.target.value)}
-            className={`${inputClassName} font-[inherit] text-[15px] leading-relaxed disabled:bg-neutral-100`}
+            className={`${inputClassName} font-[inherit] text-[15px] leading-relaxed disabled:bg-line`}
           />
         )}
       </section>
@@ -373,13 +373,13 @@ function PanelBody({ property, onDone }: { property: Property; onDone: () => voi
           type="button"
           onClick={openWhatsapp}
           disabled={!canWhatsapp}
-          className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[8px] bg-[#25D366] px-4 text-[15px] font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[8px] bg-[#25D366] px-4 text-[15px] font-semibold text-paper transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {link.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-5 w-5" />}
           Abrir no WhatsApp
         </button>
         {recipient === 'phone' && otherPhone && !phoneOk && (
-          <p className="text-xs text-neutral-400">Informe o número com DDD.</p>
+          <p className="text-xs text-muted-foreground">Informe o número com DDD.</p>
         )}
         <div className="grid grid-cols-2 gap-2">
           {canNativeShare && (
@@ -387,7 +387,7 @@ function PanelBody({ property, onDone }: { property: Property; onDone: () => voi
               type="button"
               onClick={() => void nativeShare()}
               disabled={!canUseLink}
-              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[8px] border-[1.5px] border-neutral-200 px-3 text-sm font-medium text-neutral-900 disabled:opacity-50"
+              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[8px] border-[1.5px] border-line px-3 text-sm font-medium text-brand disabled:opacity-50"
             >
               <Share2 className="h-4 w-4" />
               Compartilhar…
@@ -397,7 +397,7 @@ function PanelBody({ property, onDone }: { property: Property; onDone: () => voi
             type="button"
             onClick={() => share && void copy(share.url, 'Link')}
             disabled={!canUseLink}
-            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[8px] border-[1.5px] border-neutral-200 px-3 text-sm font-medium text-neutral-900 disabled:opacity-50"
+            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[8px] border-[1.5px] border-line px-3 text-sm font-medium text-brand disabled:opacity-50"
           >
             <Link2 className="h-4 w-4" />
             Copiar link
@@ -406,7 +406,7 @@ function PanelBody({ property, onDone }: { property: Property; onDone: () => voi
             type="button"
             onClick={() => void copy(message, 'Mensagem')}
             disabled={!canUseLink}
-            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[8px] border-[1.5px] border-neutral-200 px-3 text-sm font-medium text-neutral-900 disabled:opacity-50"
+            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[8px] border-[1.5px] border-line px-3 text-sm font-medium text-brand disabled:opacity-50"
           >
             <Copy className="h-4 w-4" />
             Copiar mensagem
@@ -415,20 +415,20 @@ function PanelBody({ property, onDone }: { property: Property; onDone: () => voi
             type="button"
             onClick={() => share && window.open(`/i/${share.token}`, '_blank', 'noopener,noreferrer')}
             disabled={!canUseLink}
-            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[8px] border-[1.5px] border-neutral-200 px-3 text-sm font-medium text-neutral-900 disabled:opacity-50"
+            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[8px] border-[1.5px] border-line px-3 text-sm font-medium text-brand disabled:opacity-50"
           >
             <ExternalLink className="h-4 w-4" />
             Pré-visualizar página
           </button>
         </div>
         {share?.expiresAt && (
-          <p className="text-center text-xs text-neutral-400">
+          <p className="text-center text-xs text-muted-foreground">
             Link válido até {new Date(share.expiresAt).toLocaleDateString('pt-BR')}
           </p>
         )}
       </section>
 
-      <button type="button" onClick={onDone} className="min-h-11 w-full text-sm font-medium text-neutral-600">
+      <button type="button" onClick={onDone} className="min-h-11 w-full text-sm font-medium text-muted-foreground">
         Concluir
       </button>
     </div>
@@ -453,8 +453,8 @@ export function SharePropertyPanel({
   if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="max-h-[92dvh] gap-0 overflow-y-auto rounded-t-2xl bg-white p-0">
-          <SheetHeader className="sticky top-0 z-10 border-b-[0.5px] border-neutral-200 bg-white p-4 pr-12">
+        <SheetContent side="bottom" className="max-h-[92dvh] gap-0 overflow-y-auto rounded-t-2xl bg-paper p-0">
+          <SheetHeader className="sticky top-0 z-10 border-b-[0.5px] border-line bg-paper p-4 pr-12">
             <SheetTitle>{title}</SheetTitle>
             <SheetDescription className="truncate">{description}</SheetDescription>
           </SheetHeader>
@@ -466,7 +466,7 @@ export function SharePropertyPanel({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-2xl border-[0.5px] border-neutral-200 bg-white p-5 ring-0 sm:max-w-lg sm:p-6">
+      <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-2xl border-[0.5px] border-line bg-paper p-5 ring-0 sm:max-w-lg sm:p-6">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription className="truncate">{description}</DialogDescription>

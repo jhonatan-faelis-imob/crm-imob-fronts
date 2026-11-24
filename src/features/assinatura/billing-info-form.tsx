@@ -63,7 +63,7 @@ export function BillingInfoForm({
         <button
           type="submit"
           disabled={(!isDirty && !onSaved) || save.isPending}
-          className="min-h-11 w-full rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-60 sm:w-auto"
+          className="min-h-11 w-full rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:opacity-60 sm:w-auto"
         >
           {save.isPending ? 'Salvando...' : submitLabel}
         </button>

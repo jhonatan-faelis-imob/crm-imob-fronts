@@ -75,7 +75,7 @@ export function DeleteGoalDialog({
         if (!nextOpen) close()
       }}
     >
-      <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0">
+      <AlertDialogContent className="w-[calc(100%-2rem)] gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0">
         <form onSubmit={onSubmit}>
           <AlertDialogHeader className="p-4 sm:p-6">
             <AlertDialogTitle>Excluir meta?</AlertDialogTitle>
@@ -92,7 +92,7 @@ export function DeleteGoalDialog({
               </p>
             )}
             <div>
-              <label htmlFor="delete-goal-confirmation" className="text-[13px] font-medium text-neutral-900">
+              <label htmlFor="delete-goal-confirmation" className="text-[13px] font-medium text-brand">
                 Para confirmar, digite meta abaixo
               </label>
               <input
@@ -100,19 +100,19 @@ export function DeleteGoalDialog({
                 value={confirmation}
                 onChange={(event) => setConfirmation(event.target.value)}
                 autoComplete="off"
-                className="mt-1.5 w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-base text-neutral-900 outline-none transition-colors focus:border-brand"
+                className="mt-1.5 w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-base text-brand outline-none transition-colors focus:border-brand"
               />
             </div>
           </div>
 
-          <AlertDialogFooter className="mx-0 mb-0 gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:p-6">
-            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-neutral-600 sm:h-10">
+          <AlertDialogFooter className="mx-0 mb-0 gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:p-6">
+            <AlertDialogCancel className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-muted-foreground sm:h-10">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
               type="submit"
               disabled={!isConfirmed || deleteGoal.isPending}
-              className="h-11 rounded-[8px] bg-danger px-4 text-white hover:bg-danger hover:opacity-90 sm:h-10"
+              className="h-11 rounded-[8px] bg-danger px-4 text-paper hover:bg-danger hover:opacity-90 sm:h-10"
             >
               Excluir meta
             </AlertDialogAction>

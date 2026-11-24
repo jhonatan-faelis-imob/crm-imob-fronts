@@ -11,24 +11,24 @@ export function PaymentsList({ payments, isLoading }: { payments: PaymentRow[] |
   if (!payments || payments.length === 0) {
     return (
       <div className="flex flex-col items-center gap-2 py-6 text-center">
-        <Receipt className="h-5 w-5 text-neutral-400" />
-        <p className="text-sm text-neutral-400">Nenhuma cobrança ainda.</p>
+        <Receipt className="h-5 w-5 text-muted-foreground" />
+        <p className="text-sm text-muted-foreground">Nenhuma cobrança ainda.</p>
       </div>
     )
   }
 
   return (
-    <ul className="divide-y-[0.5px] divide-neutral-200">
+    <ul className="divide-y-[0.5px] divide-line">
       {payments.map((payment) => {
         const meta = paymentStatusMeta(payment.status)
         return (
           <li key={payment.id} className="flex items-center gap-3 py-3">
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-neutral-900">
+              <p className="text-sm font-medium text-brand">
                 {formatMoney(payment.value)}{' '}
                 <span className={cn('ml-1 rounded-full px-2 py-0.5 text-[11px] font-semibold', meta.className)}>{meta.label}</span>
               </p>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-muted-foreground">
                 Vence {formatDay(payment.dueDate)}
                 {payment.paidAt ? ` · Paga em ${formatDay(payment.paidAt)}` : ''}
                 {payment.billingType ? ` · ${BILLING_TYPE_LABEL[payment.billingType] ?? payment.billingType}` : ''}
@@ -39,7 +39,7 @@ export function PaymentsList({ payments, isLoading }: { payments: PaymentRow[] |
                 href={payment.invoiceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-[8px] px-3 text-sm font-medium text-brand hover:bg-brand-bg"
+                className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-[8px] px-3 text-sm font-medium text-brand hover:bg-line"
               >
                 Fatura
                 <ExternalLink className="h-3.5 w-3.5" />

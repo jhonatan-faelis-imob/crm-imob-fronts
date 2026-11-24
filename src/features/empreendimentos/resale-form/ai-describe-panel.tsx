@@ -71,41 +71,41 @@ export function AiDescribePanel({
         type="button"
         onClick={() => generate.mutate()}
         disabled={disabledReason !== null || generate.isPending}
-        className="inline-flex min-h-11 items-center gap-2 rounded-[8px] border-[1.5px] border-brand px-4 text-sm font-medium text-brand transition-colors hover:bg-brand-bg disabled:cursor-not-allowed disabled:border-neutral-200 disabled:text-neutral-400 disabled:hover:bg-transparent sm:min-h-10"
+        className="inline-flex min-h-11 items-center gap-2 rounded-[8px] border-[1.5px] border-brand px-4 text-sm font-medium text-brand transition-colors hover:bg-line disabled:cursor-not-allowed disabled:border-line disabled:text-muted-foreground disabled:hover:bg-transparent sm:min-h-10"
       >
         {generate.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
         {generate.isPending ? 'Gerando…' : 'Gerar título e descrição com IA'}
       </button>
-      {disabledReason && <p className="text-xs text-neutral-400">{disabledReason}</p>}
+      {disabledReason && <p className="text-xs text-muted-foreground">{disabledReason}</p>}
       {error && <p className="text-xs text-danger">{error}</p>}
 
       {result && (
-        <div className="space-y-3 rounded-[12px] border-[0.5px] border-neutral-200 bg-neutral-100 p-3">
+        <div className="space-y-3 rounded-[12px] border-[0.5px] border-line bg-canvas p-3">
           <div>
-            <p className="text-xs font-medium text-neutral-400">Título sugerido ({result.title.length}/100)</p>
-            <p className="mt-0.5 text-sm font-medium text-neutral-900">{result.title}</p>
+            <p className="text-xs font-medium text-muted-foreground">Título sugerido ({result.title.length}/100)</p>
+            <p className="mt-0.5 text-sm font-medium text-brand">{result.title}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-neutral-400">Descrição sugerida ({result.description.length} caracteres)</p>
-            <p className="mt-0.5 whitespace-pre-line text-sm text-neutral-600">{result.description}</p>
+            <p className="text-xs font-medium text-muted-foreground">Descrição sugerida ({result.description.length} caracteres)</p>
+            <p className="mt-0.5 whitespace-pre-line text-sm text-muted-foreground">{result.description}</p>
           </div>
-          <p className="text-xs text-neutral-400">Revise antes de usar: a IA pode errar.</p>
+          <p className="text-xs text-muted-foreground">Revise antes de usar: a IA pode errar.</p>
 
           {confirming ? (
-            <div className="space-y-2 rounded-[8px] bg-white p-3">
-              <p className="text-sm text-neutral-900">Isto substitui {TARGET_LABEL[confirming]} que você já escreveu.</p>
+            <div className="space-y-2 rounded-[8px] bg-paper p-3">
+              <p className="text-sm text-brand">Isto substitui {TARGET_LABEL[confirming]} que você já escreveu.</p>
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={() => apply(confirming, true)}
-                  className="min-h-10 rounded-[8px] bg-brand px-3 text-sm font-medium text-white hover:bg-brand-dark"
+                  className="min-h-10 rounded-[8px] bg-brand px-3 text-sm font-medium text-paper hover:bg-ink"
                 >
                   Substituir
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirming(null)}
-                  className="min-h-10 rounded-[8px] border-[0.5px] border-neutral-200 px-3 text-sm font-medium text-neutral-600"
+                  className="min-h-10 rounded-[8px] border-[0.5px] border-line px-3 text-sm font-medium text-muted-foreground"
                 >
                   Manter o meu
                 </button>
@@ -118,7 +118,7 @@ export function AiDescribePanel({
                   key={target}
                   type="button"
                   onClick={() => apply(target)}
-                  className="min-h-10 rounded-[8px] border-[0.5px] border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-900 hover:border-brand hover:text-brand"
+                  className="min-h-10 rounded-[8px] border-[0.5px] border-line bg-paper px-3 text-sm font-medium text-brand hover:border-brand hover:text-brand"
                 >
                   {target === 'title' ? 'Usar título' : target === 'description' ? 'Usar descrição' : 'Usar os dois'}
                 </button>

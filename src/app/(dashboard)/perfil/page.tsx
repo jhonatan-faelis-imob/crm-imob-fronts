@@ -15,8 +15,8 @@ export default function PerfilPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <p className="text-xs font-medium text-neutral-400">Conta</p>
-        <h1 className="text-[28px] font-semibold text-neutral-900">Meu perfil</h1>
+        <p className="text-xs font-medium text-muted-foreground">Conta</p>
+        <h1 className="text-[28px] font-semibold text-brand">Meu perfil</h1>
       </div>
 
       {isLoading && (
@@ -27,12 +27,12 @@ export default function PerfilPage() {
       )}
 
       {isError && (
-        <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-6 text-center">
-          <p className="text-sm text-neutral-600">Não foi possível carregar seu perfil.</p>
+        <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-6 text-center">
+          <p className="text-sm text-muted-foreground">Não foi possível carregar seu perfil.</p>
           <button
             type="button"
             onClick={() => refetch()}
-            className="mt-3 min-h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-sm font-medium text-neutral-900 hover:border-brand hover:text-brand"
+            className="mt-3 min-h-11 rounded-[8px] border-[1.5px] border-line px-4 text-sm font-medium text-brand hover:border-brand hover:text-brand"
           >
             Tentar de novo
           </button>

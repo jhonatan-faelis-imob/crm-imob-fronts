@@ -13,8 +13,8 @@ import { invalidateAdmin } from './use-admin'
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline justify-between gap-3 text-sm">
-      <dt className="shrink-0 text-neutral-400">{label}</dt>
-      <dd className="min-w-0 truncate text-right font-mono text-[13px] text-neutral-900">{value}</dd>
+      <dt className="shrink-0 text-muted-foreground">{label}</dt>
+      <dd className="min-w-0 truncate text-right font-mono text-[13px] text-brand">{value}</dd>
     </div>
   )
 }
@@ -50,7 +50,7 @@ export function AsaasSection({ organization }: { organization: AdminOrganization
         type="button"
         onClick={() => sync.mutate()}
         disabled={!organization.asaasSubscriptionId || sync.isPending}
-        className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-neutral-200 px-3 text-sm font-medium text-neutral-900 hover:border-brand hover:text-brand disabled:opacity-50"
+        className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[8px] border-[1.5px] border-line px-3 text-sm font-medium text-brand hover:border-brand hover:text-brand disabled:opacity-50"
       >
         <RefreshCw className={sync.isPending ? 'h-4 w-4 animate-spin' : 'h-4 w-4'} />
         Sincronizar com Asaas

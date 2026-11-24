@@ -19,18 +19,18 @@ function SourceTooltip({ active, payload }: TooltipContentProps) {
   const meta = sourceMeta(point.source)
 
   return (
-    <div className="rounded-[12px] border-[0.5px] border-neutral-200 bg-white p-3 shadow-lg">
-      <p className="text-xs font-medium text-neutral-900">{meta.label}</p>
-      <p className="mt-1 text-sm font-semibold text-neutral-900">{point.count} leads</p>
-      <p className="text-xs text-neutral-400">{point.percent}% do total</p>
+    <div className="rounded-[12px] border-[0.5px] border-line bg-paper p-3 shadow-lg">
+      <p className="text-xs font-medium text-brand">{meta.label}</p>
+      <p className="mt-1 text-sm font-semibold text-brand">{point.count} leads</p>
+      <p className="text-xs text-muted-foreground">{point.percent}% do total</p>
     </div>
   )
 }
 
 export function LeadsBySourceChart({ data, isLoading }: { data: SourceDistributionEntry[]; isLoading: boolean }) {
   return (
-    <div className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white p-5 lg:p-6">
-      <h2 className="text-[20px] font-semibold text-neutral-900">Origem dos leads</h2>
+    <div className="rounded-[16px] border-[0.5px] border-line bg-paper p-5 lg:p-6">
+      <h2 className="text-[20px] font-semibold text-brand">Origem dos leads</h2>
 
       {isLoading ? (
         <Skeleton className="mt-4 h-56 w-full rounded-[12px]" />
@@ -64,9 +64,9 @@ export function LeadsBySourceChart({ data, isLoading }: { data: SourceDistributi
                 <li key={entry.source} className="flex items-center justify-between gap-2 text-sm">
                   <span className="flex min-w-0 items-center gap-2">
                     <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: meta.color }} />
-                    <span className="truncate text-neutral-900">{meta.label}</span>
+                    <span className="truncate text-brand">{meta.label}</span>
                   </span>
-                  <span className="shrink-0 text-neutral-400">
+                  <span className="shrink-0 text-muted-foreground">
                     {entry.percent}% · {entry.count}
                   </span>
                 </li>

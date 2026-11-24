@@ -27,7 +27,7 @@ export function TeamsSection({
 
   return (
     <section>
-      <h2 className="text-[20px] font-semibold text-neutral-900">Equipes</h2>
+      <h2 className="text-[20px] font-semibold text-brand">Equipes</h2>
 
       {teams.length === 0 ? (
         <div className="mt-4">

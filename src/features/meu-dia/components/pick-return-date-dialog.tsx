@@ -26,7 +26,7 @@ export function PickReturnDateDialog({
     <ResponsiveModal open={open} onOpenChange={onOpenChange} title="Agendar retorno">
       <div className="min-w-0 space-y-4">
         <div>
-          <label htmlFor="return-date" className="text-[13px] font-medium text-neutral-900">
+          <label htmlFor="return-date" className="text-[13px] font-medium text-brand">
             Data do retorno
           </label>
           <input
@@ -35,14 +35,14 @@ export function PickReturnDateDialog({
             min={today}
             value={day}
             onChange={(event) => setDay(event.target.value)}
-            className="mt-1.5 w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-base text-neutral-900 outline-none transition-colors focus:border-brand"
+            className="mt-1.5 w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-base text-brand outline-none transition-colors focus:border-brand"
           />
         </div>
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-sm font-medium text-neutral-600 hover:bg-neutral-100"
+            className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-sm font-medium text-muted-foreground hover:bg-canvas"
           >
             Cancelar
           </button>
@@ -50,7 +50,7 @@ export function PickReturnDateDialog({
             type="button"
             onClick={confirm}
             disabled={!isValid}
-            className="h-11 rounded-[8px] bg-brand px-4 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-70"
+            className="h-11 rounded-[8px] bg-brand px-4 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:cursor-not-allowed disabled:opacity-70"
           >
             Agendar
           </button>

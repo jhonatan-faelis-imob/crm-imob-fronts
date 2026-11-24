@@ -33,7 +33,7 @@ const passwordSchema = z
 
 type PasswordFormValues = z.infer<typeof passwordSchema>
 
-const STRENGTH_COLORS = ['bg-neutral-200', 'bg-danger', 'bg-warning', 'bg-success'] as const
+const STRENGTH_COLORS = ['bg-line', 'bg-danger', 'bg-warning', 'bg-success'] as const
 
 function StrengthMeter({ password }: { password: string }) {
   const { score, label } = passwordStrength(password)
@@ -44,11 +44,11 @@ function StrengthMeter({ password }: { password: string }) {
         {[1, 2, 3].map((step) => (
           <span
             key={step}
-            className={cn('h-1.5 flex-1 rounded-full', step <= score ? STRENGTH_COLORS[score] : 'bg-neutral-200')}
+            className={cn('h-1.5 flex-1 rounded-full', step <= score ? STRENGTH_COLORS[score] : 'bg-line')}
           />
         ))}
       </div>
-      <span className="w-12 text-right text-xs text-neutral-600">{label}</span>
+      <span className="w-12 text-right text-xs text-muted-foreground">{label}</span>
     </div>
   )
 }
@@ -84,13 +84,13 @@ export function PasswordForm() {
   })
 
   return (
-    <section className="rounded-[16px] border-[0.5px] border-neutral-200 bg-white">
-      <div className="border-b-[0.5px] border-neutral-200 p-4 sm:p-6">
-        <h2 className="text-[18px] font-semibold text-neutral-900">Segurança</h2>
+    <section className="rounded-[16px] border-[0.5px] border-line bg-paper">
+      <div className="border-b-[0.5px] border-line p-4 sm:p-6">
+        <h2 className="text-[18px] font-semibold text-brand">Segurança</h2>
       </div>
 
       <form onSubmit={handleSubmit((values) => change.mutate(values))} noValidate className="space-y-4 p-4 sm:p-6">
-        <div role="note" className="flex gap-2 rounded-[12px] bg-neutral-100 p-3 text-sm text-neutral-600">
+        <div role="note" className="flex gap-2 rounded-[12px] bg-canvas p-3 text-sm text-muted-foreground">
           <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
           <p>Ao trocar a senha, você será desconectado nos outros aparelhos.</p>
         </div>
@@ -137,7 +137,7 @@ export function PasswordForm() {
           <button
             type="submit"
             disabled={change.isPending}
-            className="min-h-11 w-full rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-60 sm:w-auto"
+            className="min-h-11 w-full rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:opacity-60 sm:w-auto"
           >
             {change.isPending ? 'Trocando...' : 'Trocar senha'}
           </button>

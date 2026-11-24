@@ -31,18 +31,18 @@ export function ColorPicker({
               onClick={() => onChange(color)}
               className={cn(
                 'flex size-11 items-center justify-center rounded-full border-2 transition-transform sm:size-9',
-                selected ? 'scale-110 border-neutral-900' : 'border-transparent hover:scale-105',
+                selected ? 'scale-110 border-brand' : 'border-transparent hover:scale-105',
               )}
               style={{ backgroundColor: color }}
             >
-              {selected && <Check className="h-4 w-4 text-white" />}
+              {selected && <Check className="h-4 w-4 text-paper" />}
             </button>
           )
         })}
       </div>
       <div className="flex items-center gap-3">
         <span
-          className="size-9 shrink-0 rounded-full border-[0.5px] border-neutral-200"
+          className="size-9 shrink-0 rounded-full border-[0.5px] border-line"
           style={{ backgroundColor: typedInvalid ? 'transparent' : value }}
         />
         <div className="flex-1">
@@ -57,7 +57,7 @@ export function ColorPicker({
             placeholder="#6366f1"
             autoComplete="off"
             aria-invalid={typedInvalid}
-            className="w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 font-mono text-base text-neutral-900 outline-none focus:border-brand aria-[invalid=true]:border-danger"
+            className="w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 font-mono text-base text-brand outline-none focus:border-brand aria-[invalid=true]:border-danger"
           />
         </div>
       </div>

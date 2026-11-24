@@ -118,16 +118,16 @@ export default function LeadsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-[28px] font-semibold text-neutral-900">Leads</h1>
+          <h1 className="text-[28px] font-semibold text-brand">Leads</h1>
           {isLoading ? (
-            <p className="mt-1 text-sm text-neutral-400">Carregando...</p>
+            <p className="mt-1 text-sm text-muted-foreground">Carregando...</p>
           ) : (
-            <div className="mt-1 flex items-center gap-2 text-sm text-neutral-400">
+            <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
               <span>{leads.length} leads</span>
               {totalVgv > 0 && (
                 <>
                   <span>·</span>
-                  <span className="font-semibold text-neutral-600">{formatVgv(totalVgv)} em potencial</span>
+                  <span className="font-semibold text-muted-foreground">{formatVgv(totalVgv)} em potencial</span>
                 </>
               )}
             </div>
@@ -139,7 +139,7 @@ export default function LeadsPage() {
             <Link
               href="/funil"
               aria-label="Etapas do funil"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border-[0.5px] border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 sm:h-10"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border-[0.5px] border-line bg-paper px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-canvas sm:h-10"
             >
               <Columns3 className="h-4 w-4" />
               <span className="hidden sm:inline">Etapas do funil</span>
@@ -148,19 +148,19 @@ export default function LeadsPage() {
           {showCadences && (
             <Link
               href="/cadencias"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border-[0.5px] border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 sm:h-10"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] border-[0.5px] border-line bg-paper px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-canvas sm:h-10"
             >
               <Workflow className="h-4 w-4" />
               Cadências
             </Link>
           )}
-          <div className="flex items-center gap-1 rounded-[8px] border-[0.5px] border-neutral-200 bg-white p-1">
+          <div className="flex items-center gap-1 rounded-[8px] border-[0.5px] border-line bg-paper p-1">
             <button
               type="button"
               aria-label="Visualizar em kanban"
               onClick={() => setView('kanban')}
               className={`rounded-[6px] p-1.5 ${
-                view === 'kanban' ? 'bg-brand-bg text-brand' : 'text-neutral-400 hover:bg-neutral-100'
+                view === 'kanban' ? 'bg-line text-brand' : 'text-muted-foreground hover:bg-canvas'
               }`}
             >
               <SquareKanban className="h-4 w-4" />
@@ -170,7 +170,7 @@ export default function LeadsPage() {
               aria-label="Visualizar em lista"
               onClick={() => setView('list')}
               className={`rounded-[6px] p-1.5 ${
-                view === 'list' ? 'bg-brand-bg text-brand' : 'text-neutral-400 hover:bg-neutral-100'
+                view === 'list' ? 'bg-line text-brand' : 'text-muted-foreground hover:bg-canvas'
               }`}
             >
               <List className="h-4 w-4" />
@@ -180,7 +180,7 @@ export default function LeadsPage() {
           <button
             type="button"
             onClick={() => setIsDialogOpen(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+            className="inline-flex items-center justify-center gap-2 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink"
           >
             <Plus className="h-4 w-4" />
             Novo lead

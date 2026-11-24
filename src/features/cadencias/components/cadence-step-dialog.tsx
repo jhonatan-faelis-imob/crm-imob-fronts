@@ -34,8 +34,8 @@ const stepSchema = z.object({
 type StepFormData = z.infer<typeof stepSchema>
 
 const inputClassName =
-  'mt-1.5 w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-base text-neutral-900 outline-none transition-colors focus:border-brand'
-const labelClassName = 'text-[13px] font-medium text-neutral-900'
+  'mt-1.5 w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-base text-brand outline-none transition-colors focus:border-brand'
+const labelClassName = 'text-[13px] font-medium text-brand'
 const errorClassName = 'mt-1 text-[12px] text-danger'
 
 export function CadenceStepDialog({
@@ -95,10 +95,10 @@ export function CadenceStepDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl border-[0.5px] border-neutral-200 bg-white ring-0 sm:max-w-lg">
+      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl border-[0.5px] border-line bg-paper ring-0 sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{step ? 'Editar passo' : 'Adicionar passo'}</DialogTitle>
-          {stage && <p className="text-sm text-neutral-400">Etapa {stage.name}</p>}
+          {stage && <p className="text-sm text-muted-foreground">Etapa {stage.name}</p>}
         </DialogHeader>
 
         <form onSubmit={handleSubmit((data) => save.mutate(data))} noValidate className="min-w-0 space-y-4">
@@ -107,7 +107,7 @@ export function CadenceStepDialog({
               Título
             </label>
             <input id="step-title" className={inputClassName} {...register('title')} />
-            <p className="mt-1 text-[12px] text-neutral-400">
+            <p className="mt-1 text-[12px] text-muted-foreground">
               Use {'{{nome}}'} ou {'{{primeiro_nome}}'} para o nome do lead.
             </p>
             {errors.title && <p className={errorClassName}>{errors.title.message}</p>}
@@ -162,20 +162,20 @@ export function CadenceStepDialog({
             </div>
           </div>
 
-          <label className="flex min-h-11 items-center gap-2.5 text-sm text-neutral-900">
+          <label className="flex min-h-11 items-center gap-2.5 text-sm text-brand">
             <input type="checkbox" className="h-4 w-4 accent-brand" {...register('skipWeekends')} />
             Pular fins de semana
           </label>
 
           <div>
             <label htmlFor="step-description" className={labelClassName}>
-              Descrição <span className="font-normal text-neutral-400">(opcional)</span>
+              Descrição <span className="font-normal text-muted-foreground">(opcional)</span>
             </label>
             <textarea id="step-description" rows={3} className={`${inputClassName} resize-none`} {...register('description')} />
             {errors.description && <p className={errorClassName}>{errors.description.message}</p>}
           </div>
 
-          <p className="rounded-[12px] bg-neutral-100 p-3 text-sm text-neutral-600">
+          <p className="rounded-[12px] bg-canvas p-3 text-sm text-muted-foreground">
             {canPreview
               ? `Se o lead entrar hoje, a tarefa vence em ${previewDueDate({ offsetDays, dueTime, skipWeekends })}.`
               : 'Preencha os dias e o horário para ver quando a tarefa vence.'}
@@ -185,14 +185,14 @@ export function CadenceStepDialog({
             <button
               type="button"
               onClick={() => onOpenChange(false)}
-              className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-sm font-medium text-neutral-600 hover:bg-neutral-100 sm:h-10"
+              className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-sm font-medium text-muted-foreground hover:bg-canvas sm:h-10"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={save.isPending}
-              className="h-11 rounded-[8px] bg-brand px-4 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-70 sm:h-10"
+              className="h-11 rounded-[8px] bg-brand px-4 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:cursor-not-allowed disabled:opacity-70 sm:h-10"
             >
               Salvar
             </button>

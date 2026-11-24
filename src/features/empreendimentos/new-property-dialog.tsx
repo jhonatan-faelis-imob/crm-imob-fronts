@@ -37,7 +37,7 @@ import {
 } from './resale-form/form'
 import { TabAddress, TabBasic, TabFeatures, TabPortal } from './resale-form/tabs'
 
-const navButtonClassName = 'size-11 rounded-[8px] border-[1.5px] border-neutral-200 text-neutral-600 sm:size-10'
+const navButtonClassName = 'size-11 rounded-[8px] border-[1.5px] border-line text-muted-foreground sm:size-10'
 
 // Dono do estado do formulário; o pai remonta com `key` a cada imóvel aberto
 function ResaleForm({
@@ -124,14 +124,14 @@ function ResaleForm({
 
   return (
     <>
-      <div className="flex shrink-0 gap-1 overflow-x-auto border-b-[0.5px] border-neutral-200 px-4 sm:px-6">
+      <div className="flex shrink-0 gap-1 overflow-x-auto border-b-[0.5px] border-line px-4 sm:px-6">
         {RESALE_TABS.map((tab, index) => (
           <button
             key={tab.key}
             type="button"
             onClick={() => setActiveTab(index)}
             className={`flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
-              activeTab === index ? 'border-brand text-brand' : 'border-transparent text-neutral-400 hover:text-neutral-600'
+              activeTab === index ? 'border-brand text-brand' : 'border-transparent text-muted-foreground hover:text-muted-foreground'
             }`}
           >
             {index + 1}. {tab.label}
@@ -155,14 +155,14 @@ function ResaleForm({
         </form>
       </FormProvider>
 
-      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row items-center justify-between gap-2 rounded-b-2xl border-t-[0.5px] border-neutral-200 bg-white p-4 sm:justify-between sm:p-6">
+      <DialogFooter className="mx-0 mb-0 shrink-0 flex-row items-center justify-between gap-2 rounded-b-2xl border-t-[0.5px] border-line bg-paper p-4 sm:justify-between sm:p-6">
         <Button
           type="button"
           variant="ghost"
           onClick={onCancel}
           disabled={isSubmitting}
           aria-label="Cancelar"
-          className="h-11 min-w-11 rounded-[8px] border-[0.5px] border-neutral-200 px-3 text-neutral-600 sm:h-10"
+          className="h-11 min-w-11 rounded-[8px] border-[0.5px] border-line px-3 text-muted-foreground sm:h-10"
         >
           <X className="min-[360px]:hidden" />
           <span className="hidden min-[360px]:inline">Cancelar</span>
@@ -203,7 +203,7 @@ function ResaleForm({
                 type="button"
                 onClick={handleSubmit(onSubmit, onInvalid)}
                 disabled={!canSave}
-                className="h-11 rounded-[8px] bg-brand px-4 text-white hover:bg-brand-dark sm:h-10"
+                className="h-11 rounded-[8px] bg-brand px-4 text-paper hover:bg-ink sm:h-10"
               >
                 {isSubmitting ? 'Salvando...' : 'Salvar'}
               </Button>
@@ -236,7 +236,7 @@ export function NewPropertyDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="grid-cols-none flex max-h-[90vh] w-[calc(100%-2rem)] max-w-2xl flex-col gap-0 rounded-2xl border-[0.5px] border-neutral-200 bg-white p-0 ring-0 sm:max-w-2xl">
+      <DialogContent className="grid-cols-none flex max-h-[90vh] w-[calc(100%-2rem)] max-w-2xl flex-col gap-0 rounded-2xl border-[0.5px] border-line bg-paper p-0 ring-0 sm:max-w-2xl">
         <DialogHeader className="shrink-0 gap-1 p-4 pr-12 sm:p-6 sm:pr-14">
           <DialogTitle>{isEditing ? 'Editar imóvel' : 'Novo imóvel (revenda)'}</DialogTitle>
           <DialogDescription>

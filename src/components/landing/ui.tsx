@@ -24,10 +24,10 @@ export function SectionTitle({ children, className = '' }: { children: ReactNode
 type ButtonVariant = 'primary' | 'outline-dark-bg' | 'outline-light-bg' | 'outline-on-featured'
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: 'lp-btn-primary bg-[#E31C5F] text-white hover:bg-[#C8104A]',
-  'outline-dark-bg': 'border border-[#4A4A4A] text-white hover:bg-white/10',
-  'outline-light-bg': 'border border-[#1C1B1A] text-[#1C1B1A] hover:bg-[#1C1B1A] hover:text-white',
-  'outline-on-featured': 'border border-white/40 text-white hover:bg-white/10',
+  primary: 'lp-btn-primary bg-[#E31C5F] text-paper hover:bg-[#C8104A]',
+  'outline-dark-bg': 'border border-[#4A4A4A] text-paper hover:bg-paper/10',
+  'outline-light-bg': 'border border-[#1C1B1A] text-[#1C1B1A] hover:bg-[#1C1B1A] hover:text-paper',
+  'outline-on-featured': 'border border-paper/40 text-paper hover:bg-paper/10',
 }
 
 export function ButtonLink({
@@ -96,7 +96,7 @@ export function MockupFrame({
   return (
     <div
       data-reveal={reveal}
-      className={`rounded-[20px] border border-[#E6E2DD] bg-white p-5 shadow-[0_24px_60px_-24px_rgba(28,27,26,0.25)] sm:p-6 ${className}`}
+      className={`rounded-[20px] border border-[#E6E2DD] bg-paper p-5 shadow-[0_24px_60px_-24px_rgba(28,27,26,0.25)] sm:p-6 ${className}`}
     >
       {children}
     </div>

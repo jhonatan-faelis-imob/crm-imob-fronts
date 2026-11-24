@@ -35,7 +35,7 @@ export function MemberMultiSelect<TFieldValues extends FieldValues>({
                 {selectedMembers.map((member) => (
                   <span
                     key={member.id}
-                    className="flex items-center gap-1 rounded-full bg-brand-bg px-2.5 py-1 text-xs font-medium text-brand"
+                    className="flex items-center gap-1 rounded-full bg-line px-2.5 py-1 text-xs font-medium text-brand"
                   >
                     {member.name}
                     <button
@@ -52,20 +52,20 @@ export function MemberMultiSelect<TFieldValues extends FieldValues>({
             )}
 
             {availableOptions.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5 rounded-[12px] border-[1.5px] border-neutral-200 bg-white p-2">
+              <div className="flex flex-wrap gap-1.5 rounded-[12px] border-[1.5px] border-line bg-paper p-2">
                 {availableOptions.map((member) => (
                   <button
                     key={member.id}
                     type="button"
                     onClick={() => toggle(member.id)}
-                    className="rounded-full border-[0.5px] border-neutral-200 px-2.5 py-1 text-xs font-medium text-neutral-600 transition-colors hover:border-brand hover:text-brand"
+                    className="rounded-full border-[0.5px] border-line px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-brand hover:text-brand"
                   >
                     + {member.name}
                   </button>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-neutral-400">{emptyText}</p>
+              <p className="text-xs text-muted-foreground">{emptyText}</p>
             )}
           </div>
         )

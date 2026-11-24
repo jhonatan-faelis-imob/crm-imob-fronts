@@ -31,8 +31,8 @@ function ToggleRow({
   return (
     <div className="flex items-start justify-between gap-3">
       <label htmlFor={id} className="min-w-0">
-        <span className="block text-sm font-medium text-neutral-900">{label}</span>
-        <span className="block text-xs text-neutral-400">{description}</span>
+        <span className="block text-sm font-medium text-brand">{label}</span>
+        <span className="block text-xs text-muted-foreground">{description}</span>
       </label>
       <Switch id={id} checked={checked} disabled={disabled} onCheckedChange={onChange} />
     </div>
@@ -114,7 +114,7 @@ export function AiPanel({ open, onOpenChange }: { open: boolean; onOpenChange: (
       ) : (
         <>
           <section className="space-y-4">
-            <h3 className="text-sm font-semibold text-neutral-900">Recursos</h3>
+            <h3 className="text-sm font-semibold text-brand">Recursos</h3>
             <ToggleRow
               id="ai-lead-score"
               label="Análise de lead"
@@ -137,7 +137,7 @@ export function AiPanel({ open, onOpenChange }: { open: boolean; onOpenChange: (
             />
           </section>
 
-          <section className="space-y-3 border-t-[0.5px] border-neutral-200 pt-5">
+          <section className="space-y-3 border-t-[0.5px] border-line pt-5">
             <ToggleRow
               id="ai-own-key"
               label="Usar minha própria chave do Gemini"
@@ -154,8 +154,8 @@ export function AiPanel({ open, onOpenChange }: { open: boolean; onOpenChange: (
             {settings.useOwnKey && (
               <div className="space-y-2">
                 {settings.hasOwnKey && (
-                  <div className="flex items-center justify-between gap-2 rounded-[12px] bg-neutral-100 px-3 py-2">
-                    <span className="font-mono text-sm text-neutral-900">{settings.keyMasked ?? '••••'}</span>
+                  <div className="flex items-center justify-between gap-2 rounded-[12px] bg-canvas px-3 py-2">
+                    <span className="font-mono text-sm text-brand">{settings.keyMasked ?? '••••'}</span>
                     <button
                       type="button"
                       onClick={() => removeKey.mutate()}
@@ -181,30 +181,30 @@ export function AiPanel({ open, onOpenChange }: { open: boolean; onOpenChange: (
                     placeholder={settings.hasOwnKey ? 'Trocar a chave' : 'Cole a chave do Gemini'}
                     autoComplete="off"
                     aria-label="Chave do Gemini"
-                    className="h-10 min-w-0 flex-1 rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 text-[16px] text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-brand sm:text-sm"
+                    className="h-10 min-w-0 flex-1 rounded-[12px] border-[1.5px] border-line bg-paper px-3 text-[16px] text-brand outline-none placeholder:text-muted-foreground focus:border-brand sm:text-sm"
                   />
                   <button
                     type="submit"
                     disabled={saveKey.isPending || apiKey.trim().length < 10}
-                    className="inline-flex h-10 shrink-0 items-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
+                    className="inline-flex h-10 shrink-0 items-center gap-2 rounded-[8px] bg-brand px-4 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:opacity-60"
                   >
                     {saveKey.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
                     Salvar
                   </button>
                 </form>
-                <p className="text-xs text-neutral-400">A chave fica guardada criptografada e nunca é exibida de novo.</p>
+                <p className="text-xs text-muted-foreground">A chave fica guardada criptografada e nunca é exibida de novo.</p>
               </div>
             )}
           </section>
 
-          <section className="space-y-3 border-t-[0.5px] border-neutral-200 pt-5">
+          <section className="space-y-3 border-t-[0.5px] border-line pt-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs text-neutral-400">Modelo: {settings.model}</p>
+              <p className="text-xs text-muted-foreground">Modelo: {settings.model}</p>
               <button
                 type="button"
                 onClick={() => test.mutate()}
                 disabled={test.isPending}
-                className="inline-flex h-10 items-center gap-2 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 disabled:opacity-60"
+                className="inline-flex h-10 items-center gap-2 rounded-[8px] border-[1.5px] border-line px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-canvas disabled:opacity-60"
               >
                 {test.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <PlugZap className="h-4 w-4" />}
                 Testar conexão

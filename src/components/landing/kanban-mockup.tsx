@@ -47,7 +47,7 @@ function cardOffset(columnIndex: number) {
 
 export function KanbanMockup() {
   return (
-    <figure className="overflow-hidden rounded-[20px] bg-white text-left shadow-[0_50px_100px_-20px_rgba(0,0,0,0.7)]">
+    <figure className="overflow-hidden rounded-[20px] bg-paper text-left shadow-[0_50px_100px_-20px_rgba(0,0,0,0.7)]">
       <figcaption className="sr-only">
         Exemplo da tela de funil de vendas do Smart CRM em Kanban, com o VGV de cada etapa e o score de IA de cada lead.
       </figcaption>
@@ -57,7 +57,7 @@ export function KanbanMockup() {
           <span className="h-3 w-3 rounded-full bg-[#D6D1CB]" />
           <span className="h-3 w-3 rounded-full bg-[#D6D1CB]" />
         </div>
-        <div className="mx-auto w-full max-w-[360px] truncate rounded-[8px] bg-white px-3 py-1 text-center text-[12px] text-[#57534E]">
+        <div className="mx-auto w-full max-w-[360px] truncate rounded-[8px] bg-paper px-3 py-1 text-center text-[12px] text-[#57534E]">
           app.crmimob.com.br/leads
         </div>
         <div className="w-[42px]" aria-hidden="true" />
@@ -96,7 +96,7 @@ export function KanbanMockup() {
                         key={card.name}
                         data-hero-seq
                         style={motionVars({ d: delay, ring: card.highlight ? RING_DELAY : undefined })}
-                        className={`rounded-[10px] bg-white p-3 ${
+                        className={`rounded-[10px] bg-paper p-3 ${
                           card.highlight ? 'lp-ring border-2 border-[#FF385C]' : 'border border-[#E6E2DD]'
                         }`}
                       >

@@ -53,7 +53,7 @@ export function ChecklistRow({
           type="button"
           onClick={() => onChange({ status: quickToggle })}
           aria-label={quickToggle === 'recebido' ? `Marcar ${item.name} como recebido` : `Voltar ${item.name} para pendente`}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-neutral-100"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-canvas"
           style={{ color: meta.text }}
         >
           <Icon className="h-5 w-5" />
@@ -66,7 +66,7 @@ export function ChecklistRow({
             <button
               type="button"
               aria-label={`Alterar status de ${item.name}`}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-neutral-100"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-canvas"
               style={{ color: meta.text }}
             >
               <Icon className="h-5 w-5" />
@@ -77,22 +77,22 @@ export function ChecklistRow({
 
       <div className="min-w-0 flex-1 pt-2.5">
         <div className="flex flex-wrap items-center gap-1.5">
-          <p className={cn('break-words text-sm font-medium text-neutral-900', meta.strike && 'text-neutral-400 line-through')}>
+          <p className={cn('break-words text-sm font-medium text-brand', meta.strike && 'text-muted-foreground line-through')}>
             {item.name}
           </p>
           {!item.required && (
-            <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-600">
+            <span className="rounded-full bg-canvas px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
               Opcional
             </span>
           )}
           {item.notes && (
-            <span title={item.notes} aria-label="Tem observação" className="text-neutral-400">
+            <span title={item.notes} aria-label="Tem observação" className="text-muted-foreground">
               <StickyNote className="h-3.5 w-3.5" />
             </span>
           )}
         </div>
-        {item.description && <p className="mt-0.5 text-xs text-neutral-400">{item.description}</p>}
-        {item.notes && <p className="mt-1 break-words text-xs text-neutral-600">{item.notes}</p>}
+        {item.description && <p className="mt-0.5 text-xs text-muted-foreground">{item.description}</p>}
+        {item.notes && <p className="mt-1 break-words text-xs text-muted-foreground">{item.notes}</p>}
       </div>
 
       <div className="flex shrink-0 items-center gap-0.5 pt-1.5">
@@ -116,13 +116,13 @@ export function ChecklistRow({
                 <button
                   type="button"
                   aria-label={`Mais opções de ${item.name}`}
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900"
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-canvas hover:text-brand"
                 />
               }
             >
               <MoreHorizontal className="h-4 w-4" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40 bg-white">
+            <DropdownMenuContent align="end" className="w-40 bg-paper">
               <DropdownMenuItem className="min-h-11 sm:min-h-8" onClick={onRename}>
                 <Pencil className="h-4 w-4" />
                 Renomear

@@ -19,7 +19,7 @@ import { SellerLeadPicker } from './seller-lead-picker'
 
 function Counter({ value, max }: { value: number; max: number }) {
   return (
-    <span className={`text-xs tabular-nums ${value > max ? 'text-danger' : 'text-neutral-400'}`}>
+    <span className={`text-xs tabular-nums ${value > max ? 'text-danger' : 'text-muted-foreground'}`}>
       {value}/{max}
     </span>
   )
@@ -78,7 +78,7 @@ export function TabBasic({
       <FormField label="Título" htmlFor="prop-title" required error={errors.title?.message} fullWidth>
         <input id="prop-title" maxLength={limits?.TITLE_MAX ?? 100} className={inputClassName} {...register('title')} />
         <div className="mt-1 flex items-center justify-between gap-2">
-          <span className="text-xs text-neutral-400">
+          <span className="text-xs text-muted-foreground">
             {limits ? `${limits.TITLE_MIN} a ${limits.TITLE_MAX} caracteres para os portais` : ''}
           </span>
           <Counter value={title.length} max={limits?.TITLE_MAX ?? 100} />
@@ -182,7 +182,7 @@ export function TabAddress() {
               type="button"
               onClick={() => void fillFromCep(getValues('cep'))}
               disabled={isLoading}
-              className="min-h-11 shrink-0 rounded-[8px] border-[1.5px] border-neutral-200 px-3 text-sm font-medium text-neutral-600 transition-colors hover:border-brand hover:text-brand disabled:cursor-not-allowed disabled:opacity-60"
+              className="min-h-11 shrink-0 rounded-[8px] border-[1.5px] border-line px-3 text-sm font-medium text-muted-foreground transition-colors hover:border-brand hover:text-brand disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading ? 'Buscando…' : 'Buscar'}
             </button>
@@ -203,7 +203,7 @@ export function TabAddress() {
 
         <FormField label="Bairro" htmlFor="prop-neighborhood" required={requireNeighborhood}>
           <input id="prop-neighborhood" className={inputClassName} {...register('neighborhood')} />
-          {requireNeighborhood && <p className="mt-1 text-xs text-neutral-400">O CEP não trouxe o bairro: preencha.</p>}
+          {requireNeighborhood && <p className="mt-1 text-xs text-muted-foreground">O CEP não trouxe o bairro: preencha.</p>}
         </FormField>
 
         <FormField label="Cidade" htmlFor="prop-city" required>
@@ -222,7 +222,7 @@ export function TabAddress() {
       </FieldGrid>
 
       <div>
-        <p className="mb-1.5 text-[13px] font-medium text-neutral-900">Como mostrar o endereço nos portais</p>
+        <p className="mb-1.5 text-[13px] font-medium text-brand">Como mostrar o endereço nos portais</p>
         <Controller
           control={control}
           name="portalAddressDisplay"
@@ -236,7 +236,7 @@ export function TabAddress() {
             />
           )}
         />
-        <p className="mt-1.5 text-xs text-neutral-400">
+        <p className="mt-1.5 text-xs text-muted-foreground">
           Os portais recebem sempre o endereço completo. Isto só controla o que o público vê.
         </p>
       </div>
@@ -255,7 +255,7 @@ export function TabFeatures({ config, type }: { config: PortalConfig | undefined
 
   return (
     <div className="space-y-6">
-      {!type && <p className="rounded-[12px] bg-neutral-100 p-3 text-sm text-neutral-600">Escolha o tipo na aba Básico para ver os campos certos.</p>}
+      {!type && <p className="rounded-[12px] bg-canvas p-3 text-sm text-muted-foreground">Escolha o tipo na aba Básico para ver os campos certos.</p>}
       <FieldGrid>
         {isLot ? (
           <FormField label="Área total (m²)" htmlFor="prop-lotAreaM2">
@@ -349,7 +349,7 @@ export function TabFeatures({ config, type }: { config: PortalConfig | undefined
 
       {config && (
         <div>
-          <p className="mb-1.5 text-[13px] font-medium text-neutral-900">Características</p>
+          <p className="mb-1.5 text-[13px] font-medium text-brand">Características</p>
           <Controller
             control={control}
             name="features"
@@ -407,7 +407,7 @@ export function TabPortal({
           {...register('description')}
         />
         <div className="mt-1 flex items-center justify-between gap-2">
-          <span className="text-xs text-neutral-400">
+          <span className="text-xs text-muted-foreground">
             {limits ? `Mínimo de ${limits.DESC_MIN} para os portais. Sem HTML.` : ''}
           </span>
           <Counter value={description.length} max={limits?.DESC_MAX ?? 3000} />
@@ -428,7 +428,7 @@ export function TabPortal({
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <p className="mb-1.5 text-[13px] font-medium text-neutral-900">Aceita FGTS</p>
+          <p className="mb-1.5 text-[13px] font-medium text-brand">Aceita FGTS</p>
           <Controller
             control={control}
             name="acceptsFgts"
@@ -438,7 +438,7 @@ export function TabPortal({
           />
         </div>
         <div>
-          <p className="mb-1.5 text-[13px] font-medium text-neutral-900">Aceita financiamento</p>
+          <p className="mb-1.5 text-[13px] font-medium text-brand">Aceita financiamento</p>
           <Controller
             control={control}
             name="acceptsFinancing"
@@ -455,9 +455,9 @@ export function TabPortal({
         </div>
       </div>
 
-      <div className="space-y-4 rounded-[16px] border-[0.5px] border-neutral-200 p-4">
+      <div className="space-y-4 rounded-[16px] border-[0.5px] border-line p-4">
         <label className="flex min-h-11 items-center justify-between gap-3">
-          <span className="text-sm font-medium text-neutral-900">Exclusividade</span>
+          <span className="text-sm font-medium text-brand">Exclusividade</span>
           <Controller
             control={control}
             name="exclusive"
@@ -471,15 +471,15 @@ export function TabPortal({
         )}
         <FormField label="Observações internas" htmlFor="prop-internalNotes" error={errors.internalNotes?.message}>
           <textarea id="prop-internalNotes" rows={3} maxLength={2000} className={inputClassName} {...register('internalNotes')} />
-          <p className="mt-1 text-xs text-neutral-400">Só para a equipe: nunca são publicadas.</p>
+          <p className="mt-1 text-xs text-muted-foreground">Só para a equipe: nunca são publicadas.</p>
         </FormField>
       </div>
 
       <ReadinessCard readiness={readiness} onGoTo={onGoTo} />
 
-      <div className="space-y-2 rounded-[16px] border-[0.5px] border-neutral-200 p-4">
+      <div className="space-y-2 rounded-[16px] border-[0.5px] border-line p-4">
         <label className="flex min-h-11 items-center justify-between gap-3">
-          <span className="text-sm font-medium text-neutral-900">Publicar nos portais</span>
+          <span className="text-sm font-medium text-brand">Publicar nos portais</span>
           <Controller
             control={control}
             name="publishToPortals"
@@ -494,11 +494,11 @@ export function TabPortal({
             )}
           />
         </label>
-        <p className="text-xs text-neutral-400">
+        <p className="text-xs text-muted-foreground">
           O envio automático chega em uma próxima etapa. Ligar agora deixa o imóvel marcado e pronto.
         </p>
         {!ready && readiness && readiness.missing.length > 0 && (
-          <div className={`rounded-[8px] p-2.5 text-xs ${publish ? 'bg-[#FFEBEE] text-danger' : 'bg-neutral-100 text-neutral-600'}`}>
+          <div className={`rounded-[8px] p-2.5 text-xs ${publish ? 'bg-[#FFEBEE] text-danger' : 'bg-canvas text-muted-foreground'}`}>
             <p className="font-medium">
               {publish ? 'Complete o checklist ou desligue para salvar. Falta:' : 'Para ligar, falta:'}
             </p>

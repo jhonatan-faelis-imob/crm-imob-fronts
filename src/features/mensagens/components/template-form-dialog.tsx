@@ -33,8 +33,8 @@ const templateSchema = z.object({
 type TemplateFormData = z.infer<typeof templateSchema>
 
 const inputClassName =
-  'mt-1.5 w-full rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-base text-neutral-900 outline-none transition-colors focus:border-brand'
-const labelClassName = 'text-[13px] font-medium text-neutral-900'
+  'mt-1.5 w-full rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-base text-brand outline-none transition-colors focus:border-brand'
+const labelClassName = 'text-[13px] font-medium text-brand'
 const errorClassName = 'mt-1 text-[12px] text-danger'
 
 export function TemplateFormDialog({
@@ -107,7 +107,7 @@ export function TemplateFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl border-[0.5px] border-neutral-200 bg-white ring-0 sm:max-w-lg">
+      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl border-[0.5px] border-line bg-paper ring-0 sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{template ? 'Editar modelo' : 'Novo modelo'}</DialogTitle>
         </DialogHeader>
@@ -140,7 +140,7 @@ export function TemplateFormDialog({
                 Texto
               </label>
               <span
-                className={`text-xs ${content.length > MAX_TEMPLATE_LENGTH ? 'text-danger' : 'text-neutral-400'}`}
+                className={`text-xs ${content.length > MAX_TEMPLATE_LENGTH ? 'text-danger' : 'text-muted-foreground'}`}
               >
                 {content.length}/{MAX_TEMPLATE_LENGTH}
               </span>
@@ -162,7 +162,7 @@ export function TemplateFormDialog({
                   key={variable.key}
                   type="button"
                   onClick={() => insertVariable(variable.key)}
-                  className="min-h-9 rounded-full border-[1.5px] border-neutral-200 px-2.5 text-xs font-medium text-neutral-600 transition-colors hover:border-brand hover:text-brand"
+                  className="min-h-9 rounded-full border-[1.5px] border-line px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:border-brand hover:text-brand"
                 >
                   {`{{${variable.key}}}`}
                 </button>
@@ -172,13 +172,13 @@ export function TemplateFormDialog({
 
           <div>
             <p className={labelClassName}>Prévia</p>
-            <p className="mt-1.5 min-h-16 whitespace-pre-wrap break-words rounded-[12px] bg-neutral-100 p-3 text-sm text-neutral-600">
+            <p className="mt-1.5 min-h-16 whitespace-pre-wrap break-words rounded-[12px] bg-canvas p-3 text-sm text-muted-foreground">
               {content ? renderSample(content) : 'Escreva o texto para ver a prévia.'}
             </p>
           </div>
 
           {canShareTemplates(user) && (
-            <label className="flex min-h-11 items-center gap-2.5 text-sm text-neutral-900">
+            <label className="flex min-h-11 items-center gap-2.5 text-sm text-brand">
               <input type="checkbox" className="h-4 w-4 accent-brand" {...register('isPublic')} />
               Compartilhar com toda a imobiliária
             </label>
@@ -188,14 +188,14 @@ export function TemplateFormDialog({
             <button
               type="button"
               onClick={() => onOpenChange(false)}
-              className="h-11 rounded-[8px] border-[1.5px] border-neutral-200 px-4 text-sm font-medium text-neutral-600 hover:bg-neutral-100 sm:h-10"
+              className="h-11 rounded-[8px] border-[1.5px] border-line px-4 text-sm font-medium text-muted-foreground hover:bg-canvas sm:h-10"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={save.isPending}
-              className="h-11 rounded-[8px] bg-brand px-4 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-70 sm:h-10"
+              className="h-11 rounded-[8px] bg-brand px-4 text-sm font-medium text-paper transition-colors hover:bg-ink disabled:cursor-not-allowed disabled:opacity-70 sm:h-10"
             >
               Salvar
             </button>

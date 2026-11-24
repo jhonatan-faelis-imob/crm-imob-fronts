@@ -160,10 +160,10 @@ export default function MetasPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-[28px] font-semibold text-neutral-900">Metas</h1>
+        <h1 className="text-[28px] font-semibold text-brand">Metas</h1>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 rounded-[8px] border-[0.5px] border-neutral-200 bg-white p-1">
+          <div className="flex items-center gap-1 rounded-[8px] border-[0.5px] border-line bg-paper p-1">
             {PERIODS.map((value) => (
               <button
                 key={value}
@@ -171,8 +171,8 @@ export default function MetasPage() {
                 onClick={() => setPeriod(value)}
                 className={`rounded-[6px] px-3 py-1.5 text-sm font-medium transition-colors ${
                   period === value
-                    ? 'bg-brand-bg text-brand'
-                    : 'text-neutral-600 hover:bg-neutral-100'
+                    ? 'bg-line text-brand'
+                    : 'text-muted-foreground hover:bg-canvas'
                 }`}
               >
                 {PERIOD_META[value]}
@@ -183,7 +183,7 @@ export default function MetasPage() {
           <button
             type="button"
             onClick={openNewGoal}
-            className="inline-flex items-center justify-center gap-2 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+            className="inline-flex items-center justify-center gap-2 rounded-[8px] bg-brand px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink"
           >
             <Plus className="h-4 w-4" />
             Nova meta
@@ -226,7 +226,7 @@ export default function MetasPage() {
               })}
             </div>
           ) : (
-            <p className="rounded-[16px] border-[0.5px] border-dashed border-neutral-200 bg-white p-6 text-center text-sm text-neutral-400">
+            <p className="rounded-[16px] border-[0.5px] border-dashed border-line bg-paper p-6 text-center text-sm text-muted-foreground">
               Nenhuma meta cadastrada para este período.
             </p>
           )}

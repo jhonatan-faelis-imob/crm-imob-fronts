@@ -33,7 +33,7 @@ function PickerBody({
               aria-pressed={isSelected}
               className={cn(
                 'flex min-h-11 items-center gap-2.5 rounded-[8px] border-[1.5px] px-3 text-left text-sm font-medium transition-colors sm:min-h-10',
-                isSelected ? 'border-brand' : 'border-transparent hover:bg-neutral-100',
+                isSelected ? 'border-brand' : 'border-transparent hover:bg-canvas',
               )}
             >
               <Icon className="h-4 w-4" style={{ color: meta.text }} />
@@ -43,7 +43,7 @@ function PickerBody({
         })}
       </div>
       <div>
-        <label htmlFor={`notes-${item.id}`} className="text-[13px] font-medium text-neutral-900">
+        <label htmlFor={`notes-${item.id}`} className="text-[13px] font-medium text-brand">
           Observação
         </label>
         <textarea
@@ -53,13 +53,13 @@ function PickerBody({
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
           placeholder="Ex.: holerite de agosto está ilegível"
-          className="mt-1.5 w-full resize-none rounded-[12px] border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-base text-neutral-900 outline-none focus:border-brand sm:text-sm"
+          className="mt-1.5 w-full resize-none rounded-[12px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-base text-brand outline-none focus:border-brand sm:text-sm"
         />
       </div>
       <button
         type="button"
         onClick={() => onSave({ status, notes })}
-        className="h-11 w-full rounded-[8px] bg-brand px-4 text-sm font-medium text-white transition-colors hover:bg-brand-dark sm:h-10"
+        className="h-11 w-full rounded-[8px] bg-brand px-4 text-sm font-medium text-paper transition-colors hover:bg-ink sm:h-10"
       >
         Salvar
       </button>
@@ -89,7 +89,7 @@ export function StatusPicker({
     return (
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger render={trigger} />
-        <SheetContent side="bottom" className="max-h-[85vh] gap-2 overflow-y-auto rounded-t-[20px] bg-white pb-6">
+        <SheetContent side="bottom" className="max-h-[85vh] gap-2 overflow-y-auto rounded-t-[20px] bg-paper pb-6">
           <SheetHeader className="pb-0">
             <SheetTitle className="break-words pr-8">{item.name}</SheetTitle>
           </SheetHeader>
@@ -102,7 +102,7 @@ export function StatusPicker({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger render={trigger} />
-      <PopoverContent align="end" className="w-72 bg-white">
+      <PopoverContent align="end" className="w-72 bg-paper">
         {open && <PickerBody item={item} onSave={save} />}
       </PopoverContent>
     </Popover>

@@ -33,7 +33,7 @@ export function TabAddress() {
               type="button"
               onClick={handleAutoComplete}
               disabled={isLoading}
-              className="shrink-0 rounded-[8px] border-[1.5px] border-neutral-200 px-3 text-sm font-medium text-neutral-600 transition-colors hover:border-brand hover:text-brand disabled:cursor-not-allowed disabled:opacity-60"
+              className="shrink-0 rounded-[8px] border-[1.5px] border-line px-3 text-sm font-medium text-muted-foreground transition-colors hover:border-brand hover:text-brand disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading ? 'Buscando...' : 'Auto completar'}
             </button>

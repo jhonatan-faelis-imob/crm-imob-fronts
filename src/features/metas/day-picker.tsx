@@ -4,7 +4,7 @@ import { addDays } from '@/lib/date'
 import { formatDayLabel } from './calculations'
 
 const arrowClassName =
-  'flex h-11 w-11 shrink-0 items-center justify-center rounded-[8px] border-[0.5px] border-neutral-200 text-neutral-600 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40'
+  'flex h-11 w-11 shrink-0 items-center justify-center rounded-[8px] border-[0.5px] border-line text-muted-foreground transition-colors hover:bg-canvas disabled:cursor-not-allowed disabled:opacity-40'
 
 function openNativePicker(event: MouseEvent<HTMLInputElement>) {
   try {
@@ -40,7 +40,7 @@ export function DayPicker({
       </button>
 
       <div className="relative min-w-0 flex-1 basis-0">
-        <span className="flex h-11 items-center justify-center rounded-[8px] border-[0.5px] border-neutral-200 px-2 text-center text-[13px] font-medium leading-tight text-neutral-900">
+        <span className="flex h-11 items-center justify-center rounded-[8px] border-[0.5px] border-line px-2 text-center text-[13px] font-medium leading-tight text-brand">
           {formatDayLabel(date)}
         </span>
         <input
@@ -73,7 +73,7 @@ export function DayPicker({
           type="button"
           disabled={date === today}
           onClick={() => onChange(today)}
-          className="h-11 w-full shrink-0 rounded-[8px] border-[0.5px] border-neutral-200 px-3 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
+          className="h-11 w-full shrink-0 rounded-[8px] border-[0.5px] border-line px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-canvas disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
         >
           Hoje
         </button>

@@ -80,13 +80,13 @@ function CadenceHint({ steps }: { steps: CadenceStep[] }) {
             type="button"
             aria-label="Tarefas automáticas desta etapa"
             // Área de toque de 44px sem empurrar o cabeçalho da coluna
-            className="-m-2.5 flex h-11 w-11 items-center justify-center rounded-full text-neutral-400 transition-colors hover:text-neutral-900"
+            className="-m-2.5 flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-brand"
           />
         }
       >
         <Info className="h-3.5 w-3.5" />
       </PopoverTrigger>
-      <PopoverContent side="bottom" align="start" className="w-64 bg-neutral-900 px-3 py-2 text-xs text-white ring-0">
+      <PopoverContent side="bottom" align="start" className="w-64 bg-ink px-3 py-2 text-xs text-paper ring-0">
         <p className="mb-1 font-medium">Tarefas automáticas</p>
         <ul className="space-y-0.5">
           {steps.map((step) => (
@@ -121,7 +121,7 @@ function DroppableColumn({
       <div className="h-1 rounded-full" style={{ backgroundColor: stage.color }} />
       <div className="mt-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold text-neutral-900">{stage.name}</h3>
+          <h3 className="text-sm font-semibold text-brand">{stage.name}</h3>
           <span
             className="rounded-full px-2 py-0.5 text-xs font-medium"
             style={{ backgroundColor: `${stage.color}26`, color: stage.color }}
@@ -131,7 +131,7 @@ function DroppableColumn({
           <CadenceHint steps={cadenceSteps} />
         </div>
         {columnVgv > 0 && (
-          <span className="rounded-full bg-brand-bg px-2 py-0.5 text-xs font-semibold text-brand">
+          <span className="rounded-full bg-line px-2 py-0.5 text-xs font-semibold text-brand">
             {formatVgv(columnVgv)}
           </span>
         )}
@@ -153,14 +153,14 @@ function DroppableColumn({
         ref={setNodeRef}
         className={cn(
           'mt-3 min-h-[120px] max-h-[70vh] space-y-3 overflow-y-auto rounded-[16px] border-[1.5px] border-transparent p-1 pb-2 transition-colors',
-          isOver && 'border-brand bg-brand-bg',
+          isOver && 'border-brand bg-line',
         )}
       >
         {leads.map((lead) => (
           <DraggableLeadCard key={lead.id} lead={lead} />
         ))}
         {leads.length === 0 && (
-          <p className="rounded-[16px] border-[0.5px] border-dashed border-neutral-200 p-4 text-center text-xs text-neutral-400">
+          <p className="rounded-[16px] border-[0.5px] border-dashed border-line p-4 text-center text-xs text-muted-foreground">
             Nenhum lead nesta etapa
           </p>
         )}
