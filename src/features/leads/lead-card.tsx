@@ -65,6 +65,8 @@ export function LeadCard({ lead }: { lead: Lead }) {
         <DropdownMenu>
           <DropdownMenuTrigger
             onPointerDown={(event) => event.stopPropagation()}
+            onMouseDown={(event) => event.stopPropagation()}
+            onTouchStart={(event) => event.stopPropagation()}
             onClick={(event) => event.stopPropagation()}
             render={
               <button
@@ -80,6 +82,8 @@ export function LeadCard({ lead }: { lead: Lead }) {
             align="end"
             onClick={(event) => event.stopPropagation()}
             onPointerDown={(event) => event.stopPropagation()}
+            onMouseDown={(event) => event.stopPropagation()}
+            onTouchStart={(event) => event.stopPropagation()}
           >
             <DropdownMenuItem onClick={() => setIsMoveDialogOpen(true)}>Mover para...</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setIsWhatsAppOpen(true)}>Enviar WhatsApp</DropdownMenuItem>
@@ -151,7 +155,11 @@ export function LeadCard({ lead }: { lead: Lead }) {
       onSelect={(stage) => moveLead(lead, stage)}
     />
     {/* Portais propagam eventos pela árvore do React: sem isso, selecionar texto arrastaria o card */}
-    <div onPointerDown={(event) => event.stopPropagation()}>
+    <div
+      onPointerDown={(event) => event.stopPropagation()}
+      onMouseDown={(event) => event.stopPropagation()}
+      onTouchStart={(event) => event.stopPropagation()}
+    >
       <WhatsAppPickerDialog lead={lead} open={isWhatsAppOpen} onOpenChange={setIsWhatsAppOpen} />
     </div>
     </>

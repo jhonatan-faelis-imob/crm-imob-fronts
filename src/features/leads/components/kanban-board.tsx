@@ -4,7 +4,8 @@ import { useState } from 'react'
 import {
   DndContext,
   DragOverlay,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   closestCenter,
   useDraggable,
   useDroppable,
@@ -14,7 +15,7 @@ import {
   type DragStartEvent,
 } from '@dnd-kit/core'
 import { useQuery } from '@tanstack/react-query'
-import { Info } from 'lucide-react'
+import { Info, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Lead } from '@/types'
 import { funnelStagesService } from '@/services/funnel-stages.service'
@@ -26,15 +27,32 @@ import type { CadenceStep } from '@/types'
 import { resolveLeadStage, type ApiFunnelStage } from '../api-mapper'
 import { useMoveLeadToStage } from '../use-move-lead-to-stage'
 import { LeadCard } from '../lead-card'
+import { useKanbanHint } from '../use-kanban-hint'
+import { useIsMobile } from '@/lib/use-is-mobile'
 
 function DraggableLeadCard({ lead }: { lead: Lead }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: lead.id })
 
+  // Sem touch-action: none em repouso, o gesto de rolar passa para o navegador.
+  // select-none e touch-callout evitam a seleção de texto/menu do toque longo.
   return (
-    <div ref={setNodeRef} {...attributes} {...listeners} className={cn('touch-none', isDragging && 'opacity-50')}>
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      className={cn('select-none [-webkit-touch-callout:none]', isDragging && 'touch-none opacity-50')}
+    >
       <LeadCard lead={lead} />
     </div>
   )
+}
+
+function vibrateShort() {
+  try {
+    navigator.vibrate?.(10)
+  } catch {
+    // Nem todo aparelho tem vibração
+  }
 }
 
 export function formatVgv(value: number): string {
@@ -86,10 +104,14 @@ function DroppableColumn({
   stage,
   leads,
   cadenceSteps,
+  showHint,
+  onDismissHint,
 }: {
   stage: ApiFunnelStage
   leads: Lead[]
   cadenceSteps: CadenceStep[]
+  showHint: boolean
+  onDismissHint: () => void
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: stage.id })
   const columnVgv = sumInterestValue(leads)
@@ -114,6 +136,19 @@ function DroppableColumn({
           </span>
         )}
       </div>
+      {showHint && (
+        <p className="mt-2 flex items-start gap-1 text-xs text-muted-foreground">
+          <span className="flex-1">Segure o card para arrastar, ou use o menu para mover.</span>
+          <button
+            type="button"
+            aria-label="Fechar aviso"
+            onClick={onDismissHint}
+            className="-m-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full hover:text-brand"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </p>
+      )}
       <div
         ref={setNodeRef}
         className={cn(
@@ -154,7 +189,15 @@ export function KanbanBoard({ leads }: { leads: Lead[] }) {
     return cadences?.find((stage) => stage.id === stageId)?.cadenceSteps.filter((step) => step.active) ?? []
   }
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
+  const isMobile = useIsMobile()
+  const { showHint, dismiss: dismissHint } = useKanbanHint()
+
+  // Mouse: imediato após 8px. Toque: só o toque parado por 250ms inicia o arraste; deslizar rola a tela.
+  // MouseSensor em vez de PointerSensor: o PointerSensor também reage a toque e anularia o atraso.
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 8 } }),
+  )
 
   const orderedStages = (stages ?? []).slice().sort((a, b) => a.orderIndex - b.orderIndex)
 
@@ -166,6 +209,8 @@ export function KanbanBoard({ leads }: { leads: Lead[] }) {
 
   function handleDragStart(event: DragStartEvent) {
     setActiveId(String(event.active.id))
+    // Retorno tátil só quando o arraste veio do toque
+    if (typeof TouchEvent !== 'undefined' && event.activatorEvent instanceof TouchEvent) vibrateShort()
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -209,12 +254,15 @@ export function KanbanBoard({ leads }: { leads: Lead[] }) {
             stage={stage}
             leads={leadsForStage(stage.id)}
             cadenceSteps={activeStepsFor(stage.id)}
+            showHint={isMobile && showHint}
+            onDismissHint={dismissHint}
           />
         ))}
       </div>
       <DragOverlay>
         {activeLead ? (
-          <div className="w-[280px] rotate-2 opacity-90">
+          // Card levantado: sombra e leve aumento; touch-action: none só no card em movimento
+          <div className="w-[280px] touch-none rotate-2 scale-105 rounded-[16px] opacity-95 shadow-2xl">
             <LeadCard lead={activeLead} />
           </div>
         ) : null}
